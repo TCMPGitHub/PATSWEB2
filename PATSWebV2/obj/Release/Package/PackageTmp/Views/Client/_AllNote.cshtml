@@ -1,0 +1,149 @@
+﻿@using Kendo.Mvc.UI
+@model PATSWebV2.ViewModels.Client.CaseNoteViewModel
+    <style>
+    .k-edit-form-container{
+        width: 85vw !important;
+        height: 70vh!important;
+    } 
+        .k-popup-edit-form{
+            width: 100% !important;
+            height: 100%!important;
+            padding:10px;
+            resize:both;
+        }
+        .k-popup-edit-form k-window-content k-content{
+            width:  100% !important;
+            height: 95%!important;
+        }
+        .k-popup-edit-form .k-edit-field {
+            width:  98% !important;
+        }
+        .k-popup-edit-form .k-edit-buttons {
+            width:  100% !important;
+            height: 30px;
+            position:page;
+            padding:0px!important;
+        }
+        .k-header .k-grid-toolbar .k-grid-top {
+            background:#ADD8E6!important;
+        }
+        
+    </style>
+      <div id="divAllnotes" class="k-content">         
+            <script>
+                function TextAreaClick(e) { TextarePopup(e, false, "color-primary"); }
+                function TextArearKeyUp(e) { //key : F4
+                    if (e.keyCode == '90' && e.ctrlKey ) {
+                        TextarePopup(e, false, "color-primary");
+                    }
+                }
+                function dataBound(e) {
+                    var grid = this;
+                    grid.tbody.find("tr[role='row']").each(function () {
+                        var model = grid.dataItem(this);
+                        //T68921
+                        if (model.Id == model.CaseNoteId)
+                            $(this).find(".k-i-expand").hide();
+                    });
+
+                }
+                    function case_error_handler(e) {
+                        if (e.errors) {
+                            var message = "Errors:\n";
+                            $.each(e.errors, function (key, value) {
+                                if ('errors' in value) {
+                                    $.each(value.errors, function () {
+                                        message += this + "\n";
+                                    });
+                                }
+                            });
+
+                            alert(message);
+                            var grid = $("#gridALLNote").data("kendoGrid");
+                            grid.one("dataBinding", function (e) {
+                                e.preventDefault();   // cancel grid rebind if error occurs        
+                            });
+                        }
+                    }
+            </script>
+       @(Html.Kendo().Grid<IdentityManagement.Entities.CaseNoteData>()
+        .Name("gridALLNote")
+        .Columns(columns =>
+        {
+            columns.Bound(o => o.Id).Hidden();
+            columns.Bound(o => o.CaseNoteId).Hidden();
+            columns.Bound(p => p.CaseNoteTypeId).Hidden();
+            columns.Bound(p => p.CaseContactMethodID).Hidden();
+            columns.Bound(p => p.UpdateExpired).Hidden();
+            columns.Bound(p => p.DateAction).Title("Entered Date").Width(150).Format("{0:MM/dd/yyyy hh:mm tt}").HtmlAttributes(new { style = "white-space: nowrap;" });
+            columns.Bound(p => p.CaseNoteType).Title("Type").Width(150).HtmlAttributes(new { style = "white-space: nowrap;" });
+            columns.Bound(p => p.CaseContactMethod).Title("Contact Method").Width(150).HtmlAttributes(new { style = "white-space: nowrap;" });
+            columns.Bound(p => p.Note).Width(400).Title("Note").ClientTemplate(@"<textarea class='textareaforcasemanngement' placeholder = 'Add new note here...' readonly='readonly' 
+                   style='border:none;background-color:transparent!important;' ondblClick='TextAreaClick(event)' onKeyup='TextArearKeyUp(event)'>#= Note #</textarea>")
+                   .HtmlAttributes(new { style = "line-height:14px!important;background-color:transparent!important;padding:0px;" });
+            columns.Bound(p => p.ActionByName).Title("Entered By").Width(120);
+            columns.Bound(p => p.Id).Title("Print Note").ClientTemplate(
+                       "<a href='javascript:printPATSPDF(\"" + Model.EpisodeId + "\",\"#=Id#\", \"Case Management Note\", \"color-primary\")'>Print</a>").Width(50).Filterable(false);
+        })
+
+        .ToolBar(toolbar => toolbar.Excel().Text("Export To Excel")).Excel(exl => exl.FileName("CaseNote.xlsx").Filterable(true).AllPages(true))
+        .Sortable(sortable => sortable.AllowUnsort(true))
+        .Events(events => { events.DataBound("dataBound"); })
+        .Scrollable(a => a.Enabled(true))
+        .Navigatable()
+        .HtmlAttributes(new { @style = "padding:0px;min-width:60%;height:70vh;"})
+        .Pageable(pageable => pageable
+        .Refresh(true)
+        .PageSizes(new List<object> { 5, 10, 20, 30, 50 })
+        .ButtonCount(5))
+        .ClientDetailTemplateId("notetemplate")
+        .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+            .StartsWith("Starts with")
+            .IsEqualTo("Is equal to")
+            .IsNotEqualTo("Is not equal to")
+            ))
+        )
+        .DataSource(dataSource => dataSource
+        .Ajax()
+        .Batch(true)
+        .ServerOperation(false)
+        .Events(events => { events.Error("case_error_handler"); })
+        .PageSize(20)
+        .Model(model =>
+        {
+            model.Id(f => f.Id);
+            model.Field(f => f.CaseNoteTypeId).DefaultValue(0);
+            model.Field(f => f.CaseContactMethodID);
+        })
+        .Read(read => read.Action("CaseNoteRead", "Client", new { EpisodeId = Model.EpisodeId, ActionModel = "ALL" }))
+                  ))
+            <script id="notetemplate" type="text/kendo-tmpl">
+                @(Html.Kendo().Grid<IdentityManagement.Entities.CaseNoteHistory>()
+    .Name("grid_#=CaseNoteId#") // template expression, to be evaluated in the master context
+    .Resizable(r => r.Columns(true))
+    .Scrollable()
+            .Columns(columns =>
+            {
+                columns.Bound(o => o.DateAction).Format("{0:MM/dd/yyyy hh:mm tt}").Title("Entered Date").Width(100);
+                columns.Bound(o => o.CaseNoteType).Title("Type").Width(100);
+                columns.Bound(o => o.CaseContactMethod).Width(100);
+                columns.Bound(o => o.HisNote).ClientTemplate("<textarea class='textareaforcasemanngement' readonly='readonly' style='border-style:none;background-color:transparent!important;'>\\#= HisNote \\#</textarea>").Title("Note").Width(400).HtmlAttributes(new { style = "line-height:14px!important;background-color:transparent!important;padding:0px" });
+                columns.Bound(o => o.ActionByName).Title("Entered By").Width(100);
+            })
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .PageSize(10)
+                .Read(read => read.Action("HierarchyBinding_Note", "Client", new { CaseNoteId = "#=CaseNoteId#" }))
+            )
+            .Pageable()
+            .Sortable()
+            .ToClientTemplate()
+                )
+            </script>
+        </div>
+    @*</div>*@
+    
+

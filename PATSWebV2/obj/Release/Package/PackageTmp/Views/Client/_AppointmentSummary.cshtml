@@ -1,0 +1,32 @@
+﻿@using Kendo.Mvc.UI
+@model PATSWebV2.ViewModels.Client.EditingPaneViewModel
+<style>
+    .k-grid-header th.k-header > .k-link {
+        line-height: 12px !important;
+        min-height: 12px !important;
+        font-weight:bolder;
+    }
+</style>
+<div class="space5"></div>
+@if (Model.ApptListSmy != null )
+{
+@(Html.Kendo().Grid<IdentityManagement.Entities.AppointmentSummary>().Name("gridApptSummary")
+    .NoRecords("No Appointment found.")/*.Scrollable(s => s.Height("13vh"))*/
+    .HtmlAttributes( new { style= "background-color:#E6E6FA;margin-left:5px;width:97%;white-space : nowrap;" })
+    .Columns(column => {
+    column.Bound(m=>m.StartDate).Format("{0:MM-dd-yyyy}").Title("Date");
+    column.Bound(m => m.EventTypeDescr).Title("Type");
+    column.Bound(m => m.Clinician).Title("Assigned To");
+    column.Bound(m => m.eventstatus).Title("Attend");
+    //column.Bound(m => m.Id).Title("Print Note").ClientTemplate(
+    //              "<a href='javascript:printPATSPDF(\"#=Id#\",\"0\", \"Case Management Note\")'>Print</a>").Width(50);
+    //column.Bound(m => m.Id).Title("Print").ClientTemplate(
+    //               "<a href='javascript:printPATSPDF(\"0\",\"#=Id#\", \"Appointment Note\")'>Print</a>").Width(50);
+    column.Template(@<text><a href='javascript:printPATSPDF(@item.Id,0, "Appointment Note", "color-continue")'>Print</a></text>).Title("...").Width(50);
+        //< a href='/Appointment/PrintNotice1?EventId=" + c.Id + "'>Print</a>").Title("...").Width(50);
+    }).BindTo(Model.ApptListSmy))
+ }
+else
+{
+<div style="text-align:center;color:orange; vertical-align:central;"><b><i>No Appointment Found.</i></b></div>
+}

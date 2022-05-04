@@ -1,0 +1,537 @@
+﻿@using Kendo.Mvc.UI
+@model PATSWebV2.ViewModels.SocialWork.MCASRViewModel
+@{
+    var RadioWidth = ((1200 - 25) / 3);
+}
+@using (Ajax.BeginForm("SaveMCASR", "Client", null, new AjaxOptions
+{
+    HttpMethod = "Post",
+    UpdateTargetId = "viewPlaceHolder",
+    InsertionMode = InsertionMode.Replace,
+    OnSuccess = "OnAjaxSuccess"
+}, new
+{
+    @id = "mcasrform",
+    @name = "Multnomah Community Ability Scale",
+    @style = "min-height: 500px;",
+    @class = "color-danger"
+}))
+{
+    <div id="appointmentdiv" class="color-danger" style="height:99.5%;min-width:1200px;overflow:hidden;padding:5px;">
+        @{
+            var show = (Model.MCASRData.MCASRID > 0 ) ? "visible" : "hidden";
+        }
+        @Html.HiddenFor(m => m.MCASRData.MCASRID, new { @id = "hdMCASRID" })
+        @Html.HiddenFor(m => m.MCASRData.IsLastMCASRSet, new { @id = "hdIsLastMCASRSet" })
+        @Html.HiddenFor(m => m.EpisodeID, new { id = "hdEpisodeID" })
+        @Html.HiddenFor(m => m.MCASRData.Section1Score, new { @id = "Section1Score"})
+        @Html.HiddenFor(m => m.MCASRData.Section2Score, new { @id = "Section2Score"})
+        @Html.HiddenFor(m => m.MCASRData.Section3Score, new { @id = "Section3Score"})
+        @Html.HiddenFor(m => m.MCASRData.Section4Score, new { @id = "Section4Score"})
+        @Html.HiddenFor(m => m.CanEdit, new { @id = "hdEditable" })
+        <table style="background-color:transparent;min-width:1200px;">
+            <tr>
+                <td style="width:40vw;">
+                    <table>
+                        <tr style="line-height: 10px !important;"><td id="customers">@Html.Label("STATE OF CALIFORNIA", new { style = "float:left;font-size:12px;" })</td></tr>
+                        <tr style="line-height: 10px !important;"><td>@Html.Label("MULTNOMAH COMMUNITY ABILITY SCALE", new { style = "float:left;font-weight:bold;font-size:14px;" })&nbsp;&nbsp;@Model.NoEditAllowed</td></tr>
+                        <tr style="line-height: 10px !important;">
+                            <td>
+                                @Html.Label("CDCR 2288(11/14)", new { style = "float:left;font-size:12px;" })&nbsp;&nbsp;
+                                <a style="visibility:@show;" href="javascript:printPATSPDF(@Model.EpisodeID, @Model.MCASRData.MCASRID, 'Multnomah Community Ability Scale','color-danger')">
+                                    <img style="width:22px; height:22px;margin-top:-5px;" title="Print MULTNOMAH COMMUNITY ABILITY SCALE" src='@Url.Content("~/Content/images/printer-icon.png")' /></a>
+                            </td>
+                        </tr>
+                    </table>
+                    @*<table id="smalltable" style="background-color:transparent; margin-top:10px;min-width:500px">
+                        <tr><td colspan="3"><h6 style="float:left">STATE OF CALIFORNIA</h6></td></tr>
+                        <tr>
+                            <td colspan="3">
+                                <h5>
+                                    <strong>MULTNOMAH COMMUNITY ABILITY SCALE</strong>
+                                    &nbsp;&nbsp;@Model.NoEditAllowed
+                                </h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="150px">
+                                <h6 style="float:left">CDCR 2288(11/14)</h6>
+                                @if (Model.MCASRData.MCASRID > 0)
+                                {
+                                    <a href="javascript:printPATSPDF(@Model.EpisodeID, @Model.MCASRData.MCASRID, 'Multnomah Community Ability Scale')">
+                                        <img style="width:22px; height:22px;" title="Print MULTNOMAH COMMUNITY ABILITY SCALE" src='@Url.Content("~/Content/themes/base/images/printer-icon.png")' />
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    </table>*@
+                </td>
+                <td style="width:65vw;">
+                    <table table class="table-bordered" style="background-color:white; font-size:small;float:right;min-width:700px">
+                        <tr style="background-color:silver;height:12px!important;font-size:11px;text-align:center;" class="k-header table-bordered">
+                            <th>MCAS-R DATE:</th>
+                            <th>PROGRAM PHASE:</th>
+                            <th>RATER:</th>
+                            <th> TOTAL SCORE:</th>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;height:12px!important;font-size:11px;">
+                                <script>
+                                    function PopulatePreviousMCASRSet(e) {
+                                        if (this.select() == 0) {
+                                            DisableAllInputFields("#mcasrform :input", $("#hdEditable").val(), false);
+                                            return;
+                                        }
+                                        var object = this.dataItem(this.select());
+                                        var id = (object == undefined || object.MCASRID == "") ? 0 : object.MCASRID;
+                                        $.ajax({
+                                            url: "@Url.Action("GetMCASR", "Client")",
+                                            data: {
+                                                EpisodeId: $("#hdEpisodeID").val(), MCASRID: id
+                                            },
+                                            cache: false,
+                                            type: "POST",
+                                            dataType: "html",
+                                            success: function (data, textStatus, XMLHttpRequest) {
+                                                //$("#mcasrform").html(data); // HTML DOM replace
+                                                $("#mcasrform").replaceWith(data);
+                                            }
+                                        })
+                                    }
+                                    function onDataBound(e) {
+                                        if (this.selectedIndex == 0)
+                                            this.select(1);
+                                    }
+                                </script>
+                                @(Html.Kendo().DropDownListFor(m => m.MCASRData.MCASRID)
+                .Name("AllMCASRDates")
+                .OptionLabel("Select Dates...")
+                .DataTextField("CaseMCASRDate")
+                .DataValueField("MCASRID")
+                .HtmlAttributes(new { style = "width:105px;text-align:left;", @class = "neverDisable" })
+                .Filter(FilterType.Contains)
+                .Height(290)
+                .Events(e => { e.Change("PopulatePreviousMCASRSet"); e.DataBound("onDataBound"); })
+                .DataSource(source =>
+                {
+                    source.Read(read => read.Action("GetMCASRDateList", "Client", new { EpisodeID = Model.EpisodeID }));
+
+                }))
+                            </td>
+                            <td style="text-align:left;height:12px!important;font-size:11px;">@Html.DisplayFor(m => m.MCASRData.IDTTDecision)</td>
+                            <td style="text-align:left;height:12px!important;font-size:11px;">@Html.DisplayFor(m => m.MCASRData.ActionUserName)</td>
+                            <td style="text-align:left;height:12px!important;font-size:11px;">
+                                <span class="TotalScoreAllClass" style="color: green;font-weight:bold;font-size:large;height:10px">
+                                    @Html.DisplayFor(m => m.MCASRData.TotalScore)
+                                </span>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <div id="c" style="border:1px solid #ccc;margin-bottom:5px;background-color:white;">
+            <p style="line-height:20px;color:red;padding:0px 10px 0px 10px;">
+               <b>INSTRUCTIONS:</b>&nbsp;&nbsp;@Html.Raw("The scale is intended to be used for clients diagnosed with a severe mental illness.  The primary clinician shall check the appropriate box next to the number rating on the scale which corresponds to the client’s functioning level during the past two weeks.  The rating scores shall be totaled and the total score placed in the Score box for each section.")
+            </p>
+        </div>
+        <table class="table table-condensed" style="background-color: white;min-width:1200px;width:100%">
+            <tr>
+                <td class="mcasrheader"><div style="margin-top:5px"><center><Strong>SECTION I: INTERFERENCE WITH FUNCTIONING</Strong></center></div></td>
+                <td style="background-color:silver;"><p style="color:black;padding:5px;"><strong>This section pertains to those physical and psychiatric symptoms that make life more difficult for the client. Rate the client as he/she functions with current medications and services.</strong></p></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <script>
+                        $("#mcasrform .k-radio").click(function (e) { ReCalc(); })
+                    </script>
+                    <div id="divSection1" style="width:100%">
+                        @if (Model.Scalequestions.Where(x => x.SectionId == 1).Count() > 0)
+                        {
+                            var section1 = Model.Scalequestions.Where(x => x.SectionId == 1).ToList();
+                            for (int i = 0; i < section1.Count(); i++)
+                            {
+                                <table id="casemanagementtb" style="min-width:1200px;width:100%">
+                                    <tr>
+                                        <th width="2%" valign="top">@Html.Raw(string.Format("{0}. ", Model.Scalequestions[i].QuestionId))</th>
+                                        <th colspan="3" style="text-align:left;"><p style="word-wrap:normal;width:97%;margin-top:0px;">
+                                             @Html.Raw(string.Format("{0}: {1}", Model.Scalequestions[i].Question.TrimStart(), Model.Scalequestions[i].QuestionDescription))</p>
+                                        </th>
+                                    </tr>
+                                    @Html.HiddenFor(m => m.Scalequestions[i].QuestionId, new { @id = "hdQuestionId1" })
+                                    @Html.HiddenFor(m => m.Scalequestions[i].SelectedAnwser, new { @id = "hdSection1" + Model.Scalequestions[i].QuestionId.ToString() })
+                                    @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[0].AnwserId)
+                                    @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[1].AnwserId)
+                                    @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[2].AnwserId)
+                                    @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[3].AnwserId)
+                                    @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[4].AnwserId)
+                                    @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[5].AnwserId)
+                                    <tr>
+                            <td width="2%"></td>
+                            <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[0].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section1" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[0].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[0].QuestionAnwserId.ToString(), Model.Scalequestions[i].PossibleAnswer[0].Answer))</td>
+                            <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[2].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section1" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[2].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[2].QuestionAnwserId, Model.Scalequestions[i].PossibleAnswer[2].Answer))</td>
+                            <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[4].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section1" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[4].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[4].QuestionAnwserId, Model.Scalequestions[i].PossibleAnswer[4].Answer))</td>
+                        </tr>
+                        <tr>
+                            <td width="2%"></td>
+                            <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[1].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section1" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[1].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[1].QuestionAnwserId.ToString(), Model.Scalequestions[i].PossibleAnswer[1].Answer))</td>
+                            <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[3].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section1" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[3].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[3].QuestionAnwserId.ToString(), Model.Scalequestions[i].PossibleAnswer[3].Answer))</td>
+                            <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[5].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section1" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[5].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}   {1}", "?", Model.Scalequestions[i].PossibleAnswer[5].Answer))</td>
+                        </tr>
+                    </table>
+
+                            }
+                        }
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><center>@Html.Raw(string.Format("<b>{0}: </b>", "SUMMED SCORE FOR SECTION ONE"))<span class="TotalScore1Class" style="color: green;font-weight:bold;font-size:large">@Html.DisplayFor(m => m.MCASRData.Section1Score)</span></center></td>
+            </tr>
+        </table>
+
+        <table class="table table-condensed" style="background-color: white;min-width:1200px;width:100%;">@*padding:5px;*@
+            <tr>
+                <td class="mcasrheader"><div style="margin-top:5px"><center><Strong>SECTION II: ADJUSTMENT TO LIVING</Strong></center></div></td>
+                <td style="background-color:silver;"><p style="color:black;margin-top:6px;"><strong>This section pertains to how the client functions I his/her daily life and how he/she has adapted to the disability of mental illness. Rate behavior, not potential behavior.</strong></p></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div id="divSection2">
+                        @if (Model.Scalequestions.Where(x => x.SectionId == 2).Count() > 0)
+                        {
+                            var section2 = Model.Scalequestions.Where(x => x.SectionId == 2).ToList().OrderBy(x => x.QuestionId);
+                            int id = section2.Min(g => g.QuestionId) - 1;
+                            for (int i = id; i < section2.Count() + id; i++)
+                            {
+                                <table id="casemanagementtb" style="min-width:1200px;width:100%">
+                                    <tr>
+                                        <th width="2%" valign="top">@Html.Raw(string.Format("<b>{0}. </b>", Model.Scalequestions[i].QuestionId))</th>
+                                        <th colspan="3" style="text-align:left;"><p style="word-wrap:normal;width:97%;margin-top:0px;">
+                                             @Html.Raw(string.Format("<b>{0}: </b>{1}", Model.Scalequestions[i].Question, Model.Scalequestions[i].QuestionDescription))</p>
+                                        </th>
+                                    </tr>
+                                    @Html.HiddenFor(m => m.Scalequestions[i].QuestionId, new { @id = "hdQuestionId2" })
+                                    @Html.HiddenFor(m => m.Scalequestions[i].SelectedAnwser, new { @id = "hdSection2" + Model.Scalequestions[i].QuestionId.ToString() })
+                                    @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[0].AnwserId)
+                                    @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[1].AnwserId)
+                                    @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[2].AnwserId)
+                                    @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[3].AnwserId)
+                                    @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[4].AnwserId)
+                                    @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[5].AnwserId)
+
+                                    <tr>
+                                        <td width="2%"></td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[0].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section2" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[0].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[0].QuestionAnwserId.ToString(), Model.Scalequestions[i].PossibleAnswer[0].Answer))</td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[2].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section2" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[2].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[2].QuestionAnwserId, Model.Scalequestions[i].PossibleAnswer[2].Answer))</td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[4].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section2" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[4].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[4].QuestionAnwserId, Model.Scalequestions[i].PossibleAnswer[4].Answer))</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="2%"></td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[1].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section2" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[1].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[1].QuestionAnwserId.ToString(), Model.Scalequestions[i].PossibleAnswer[1].Answer))</td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[3].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section2" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[3].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[3].QuestionAnwserId.ToString(), Model.Scalequestions[i].PossibleAnswer[3].Answer))</td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[5].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section2" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[5].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}   {1}", "?", Model.Scalequestions[i].PossibleAnswer[5].Answer))</td>
+                                    </tr>
+                                </table>
+                            }
+                        }
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><center>@Html.Raw(string.Format("<b>{0}: </b>", "SUMMED SCORE FOR SECTION TWO"))<span class="TotalScore2Class" style="color: green;font-weight:bold;font-size:large">@Html.DisplayFor(m => m.MCASRData.Section2Score)</span></center></td>
+            </tr>
+        </table>
+
+        <table class="table table-condensed" style="background-color: white;min-width:1200px;">@*padding:5px;*@
+            <tr>
+                <td class="mcasrheader"><div style="margin-top:5px"><center><Strong>SECTION III: SOCIAL COMPETENCE</Strong></center></div></td>
+                <td style="background-color:silver;"><p style="color:black;margin-top:6px;"><strong>This section pertains to the capacity of the client to engage in appropriate interpersonal relations and culturally meaningful activity.</strong></p></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div id="divSection3">
+                        @if (Model.Scalequestions.Where(x => x.SectionId == 3).Count() > 0)
+                        {
+                            var section3 = Model.Scalequestions.Where(x => x.SectionId == 3).ToList().OrderBy(x => x.QuestionId);
+                            int id = section3.Min(g => g.QuestionId) - 1;
+                            for (int i = id; i < section3.Count() + id; i++)
+                            {
+                                @Html.HiddenFor(m => m.Scalequestions[i].QuestionId, new { @id = "hdQuestionId3" })
+                                @Html.HiddenFor(m => m.Scalequestions[i].SelectedAnwser, new { @id = "hdSection3" + Model.Scalequestions[i].QuestionId.ToString() })
+                                @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[0].AnwserId)
+                                @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[1].AnwserId)
+                                @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[2].AnwserId)
+                                @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[3].AnwserId)
+                                @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[4].AnwserId)
+                                @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[5].AnwserId)
+                                <table id="casemanagementtb" style="min-width:1200px;width:100%">
+                                    <tr>
+                                        <th width="2%" valign="top">@Html.Raw(string.Format("<b>{0}. </b>", Model.Scalequestions[i].QuestionId))</th>
+                                        <th colspan="3" style="text-align:left;"><p style="word-wrap:normal;width:97%;margin-top:0px;">
+                                            @Html.Raw(string.Format("<b>{0}: </b>{1}", Model.Scalequestions[i].Question, Model.Scalequestions[i].QuestionDescription))</p></th>
+                                    </tr>
+                                    <tr>
+                                        <td width="2%"></td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[0].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section3" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[0].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[0].QuestionAnwserId.ToString(), Model.Scalequestions[i].PossibleAnswer[0].Answer))</td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[2].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section3" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[2].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[2].QuestionAnwserId, Model.Scalequestions[i].PossibleAnswer[2].Answer))</td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[4].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section3" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[4].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[4].QuestionAnwserId, Model.Scalequestions[i].PossibleAnswer[4].Answer))</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="2%"></td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[1].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section3" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[1].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[1].QuestionAnwserId.ToString(), Model.Scalequestions[i].PossibleAnswer[1].Answer))</td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[3].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section3" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[3].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[3].QuestionAnwserId.ToString(), Model.Scalequestions[i].PossibleAnswer[3].Answer))</td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[5].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section3" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[5].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}   {1}", "?", Model.Scalequestions[i].PossibleAnswer[5].Answer))</td>
+                                    </tr>
+                                </table>
+                            }
+                        }
+                    </div>
+
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><center>@Html.Raw(string.Format("<b>{0}: </b>", "SUMMED SCORE FOR SECTION THREE"))<span class="TotalScore3Class" style="color: green;font-weight:bold;font-size:large">@Html.DisplayFor(m => m.MCASRData.Section3Score)</span></center></td>
+            </tr>
+        </table>
+
+        <table class="table table-condensed" style="background-color: white;min-width:1200px;">@*padding:5px;*@
+            <tr>
+                <td class="mcasrheader"><div style="margin-top:5px"><center><Strong>SECTION IV: BEHAVIORAL PROBLEMS</Strong></center></div></td>
+                <td style="background-color:silver;"><p style="color:black; margin-top:6px;"><strong>This section pertains to those behaviors that make is more difficult for the client to integrate successfully in the community or comply with his/her prescribed treatment.</strong></p></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div id="divSection4">
+                        @if (Model.Scalequestions.Where(x => x.SectionId == 4).Count() > 0)
+                        {
+                            var section4 = Model.Scalequestions.Where(x => x.SectionId == 4).ToList().OrderBy(x => x.QuestionId);
+                            int id = section4.Min(g => g.QuestionId) - 1;
+                            for (int i = id; i < section4.Count() + id; i++)
+                            {
+                                @Html.HiddenFor(m => m.Scalequestions[i].QuestionId, new { @id = "hdQuestionId4" })
+                                @Html.HiddenFor(m => m.Scalequestions[i].SelectedAnwser, new { @id = "hdSection4" + Model.Scalequestions[i].QuestionId.ToString() })
+                                @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[0].AnwserId)
+                                @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[1].AnwserId)
+                                @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[2].AnwserId)
+                                @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[3].AnwserId)
+                                @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[4].AnwserId)
+                                @Html.HiddenFor(m => m.Scalequestions[i].PossibleAnswer[5].AnwserId)
+                                <table id="casemanagementtb" style="min-width:1200px;width:100%">
+                                    <tr>
+                                        <th width="2%" valign="top">@Html.Raw(string.Format("<b>{0}. </b>", Model.Scalequestions[i].QuestionId))</th>
+                                        <th colspan="3" style="text-align:left;"><p style="word-wrap:normal;width:97%;margin-top:0px;">
+                                            @Html.Raw(string.Format("<b>{0}: </b>{1}", Model.Scalequestions[i].Question, Model.Scalequestions[i].QuestionDescription))</p></th>
+                                    </tr>
+                                    <tr>
+                                        <td width="2%"></td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[0].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section4" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[0].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[0].QuestionAnwserId.ToString(), Model.Scalequestions[i].PossibleAnswer[0].Answer))</td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[2].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section4" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[2].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[2].QuestionAnwserId, Model.Scalequestions[i].PossibleAnswer[2].Answer))</td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[4].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section4" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[4].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[4].QuestionAnwserId, Model.Scalequestions[i].PossibleAnswer[4].Answer))</td>
+                                    </tr>
+                                    <tr>
+                                        <td width="2%"></td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[1].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section4" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[1].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[1].QuestionAnwserId.ToString(), Model.Scalequestions[i].PossibleAnswer[1].Answer))</td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[3].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section4" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[3].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}.  {1}", Model.Scalequestions[i].PossibleAnswer[3].QuestionAnwserId.ToString(), Model.Scalequestions[i].PossibleAnswer[3].Answer))</td>
+                                        <td width=@RadioWidth>@(Html.Kendo().RadioButtonFor(m => m.Scalequestions[i].SelectedAnwser).Checked((Model.Scalequestions[i].PossibleAnswer[5].QuestionAnwserId.ToString() == Model.Scalequestions[i].SelectedAnwser)).HtmlAttributes(new { @name = "Section4" + Model.Scalequestions[i].QuestionId }).Value(Model.Scalequestions[i].PossibleAnswer[5].QuestionAnwserId.ToString()))&nbsp;&nbsp;@Html.Raw(string.Format("{0}   {1}", "?", Model.Scalequestions[i].PossibleAnswer[5].Answer))</td>
+                                    </tr>
+                                </table>
+                            }
+                        }
+                    </div>
+
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><center>@Html.Raw(string.Format("<b>{0}: </b>", "SUMMED SCORE FOR SECTION FOUR"))<span class="TotalScore4Class" style="color: green;font-weight:bold;font-size:large">@Html.DisplayFor(m => m.MCASRData.Section4Score)</span></center></td>
+            </tr>
+        </table>
+
+        <br />
+        <div class="padded aligncenter form-actions" id="caseMCASRButtonDiv">
+            @if (Model.CanEdit)
+            {
+                <button type="submit" class="btn btn-group-lg danger-button" id="mcasrSave">Submit</button>
+            }&nbsp;&nbsp;
+            <button type="button" class="btn btn-group-lg danger-button" id="mcasrCancel">Cancel</button>
+            <button type="button" class="btn btn-group-lg danger-button" id="mcasrReset">Reset</button>&nbsp;&nbsp;
+            @if (Model.MCASRData.MCASRID > 0)
+            {
+                <a href="javascript:printPATSPDF(@Model.EpisodeID, @Model.MCASRData.MCASRID, 'Multnomah Community Ability Scale','color-danger')">
+                    <img style="width:22px; height:22px;" title="Print MULTNOMAH COMMUNITY ABILITY SCALE" src='@Url.Content("~/Content/images/printer-icon.png")' /></a>
+            }
+        </div>
+        <br />
+    </div>
+}
+<script type="text/javascript">
+    function MCASRButtonDisable(disabled) {
+        $("#mcasrSave").prop('disabled', disabled);
+        $("#mcasrCancel").prop('disabled', disabled);
+        $("#mcasrReset").prop('disabled', disabled);
+    }
+    $(function () {
+        var initdata = $('#mcasrform').serialize();
+        //var initdata = $('#mcasrform').serializeAllArray();
+        $('#mcasrform').submit(function (e) {
+            e.preventDefault();
+            var nowdata = $('#mcasrform').serialize();
+            if (nowdata == "")
+                return false;
+            if (initdata === nowdata) {
+                NotifyMessage();
+                e.stopPropagation();
+                return true;
+            }
+            if (confirm("Are you sure you want to save this Multnomah Community Ability Scale?") == false) {
+                e.stopPropagation();
+                return false;
+            }
+            initdata = nowdata;
+            if (CheckAllSelection(e)) {
+                MCASRButtonDisable(true);
+                postFormAndReplaceDivHtmlPats($('#mcasrform'));
+                var tabstrip = $("#swTabstrip").data("kendoTabStrip");
+                var tab = tabstrip.select();
+                tabstrip.reload(tab);
+                return true;
+            }
+            return false;
+        });
+        $("#mcasrform :input").change(function (e) {
+            var nowdata = $('#mcasrform').serialize();
+            if (initdata === nowdata) {
+                MCASRButtonDisable(true);
+            }
+            else {
+                var ct = 0;
+                $('#mcasrform input[type=radio]').each(function (e) {
+                    var id = this.id.split('_')[1];
+                    if (this.checked) {
+                        ct++;
+                    }
+                });
+                if (ct == 17) {
+                    MCASRButtonDisable(false);
+                }
+            }
+        });
+    });
+    $('#printmcasrLink').on('click', function () {
+        var url = document.getElementById('printmcasrLink').href;
+        var substr = "MCASRID=";
+        var caseID = $("#AllMCASRDates").val();
+        if (url.indexOf("MCASRID") > 0) {
+            substr = url.substring(url.indexOf("MCASRID"));
+            url = url.substring(0, url.indexOf("&"));
+            var oldcaseId = substr.substring(substr.indexOf('=') + 1);
+            substr = substr.replace(oldcaseId, caseID);
+        }
+        else {
+            substr = substr + caseID;
+        }
+        url = url + "&" + substr;
+        this.href = url;
+    })
+    var editableMCASR = EditableEpisode($("#hdEditable").val()) && $("#hdIsLastMCASRSet").val() == "True";
+    DisableAllInputFields("#mcasrform :input", $("#hdEditable").val(), editableMCASR);
+    MCASRButtonDisable(true);
+    //$('#mcasrform input[type=radio]').on('change', function () {
+    //    ReCalc();
+    //});
+
+    $("#mcasrReset").click(function () {
+        $("#mcasrform :input").each(function () {
+            if (this.type == "checkbox" || this.type == "radio")
+                $(this).prop('checked', false);
+
+            if (this.type == "text" || this.type == "textarea") {
+                $(this).val('');
+            }
+
+        })
+        ReCalc();
+    });
+
+    $("#mcasrCancel").click(function () {
+        document.getElementById("mcasrform").reset();
+        ReCalc();
+        MCASRButtonDisable(true);
+    })
+
+    function ReCalc() {
+        var total = 0;
+        var tot = 0;
+
+        $('#divSection1 input:radio').each(function () {
+            if (this.checked) {
+                tot += parseInt(this.value);
+                $("#hd" + this.name).val(this.value);
+            }
+        });
+        total += tot;
+        $("#Section1Score").val(tot);
+        $('.TotalScore1Class').html(tot);
+
+        tot = 0;
+        $('#divSection2 input:radio').each(function () {
+            if (this.checked) {
+                tot += parseInt(this.value);
+                $("#hd" + this.name).val(this.value);
+            }
+        });
+        total += tot;
+        $("#Section2Score").val(tot);
+        $('.TotalScore2Class').html(tot);
+
+        tot = 0;
+        $('#divSection3 input:radio').each(function () {
+            if (this.checked) {
+                tot += parseInt(this.value);
+                $("#hd" + this.name).val(this.value);
+            }
+        });
+        total += tot;
+        $("#Section3Score").val(tot);
+        $('.TotalScore3Class').html(tot);
+
+        tot = 0;
+        $('#divSection4 input:radio').each(function () {
+            if (this.checked) {
+                tot += parseInt(this.value);
+                $("#hd" + this.name).val(this.value);
+            }
+        });
+        total += tot;
+        $("#Section4Score").val(tot);
+        $('.TotalScore4Class').html(tot);
+
+        $('.TotalScoreAllClass').html(total);
+        return false;
+    }
+    function CheckAllSelection(e) {
+        var msg = "";
+        var ar = [];
+        $('#mcasrform input[type=radio]').each(function (e) {
+            var id = this.id.split('_')[1];
+            if (this.checked) {
+                ar.push(id);
+            }
+        });
+        if (ar.length < 17) {
+            for (var i = 0; i < 17; i++) {
+                if (ar.indexOf(i.toString()) > -1)
+                    continue;
+                else
+                    msg += "Question " + (i + 1) + " has no selection. \n"
+            }
+        }
+        if (msg.length > 0) {
+            alert(msg);
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        return true;
+    }
+</script>
+

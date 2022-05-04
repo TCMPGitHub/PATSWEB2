@@ -1,0 +1,151 @@
+﻿@using PATSWebV2.Controllers
+@using PATSWebV2.DataAccess
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    @*<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />*@
+    <meta http-equiv="X-UA-Compatible" content="IE11=edge,chrome=IE11" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <title>@ViewBag.Title</title>
+    <META HTTP-EQUIV="Expires" CONTENT="-1">
+    <script>
+        var loginPage = '@Url.Action("Login", "PATSAccount")';
+    </script>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+
+    @Scripts.Render("~/bundles/modernizr")   
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/kendo")
+    @Scripts.Render("~/bundles/PATS")
+    @RenderSection("styles", required: false)
+    @RenderSection("scripts", required: false)
+   <style>
+     .ui-widget-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    }
+    .ui-front {
+    z-index: 100;
+    }
+    .ui-dialog{
+    border:thin solid gray;
+    }
+    .ui-dialog-buttonset {
+    height:35px;
+    }
+    .ui-dialog-button{
+    float:right!important;
+    border-style:none;
+    margin-right:2px;
+    margin-top:5px;
+    }
+    .ui-dialog-button{
+    float:right!important;
+    border-style:none;
+    margin-right:2px;
+    margin-top:5px;
+}
+
+.ui-dialog-title{
+    font-weight:bold;
+    color:darkblue;
+    margin-left:2px;
+}
+        .ui-dialog-titlebar-close {
+            height: 22px;
+            width: 22px;
+            float: right;
+            margin-right: 2px;
+            border-style: none;
+            background: url('../../Content/Images/24_close.png') no-repeat;
+        }
+</style>
+</head>
+<body onload="initSession()" style="overflow:hidden;"> 
+        @if (ViewBag.CurrentUser != null)
+        {
+            <script>
+                var currentUserID = @ViewBag.CurrentUser.UserID;
+            </script>
+
+            using (Html.BeginForm("Logout", "PATSAccount", FormMethod.Post, new { @id = "logoutForm" }))
+            { @Html.AntiForgeryToken()}
+        }    
+    <div>@RenderSection("HeaderSection", true)</div>   
+     @RenderSection("ContentBody", true)
+</body>
+@RenderSection("FooterSection", true)
+
+</html>
+<script type="text/javascript">
+    var sess_pollInterval = 60000;
+    var sess_expirationMinutes = 120;
+    var sess_warningMinutes = sess_expirationMinutes - 5;
+    var sess_intervalID;
+    var sess_lastActivity;
+
+    function initSession() {
+        sess_lastActivity = new Date();
+        sessSetInterval();
+        $(document).bind('keypress.session', function (ed, e) {
+            sessKeyPressed(ed, e);
+        });
+    }
+    function sessSetInterval() {
+        sess_intervalID = setInterval('sessInterval()', sess_pollInterval);
+    }
+    function sessClearInterval() {
+        clearInterval(sess_intervalID);
+    }
+    function sessKeyPressed(ed, e) {
+        sess_lastActivity = new Date();
+    }
+    function sessLogOut() {
+        $("#logoutButton").trigger('click');
+    }
+    function sessInterval() {
+        var now = new Date();
+        //get milliseconds of differneces
+        var diff = now - sess_lastActivity;
+        //get minutes between differences
+        var diffMins = (diff / 1000 / 60);
+        if (diffMins >= sess_warningMinutes) {
+            //warn before expiring
+            //stop the timer
+            sessClearInterval();
+            //prompt for attention
+            var active = confirm('Your session will expire in ' +
+            //alert('Your session will expire in ' +
+            (sess_expirationMinutes - sess_warningMinutes) +
+            ' minutes (as of ' + now.toTimeString() + ')' +
+            ' press OK to remain logged in ' +
+            'or press Cancel to log out.' +
+            '\nIf you are logged out any changes will be lost.');
+            if (active == true) {
+                now = new Date();
+                diff = now - sess_lastActivity;
+                diffMins = (diff / 1000 / 60);
+                if (diffMins > sess_expirationMinutes) {
+                    alert("Your session has been expired.");
+                    sessLogOut();
+                }
+                else {
+                    initSession();
+                    sessSetInterval();
+                    sess_lastActivity = new Date();
+                }
+            }
+            else {
+                sessLogOut();
+            }
+        }
+    }
+</script>

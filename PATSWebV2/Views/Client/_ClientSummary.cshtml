@@ -1,0 +1,278 @@
+﻿@model PATSWebV2.ViewModels.Client.ClientSummaryViewModel
+
+@*@if (Model.ClientSummary == null)
+{ }
+else
+{*@
+    <div id="divSummary" style="background-color: cornflowerblue;min-width:1200px;padding:1px;height:75px;">
+        @{
+            var color = "beige";
+            if (@Model.ClientSummary.CaseBankedDate.Length > 0)
+            {
+                color = "yellow";
+            }
+            else if (@Model.ClientSummary.CaseClosureDate.Length > 0)
+            {
+                color = "red";
+            }
+        }
+        @Html.HiddenFor(m => m.ClientSummary.EpisodeID, new { id = "hdSmyEpisodeID" })
+        @Html.HiddenFor(m => m.ClientSummary.SelectedLocationId, new { id = "hdSmySelectedLocationId" })
+        <table id="clienttable" style="background-color: @color;width:100%;">
+            <tr class="bg-info-1">
+                <th class="col-xs-1">Name:</th>
+                <th class="xs-width" nowrap>CDCR #:</th>
+                <th class="xs-width">PID:</th>
+                <th class="xs-width" nowrap>LOC INST:&nbsp;&nbsp;</th>
+                <th class="xs-width" nowrap>LOC BHR:</th>
+                <th class="xs-width">Region:</th>
+                <th class="xs-width" nowrap>County:</th>
+                <th class="col-xs-1">Parole Unit:</th>
+                <th class="xxxs-width">PC290:&nbsp;&nbsp;</th>
+                <th class="xxxs-width">Lifer:&nbsp;&nbsp;</th>
+                <th class="col-xs-1" colspan="3">BHR Status:</th>
+                <th class="col-xs-1">Parole Agent:</th>
+                <th class="col-xs-2">Current Assignments:</th>
+            </tr>
+            <tr>
+                <td class="col-xs-1" nowrap>@Html.DisplayFor(m => m.ClientSummary.LastFirstMI)</td>
+                <td class="xs-width">@Html.DisplayFor(m => m.ClientSummary.CDCRNumber)</td>
+                <td class="xs-width">@Html.DisplayFor(m => m.ClientSummary.SomsOffenderID)</td>
+                <td class="xs-width">@Html.DisplayFor(m => m.ClientSummary.MHSINST)</td>
+                <td class="xs-width">@Html.DisplayFor(m => m.ClientSummary.MHSPOC)</td>
+                <td class="xs-width">@Html.DisplayFor(m => m.ClientSummary.Region)</td>
+                <td class="col-xs-1">@Html.DisplayFor(m => m.ClientSummary.CountyText)</td>
+                <td class="col-xs-1">@Html.DisplayFor(m => m.ClientSummary.OfficeLocationText)</td>
+                <td class="xxxs-width">@Html.DisplayFor(m => m.ClientSummary.PC290)</td>
+                <td class="xxxs-width">@Html.DisplayFor(m => m.ClientSummary.Lifer)</td>
+                <td class="col-xs-1" colspan="3">@Html.DisplayFor(m => m.ClientSummary.ParoleStatus)</td>
+                <td class="col-xs-1">@Html.DisplayFor(m => m.ClientSummary.ParoleAgent)</td>
+                <td rowspan="5" class="col-xs-2">
+                    <table id="Satabledisplay">
+                        <tr>
+                            <td style="text-align:right">Social Worker:</td>
+                            <td>@Html.DisplayFor(m => m.Staffs[0].SocialWorker)</td>
+                        </tr>
+                        @*<tr>
+                            <td style="text-align:right">Case Manager:
+                            <td>@Html.DisplayFor(m => m.Staffs[0].CaseManager)</td>
+                        </tr>*@
+                        <tr>
+                            <td style="text-align:right">Psychiatrist:</td>
+                            <td>@Html.DisplayFor(m => m.Staffs[0].Psychiatrist)</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:right">Psychologist:</td>
+                            <td>@Html.DisplayFor(m => m.Staffs[0].Psychologist)</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr class="bg-info-1">
+                <th class="col-xs-1">Ethnicity:</th>
+                <th class="xs-width">Gender:</th>
+                <th class="xs-width">DOB:</th>
+                <th class="xxxs-width">Age:</th>
+                <th class="col-xs-1">Disabilities:</th>
+                <th class="col-xs-1">Open Date:</th>
+                <th class="col-xs-1">Banked Date:</th>
+                <th class="col-xs-1">Closure Date:</th>
+                <th class="xxxs-width">ISMIP:</th>
+                <th class="xxxs-width">MAT:</th>
+                <th class="xxxs-width">CM:</th>
+                <th class="xxxs-width">CMRPE:</th>
+                <th class="xxxs-width">ASAM:</th>
+                <th class="col-xs-1">Discharge Date:</th>
+            </tr>
+
+            <tr class="space5">
+                <td class="col-xs-1">@Html.DisplayFor(m => m.ClientSummary.EthnicityText)</td>
+                <td class="xs-width">@Html.DisplayFor(m => m.ClientSummary.Gender)</td>
+                <td class="xs-width">@Html.DisplayFor(m => m.ClientSummary.DateOfBirth)</td>
+                <td class="xxxs-width">@Html.DisplayFor(m => m.ClientSummary.CalculatedAge)</td>
+                <td class="col-xs-1">@Html.DisplayFor(m => m.ClientSummary.Disabilities)</td>
+                <td class="col-xs-1">@Html.DisplayFor(m => m.ClientSummary.CaseIntakeDate)</td>
+                <td class="col-xs-1">@Html.DisplayFor(m => m.ClientSummary.CaseBankedDate)</td>
+                <td class="col-xs-1">@Html.DisplayFor(m => m.ClientSummary.CaseClosureDate)</td>
+                <td class="xxxs-width">@Html.DisplayFor(m => m.ClientSummary.ISMIPEnrolled)</td>
+                <td class="xxxs-width">@Html.DisplayFor(m => m.ClientSummary.MATEnrolled)</td>
+                <td class="xxxs-width">@Html.DisplayFor(m => m.ClientSummary.CMEnrolled)</td>
+                <td class="xxxs-width">@Html.DisplayFor(m => m.ClientSummary.CMRPEEnrolled)</td>
+                <td class="xxxs-width">@Html.DisplayFor(m => m.ClientSummary.Asam)</td>
+                <td class="col-xs-1">@Html.DisplayFor(m => m.ClientSummary.ParoleDischargeDate)</td>
+            </tr>
+            <tr>
+                <th class="bg-info-1" colspan="2">Alerts:&nbsp;&nbsp;(@Html.DisplayFor(m => m.ClientSummary.CNEntryDate))</th>
+                <td class="alerttext" colspan="12">
+                    &nbsp;
+                    @Html.Raw(@Model.ClientSummary.ClientNote)
+                </td>
+                <td></td>
+            </tr>
+        </table>
+        <div id="megaStore">
+            <script>
+       function ActiveTab(e) {
+           var url = "";
+           var tab = "";
+           var fndata = "";
+           e.preventDefault();
+           switch (e.item.textContent) {
+               case "CLIENT PROFILE": { tab = "clientprofile"; break; }
+               case "ADDRESS & PHONE#S": { tab = "address"; break; }
+               case "CLIENT ALERTS": { tab = "clientalerts"; break; }
+               case "HEALTH CARE BENEFITS": { tab = "healthcare"; break; }
+               case "CLIENT ALL NOTES": { tab = "allnotes"; break; }
+               case "CLIENT FILE UPLOAD": { tab = "clientFileUpload";  break; }
+               case "SINGLE CLIENT ASSIGNMENTS":  { tab = "individualAssignment"; break; }
+               case "CLIENT ASSIGNMENT HISTORY":   { tab = "singleAssignmentHistory";  break; }
+               case "RE-ENTRY INITIAL": { tab = "ReEntry"; break; }
+               case "IRP": { tab = "IRP"; break; }
+               case "DSM-5": { tab = "DSM5"; break; }
+               case "MCAS-R": { tab = "Multnomah"; break; }
+               case "NEEDS ASSESSMENT": { tab = "Assessment"; break; }
+               case "PROFILE":{ tab = "PMHSProfile"; break;}
+               case "IDTT": { tab = "IDTT"; break; }
+               case "(PMHS) PLACEMENT AND CHANGE": {  tab = "PMHSPC";   break; }
+               case "(PMHS) REMOVAL": { tab = "PMHSR"; break; }
+               case "NOTE": { tab = "clinicalNote"; break; }
+               case "MMA": { tab = "mma"; break; }
+               case "PSYCHIATRIC MEDICATION Rx": { tab = "prescriptionmain";  break;  }
+               case "Rx HISTORY":  { tab = "prescriptionhis";  break; }
+               case "ADD NEW MEDICATION": {  tab = "NewMedication";  break;  }
+               case "PSYCHIATRY NOTE": { tab = "psychiatryNote"; break; }
+               case "DSM DIAGNOSIS": {  tab = "dsmmain";  break;  }
+               case "DSM HISTORY": {  tab = "dsmhis";  break;  }
+               case "LEGAL DOCUMENTS": { tab = "legaldocChecklist"; break;  }
+               case "EVALUATION": { tab = "evaluationmain";  break; }
+               case "EVALUATION HISTORY": {  tab = "evaluationhis";  break; }
+               case "ALL APPOINTMENTS": { tab = "appointment"; break; }
+               case "DAILY ACTIVITY REPORT":{ tab = "appointment"; break;}
+               //default: { return;}
+           }
+
+           switch (tab) {
+               case "clientprofile": case "address": case "clientalerts": case "healthcare": case "allnotes": case "clientFileUpload": {
+                   url = '@Url.Action("GetClientProfileIndex", "Client")';
+                   fndata = {
+                       EpisodeID: $("#AllSelectedOffenderEpisodeResult").val(),
+                       ActiveTabIn: tab,
+                       NewClient: false,
+                       FromCMRequested: false
+                   };
+                   LoadSelectedTab(url, fndata, "#viewPlaceHolder");
+                   return;
+               }
+               case "individualAssignment": case "singleAssignmentHistory": {
+                       url = '@Url.Action("ClientAssignmentIndex", "Assignment")';
+                       fndata = { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val(), ActiveTabIn: tab };
+                       LoadSelectedTab(url, fndata, "#viewPlaceHolder");
+                       return;
+                   }
+               case "ReEntry": case "IDTT": case "IRP": case "DSM5": case "Multnomah": case "Assessment": case "PMHSProfile": case "PMHSPC": case "PMHSR": case "clinicalNote": {
+                   url = '@Url.Action("GetSocialWork", "Client")';
+                   fndata = { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val(), ActiveTabIn: tab };
+                   LoadSelectedTab(url, fndata, "#viewPlaceHolder");
+                   return;
+               }
+               case "appointment": {
+                   url = '@Url.Action("GetAppointmentClientManagement", "Appointment")';
+                   var activetab = 0;
+                   if ($(e.item).children(".k-link").text() == "DAILY ACTIVITY REPORT") activetab = 1;
+                   fndata = { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val(), ParoleLocationID: $("#hdSmySelectedLocationId").val(), tab: activetab };
+                   LoadSelectedTab(url, fndata, "#viewPlaceHolder");
+                   return;
+               }
+               case "mma": case "psychiatryNote": {
+                   url = '@Url.Action("GetPsychiatry", "Client")';
+                   fndata = { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val(), ActiveTabIn: tab };
+                   LoadSelectedTab(url, fndata, "#viewPlaceHolder");
+                   return;
+               }
+               case "dsmmain": case "dsmhis": {
+                   url = '@Url.Action("GetDsm", "Client")';
+                   fndata = { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val(), ActiveTabIn: tab };
+                   LoadSelectedTab(url, fndata, "#viewPlaceHolder");
+                   return;
+               }
+               case "legaldocChecklist": {
+                   url = '@Url.Action("GetLegalDocument", "Client")';
+                   fndata = { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val() };
+                   LoadSelectedTab(url, fndata, "#viewPlaceHolder");
+                   return;
+               }
+               case "evaluationmain": case "evaluationhis": {
+                      url = '@Url.Action("GetInitialEval", "Client")';
+                      fndata = { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val(), ActiveTabIn: tab };
+                      LoadSelectedTab(url, fndata, "#viewPlaceHolder");
+                       return;
+                   }
+               default: {  return;  }
+           }
+
+       }
+    @*@style = "background:#4593e5;color:darkblue;",*@
+                @*@style = "background: -moz-linear-gradient(#3d474b, #263135);",*@
+            </script>
+            @if (Model.ClientSummary.EpisodeID > 0)
+            {
+                @(Html.Kendo().Menu().Name("ClientMenu").HtmlAttributes(new { @style = "background:#4593e5;color:darkblue;",  @class = "patsdbmenu" })
+    .Items(item =>
+    {
+        item.Add().Text("CLIENT PROFILE").HtmlAttributes(new { @id = "clientProfile",  @class = "patsdbmenu" }).Items(child =>
+        {
+            child.Add().Text("CLIENT PROFILE").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("ADDRESS & PHONE#S").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("CLIENT ALERTS").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("HEALTH CARE BENEFITS").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("CLIENT ALL NOTES").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("CLIENT FILE UPLOAD").HtmlAttributes(new { @class = "patsdbmenu" }).Visible(@Model.CanUploadFile);
+        });
+        item.Add().Text("APPOINTMENT").HtmlAttributes(new { @id = "appointment", @class = "patsdbmenu" }).Items(child =>
+        {
+            child.Add().Text("ALL APPOINTMENTS").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("DAILY ACTIVITY REPORT").HtmlAttributes(new { @class = "patsdbmenu" });
+        });
+        item.Add().Text("CLIENT ASSIGNMENT").HtmlAttributes(new { @id = "clientAssignment", @class = "patsdbmenu" }).Items(child =>
+        {
+            child.Add().Text("SINGLE CLIENT ASSIGNMENTS").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("CLIENT ASSIGNMENT HISTORY").HtmlAttributes(new { @class = "patsdbmenu" });
+        });
+        item.Add().Text("SOCIAL WORK").HtmlAttributes(new { @id = "SocialWork", @class = "patsdbmenu" }).Items(child =>
+        {
+            child.Add().Text("RE-ENTRY INITIAL").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("IDTT").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("IRP").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("DSM-5").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("MCAS-R").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("NEEDS ASSESSMENT").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("PROFILE").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("(PMHS) PLACEMENT AND CHANGE").HtmlAttributes(new { @class = "patsdbmenu", @id= "menuchange" }).Enabled(@Model.ClientSummary.HasIDTT);
+            child.Add().Text("(PMHS) REMOVAL").HtmlAttributes(new { @class = "patsdbmenu", @id = "menuremove" }).Enabled(@Model.ClientSummary.HasIDTT);
+            child.Add().Text("NOTE").HtmlAttributes(new { @class = "patsdbmenu" });
+        });
+        item.Add().Text("PSYCHIATRY").HtmlAttributes(new { @id = "psychiatry", @class = "patsdbmenu" }).Items(child =>
+        {
+            child.Add().Text("MMA").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("PSYCHIATRY NOTE").HtmlAttributes(new { @class = "patsdbmenu" });
+        });
+        item.Add().Text("DSM").HtmlAttributes(new { @id = "DSM", @class = "patsdbmenu" }).Items(child =>
+        {
+            child.Add().Text("DSM DIAGNOSIS").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("DSM HISTORY").HtmlAttributes(new { @class = "patsdbmenu" });
+        });
+        item.Add().Text("LEGAL DOCUMENT").HtmlAttributes(new { @id = "legalDocuments", @class = "patsdbmenu" }).Items(child =>
+        {
+            child.Add().Text("LEGAL DOCUMENTS").HtmlAttributes(new { @class = "patsdbmenu" });
+        });
+        item.Add().Text("EVALUATION").HtmlAttributes(new { @id = "evaluation", @class = "patsdbmenu" }).Items(child =>
+        {
+            child.Add().Text("EVALUATION").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("EVALUATION HISTORY").HtmlAttributes(new { @class = "patsdbmenu" });
+        });
+    }).Events(evt => { evt.Select("ActiveTab"); }))
+            }
+
+        </div>
+    </div>
+           

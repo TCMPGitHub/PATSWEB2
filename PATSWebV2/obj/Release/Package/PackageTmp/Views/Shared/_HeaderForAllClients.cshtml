@@ -1,0 +1,34 @@
+﻿@using PATSWebV2.Controllers
+@using PATSWebV2.DataAccess;
+@model PATSWebV2.ViewModels.Client.PersonSearchViewModel
+
+<input type="hidden" value="True" id="hdReloadRequest" />
+<div id="clientheader" style="min-width:1000px;width:100vw;height:75px;background-image: url('../../Content/Images/start.jpg'); " class="patsheader">
+    <div style="float: left; margin-left: 10px; margin-top:10px; width: 140px; " class="headitem1">
+        <center style="margin-top:13px;color:darkblue;font-size:xx-small; text-shadow: 1px 1px 2px #DAA520"><i><strong>California</strong></i></center>
+        <center style="color:darkblue;font-size:xx-small;text-shadow:1px 1px 2px #DAA520"><strong>Department <i>of</i> Corrections</strong></center>
+        <center style="margin-bottom:13px;font-size:xx-small;color:darkblue; text-shadow:1px 1px 2px #DAA520"><strong><i>and Rehabilitation</i></strong></center>
+    </div>
+    <div class="headitem2"><img id="logo" alt="logo" title="cdcr-logo" src="~/Content/images/cdcr-masthead-logo.png" style="width:75px;float:left;" /></div>
+    <div style="margin-top:25px; margin-left:20px;font-weight:bold; width:250px;float:left;color:darkblue;font-size:18px;
+                text-shadow:0px -1px 0 darkblue, 1px 1px 0 darkgray;" class="headitem3">
+        <span class="navbar-text"></span>PATS Web @PatsConstants.Environment
+    </div>
+    <div id="menu-outer" style="float:left;font-size:14px;" class="headitem4">
+        <div class="table">
+            <ul id="horizontal-list">
+                <li class="list-inline @(ViewBag.ControllerID == ControllerID.Client ? "active" : "")">@Html.ActionLink("Client Profile", "Index", "Client", null, new { @style = "color:darkblue;" })</li>
+                <li class="list-inline @(ViewBag.ControllerID == ControllerID.Assignment ? "active" : "")">@Html.ActionLink("Assignments", "AssignmentIndex", "Assignment", null, new { @style = "color:darkblue;" })</li>
+                <li class="list-inline @(ViewBag.ControllerID == ControllerID.Appointment ? "active" : "")">@Html.ActionLink("Appointments", "ApptIndex", "Appointment", null, new { @style = "color:darkblue;" })</li>
+                <li class="list-inline @(ViewBag.ControllerID == ControllerID.Reports ? "active" : "")">@Html.ActionLink("Reports", "Index", "Home", null, new { @style = "color:darkblue;" })</li>
+            </ul>
+        </div>
+    </div>
+    <div style="margin-top:25px;margin-right:50px;width:180px;float:right;" class="headitem1">
+        @{ 
+            var logname = (@ViewBag.CurrentUser == null ? "" : @ViewBag.CurrentUser.FirstName + " " + @ViewBag.CurrentUser.LastName);
+        }
+        <div style="margin-top:5px;float:left;"><scan style="color:darkgreen;font-weight:bold;">@logname</scan></div>
+        &nbsp;&nbsp;<button type="button" id="logoutButton" class="btn" title="Logout" />
+    </div>
+</div>

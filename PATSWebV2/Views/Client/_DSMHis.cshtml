@@ -1,0 +1,76 @@
+﻿@model PATSWebV2.ViewModels.DSM.DsmViewModel
+
+@*<h5 style="float:left;margin-left:10px; margin-top:5px"><strong>DSM History</strong></h5><br />*@
+
+<div class="k-content color-continue appointmentdiv ">
+<script>
+    function onHisDataBound() {
+            var grid = $("#gridDSMHis").data("kendoGrid");
+            var data = grid.dataSource.data();
+            $.each(data, function (i, row) {
+                if (row.ActionStatus == "Deleted") {
+                    $('tr[data-uid="' + row.uid + '"]').css("background-color", "#e74c3c");
+                }
+            });
+        }
+</script>
+@(Html.Kendo().Grid<IdentityManagement.Entities.DsmData>()
+       .Name("gridDSMHis")
+       .Columns(columns =>
+       {
+           columns.Bound(o => o.Id).Hidden(true);
+           columns.Bound(p => p.MasterDXId).Title("DSM ID").Hidden(true);
+           columns.Bound(p => p.DateDsmDate).Title("DSM Date").Format("{0:MM/dd/yyyy hh:mm tt}").Width(90).HtmlAttributes(new { title = "Dsm Date" }); ;
+           columns.Bound(p => p.IcdCode).Width(60).Title("ICD Code");
+           columns.Bound(p => p.DsmType).Width(80).Title("Dsm Type");
+           columns.Bound(p => p.DsmSpecifier).Width(80).Title("Specifier");
+           columns.Bound(p => p.DsmDesc).Title("DSM Description").Width(200);
+           columns.Bound(p => p.ClinicalName).Title("Action By").Width(70);
+           //columns.Bound(p => p.ActionStatus).Title("Status").Width(50);
+           columns.Bound(p => p.Comments).Title("Comments").Width(100);
+       })
+       .ToolBar(tools => tools.Excel())
+       .Resizable(size => size.Columns(true))
+       .Events(events => events.DataBound("onHisDataBound"))
+       .Excel(excel => excel
+        .FileName("DMSHx.xlsx")
+        .Filterable(true)
+        .AllPages(true)
+        //.ProxyURL(Url.Action("EvaluationToExcel", "Evaluation"))
+        )
+       .Sortable(sortable => sortable.AllowUnsort(false))
+       .Scrollable(a => a.Height("58vh"))
+       .Selectable(selectable => selectable
+           .Mode(GridSelectionMode.Single))
+       .Navigatable()
+        .HtmlAttributes(new { style = "margin-top:5px;" })
+        .Pageable(pageable => pageable
+             .Refresh(true)
+             .PageSizes(new List<object> { 10, 20, 30, 50 })
+             .ButtonCount(5))
+        .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+            .StartsWith("Starts with")
+            .IsEqualTo("Is equal to")
+            .IsNotEqualTo("Is not equal to")
+            ))
+       )
+       .DataSource(dataSource => dataSource
+           .Ajax()
+           .Batch(true)
+           //.Events(events => events.Error("error_handler"))
+           .PageSize(20)
+           .Read(read => read.Action("DSMHisRead", "Client", new { EpisodeId = Model.EpisodeId }))
+           .Model(model =>
+           {
+               model.Id(field => field.Id);
+           })
+       )
+)
+<script id="template" type="text/x-kendo-template">
+    <div> @Html.Raw("#=changeNewLine(DsmDesc)#")</div>
+</script>
+</div>
+

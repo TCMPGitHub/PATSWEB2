@@ -1,0 +1,126 @@
+﻿<script>
+    function ExcelClientHisCellFormat(e) {
+        var grid = $("#gridClientSchedulerHis").data("kendoGrid").dataSource;
+        grid.fetch(function () {
+            var data = this.data();
+            var rows = [{
+                cells: [{
+                    value: "All Appointments for " + data[0].SelectedClients[0].CDCRNumber + "-" + data[0].SelectedClients[0].ClientName,
+                    bold: true, color: "#ffffff", background: "#60b5ff", fontSize: 24,
+                    colSpan: 9, vAlign: "center", hAlign: "center"
+                }], type: "header", height: 50
+            }];
+            rows.push({
+                cells: [
+                  { value: "Staff Name", vAlign: "center", hAlign: "center", background: "#84A3BF" },
+                  { value: "Location", vAlign: "center", hAlign: "center", background: "#84A3BF" },
+                  { value: "Appt. Date", vAlign: "center", hAlign: "center", background: "#84A3BF" },
+                  { value: "Start Time", vAlign: "center", hAlign: "center", background: "#84A3BF" },
+                  { value: "End Time", vAlign: "center", hAlign: "center", background: "#84A3BF" },
+                  { value: "Type", vAlign: "center", hAlign: "center", background: "#84A3BF" },
+                  { value: "Status", vAlign: "center", hAlign: "center", background: "#84A3BF" },
+                  { value: "Process", vAlign: "center", hAlign: "center", background: "#84A3BF" },
+                  { value: "ADA/EC", vAlign: "center", hAlign: "center", background: "#84A3BF" }], type: "header"
+            });
+            for (var i = 0; i < data.length; i++) {
+               var ada = "";
+                if (data[i].SelectedADAItems != null && data[i].SelectedADAItems.length > 0) {
+                    for (var i1 = 0; i1 < data[i].SelectedADAItems.length; i1++) {
+                        if (ada == "")
+                            ada = data[i].SelectedADAItems[i1].Text;
+                        else
+                            ada = ada + '\n' + data[i].SelectedADAItems[i1].Text;
+                    }
+                }
+
+                rows.push({
+                    cells: [
+                      { value: data[i].SelectedStaffNames, wrap: true, vAlign: "top", hAlign: "left" },
+                      { value: data[i].SelectedLocationDesc, vAlign: "top", hAlign: "left" },
+                      { value: data[i].Start, vAlign: "top", hAlign: "left" },
+                      { value: data[i].StartTime, vAlign: "top", hAlign: "left", format: "h:mm AM/PM"},
+                      { value: data[i].EndTime, vAlign: "top", hAlign: "left", format: "h:mm AM/PM" },
+                      { value: data[i].TypeDesc, vAlign: "top", hAlign: "left" },
+                      { value: data[i].Eventstatus, vAlign: "top", hAlign: "left" },
+                      { value: data[i].ProcessStatus, vAlign: "top", hAlign: "left" },
+                      { value: ada, wrap: true, vAlign: "top", hAlign: "left" }], height: (ada == "" ? 20 : 20 * data[i].SelectedADAItems.length)
+                })
+            }
+            var workbook = new kendo.ooxml.Workbook({
+                sheets: [
+                  {
+                      frozenRows: 2,
+                      filter: { from: 0, to: 8 },
+                      columns: [
+                        { width: 200}, { width: 150 }, { width: 80 }, { width: 70},
+                        { width: 70},
+                        { width: 150 }, { width: 80 }, { width: 80 }, { width: 400 }
+                      ],
+                      title: "All Appointments",
+                      rows: rows
+                  }
+                ]
+            });
+
+            kendo.saveAs({
+                dataURI: workbook.toDataURL(),
+                fileName: "ClientAppointmentHis.xlsx"
+            });
+        });
+    }
+    function GetClientAttendStatus(obj) {
+        switch (obj) {
+            case 1: return "Absent";
+            case 3: return "Present";
+            case 4: return "Excused";
+        }
+        return "Pending";
+    }
+</script>
+@(Html.Kendo().Grid<PATSWebV2.ViewModels.AppointmentViewModel>()
+        .Name("gridClientSchedulerHis")
+        .HtmlAttributes(new { style = "padding:2px;min-height:500px;height:68vh;" })
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.AppointmentId).Hidden();
+            columns.Bound(p => p.EpisodeId).Hidden();
+            columns.Bound(p => p.SelectedStaffNames).Title("Case Worker").Width(250);
+            columns.Bound(p => p.SelectedLocationDesc).Title("Appt. Office").Width(200);
+            columns.Bound(p => p.Start).Title("Appt. Date").Width(90);
+            columns.Bound(p => p.StartTime).Format("{0:h:mm tt}").Title("Start Time").Width(90);
+            columns.Bound(p => p.End).Title("End Date").Width(90).Hidden();
+            columns.Bound(p => p.EndTime).Format("{0:h:mm tt}").Title("End Time").Width(90);
+            columns.Bound(p => p.TypeDesc).Title("Type").Width(150);
+            columns.Bound(p => p.SelectedClients[0].ClientStatus).ClientTemplate("#=GetClientAttendStatus(SelectedClients[0].ClientStatus)#").Title("Attend").Width(50);
+            columns.Bound(p => p.Eventstatus).Title("Status").Width(150).Hidden();
+            columns.Bound(p => p.ProcessStatus).Title("Progress").Width(150);
+            columns.Bound(p => p.SelectedADAItems).Title("ADA/EC").ClientTemplate("#=BuildClientADAEC(SelectedADAItems)#").HtmlAttributes(new { style = "line-height:12px;" }).Width(200).Hidden();
+            //columns.Bound(p => p.Description).Title("Purpose").Width(200).ClientTemplate("<textarea class='textareaforcasemanngement apptPurpose' placeholder = 'Purpose...' readonly='readonly' style='wordwrap:true;background-color:transparent;padding:0;'>#if(Description == null){# #='' # #}else{# #=Description # #} #</textarea>");
+            columns.Bound(p => p.AppointmentId).Title("Print").ClientTemplate(
+                "<a href='javascript:printPATSPDF(\"#=AppointmentId#\",\"0\", \"Appointment Note\", \"color-continue\")'>Print</a>").Width(50);
+            //"<a href='" + Url.Action("PrintNotice1", "Appointment", new { EventId = "#=AppointmentId#" }) + "'>Print</a>").Width(50);
+        })
+        .ToolBar(tb =>
+        {
+            tb.Template(@<text><a class='k-button k-grid-export' title='Export to excel' href="javascript:ExcelClientHisCellFormat()"><span class="k-icon k-i-excel"></span>Export to excel</a></text>);
+        })
+        //.ToolBar(toolbar => toolbar.Excel().Text("Export to Excel").HtmlAttributes(new { @style = "float:right" }))
+        //.Excel(exl => exl.FileName("ClientAppointmentHis.xlsx").AllPages(true).Filterable(true))
+        //.Events(e => e.ExcelExport("ExcelClientHisCellFormat"))
+        .Sortable(s => s.AllowUnsort(false))
+        .Scrollable(a => a.Height("55vh"))
+        .Resizable(resize => resize.Columns(true))
+        .Pageable(pageable => pageable.Refresh(true)
+        .PageSizes(new List<object> { 5, 10, 20, 30, 50 })
+        .ButtonCount(5))
+        .DataSource(dataSource => dataSource
+        .Ajax()
+        .Sort(s => { s.Add("Start").Descending(); s.Add("StartTime").Ascending(); })
+        //.ServerOperation(true)
+        .PageSize(20)
+        .Read(read => read.Action("AppointmentClientHisRead", "Appointment").Data("getGridClientHisData"))
+        .Model(model =>
+        {
+            model.Id(field => field.AppointmentId);
+        })
+        ))

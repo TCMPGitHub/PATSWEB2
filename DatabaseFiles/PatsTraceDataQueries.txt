@@ -1,0 +1,116 @@
+INSERT INTO EpisodeTrace(EpisodeID, ClientEpisodeID, DateAction) 
+SELECT t1.EpisodeID, t2.ClientEpisodeID, ISNULL(t2.DateAction, GetDate()) FROM Episode t1 left outer join 
+(Select EpisodeID, ClientEpisodeID, DateAction FROM 
+(SELECT EpisodeID, ClientEpisodeID, DateAction, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ClientEpisodeID DESC) AS RowNum 
+   FROM clientEpisode)e WHERE e.RowNum = 1) t2 ON t1.EpisodeID = t2.EpisodeID
+
+Update tgr SET tgr.ClientNoteID = scr.ClientNoteID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ClientNoteID FROM 
+(SELECT EpisodeID, ClientNoteID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ClientNoteID DESC) AS RowNum 
+   FROM ClientNote)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+Update tgr SET tgr.StaffAssignmentID = scr.ID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ID FROM 
+(SELECT EpisodeID, ID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ID DESC) AS RowNum 
+   FROM StaffAssignment)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+Update tgr SET tgr.HealthBenefitID = scr.ID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ID FROM 
+(SELECT EpisodeID, ID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ID DESC) AS RowNum 
+   FROM ClientHealthCareBenefit)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+Update tgr SET tgr.IDTTID = scr.ID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ID FROM 
+(SELECT EpisodeID, ID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ID DESC) AS RowNum 
+   FROM ClinicalIDTT)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+Update tgr SET tgr.IRPID = scr.ID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ID FROM 
+(SELECT EpisodeID, ID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ID DESC) AS RowNum 
+   FROM CaseIRP)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+Update tgr SET tgr.MCASRID = scr.ID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ID FROM 
+(SELECT EpisodeID, ID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ID DESC) AS RowNum 
+   FROM CaseMCASR)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+Update tgr SET tgr.NeedsAssessmentID = scr.ID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ID FROM 
+(SELECT EpisodeID, ID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ID DESC) AS RowNum 
+   FROM CaseNeedsAssessment)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+Update tgr SET tgr.ReEntryIMHSID = scr.ID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ID FROM 
+(SELECT EpisodeID, ID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ID DESC) AS RowNum 
+   FROM CaseReEntryIMHS)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+Update tgr SET tgr.PMHSID = scr.ID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ID FROM 
+(SELECT EpisodeID, ID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ID DESC) AS RowNum 
+   FROM ClinicalPMHS)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+Update tgr SET tgr.DSMID = scr.ID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ID FROM 
+(SELECT EpisodeID, ID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ID DESC) AS RowNum 
+   FROM DSM)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+Update tgr SET tgr.LegalDocID = scr.ID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ID FROM 
+(SELECT EpisodeID, ID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ID DESC) AS RowNum 
+   FROM LegalDocument)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+Update tgr SET tgr.ASMTID = scr.ID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ID FROM 
+(SELECT EpisodeID, ID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ID DESC) AS RowNum 
+   FROM PsychiatryASMT)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+Update tgr SET tgr.EvaluationID = scr.ID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ID FROM 
+(SELECT EpisodeID, ID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID ORDER BY ID DESC) AS RowNum 
+   FROM EpisodeEvaluation WHERE EvaluationItemId = 1)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+Update tgr SET tgr.AddressID = scr.ID 
+FROM EpisodeTrace tgr INNER JOIN
+(Select EpisodeID, ID FROM 
+(SELECT EpisodeID, ID, AddressTypeID, 
+        ROW_NUMBER() OVER (PARTITION BY EpisodeID, AddressTypeID ORDER BY ID DESC) AS RowNum 
+   FROM Address WHERE AddressTypeID= 1 AND ISNULL(Inactive, 0) = 0)e WHERE e.RowNum = 1) scr ON tgr.EpisodeID = scr.EpisodeID
+
+INSERT INTO AppointmentTrace(AppointmentTraceID, AppointmentID) 
+Select  AppointmentTraceID, AppointmentID FROM 
+(SELECT AppointmentTraceID, AppointmentID,
+        ROW_NUMBER() OVER (PARTITION BY AppointmentTraceID ORDER BY AppointmentID DESC) AS RowNum 
+   FROM Appointment)e WHERE e.RowNum = 1
+
+INSERT INTO CaseNoteTrace(CaseNoteID, NoteID) 
+Select  CaseNoteID, ID FROM 
+(SELECT CaseNoteID, ID,
+        ROW_NUMBER() OVER (PARTITION BY CaseNoteID ORDER BY ID DESC) AS RowNum 
+   FROM dbo.CaseNote)c WHERE c.RowNum = 1

@@ -3,3 +3,10 @@
 ################################################################################
 
 /IdentityManagement/bin/Debug
+/IdentityManagement/bin/Release
+/PATSWebV2/obj/Debug
+/PATSWebV2/Properties/PublishProfiles/PATSWebV2DEV.pubxml.user
+/PATSWebV2/Properties/PublishProfiles/PATSWebV2DEV.pubxml
+/PATSWebV2/Properties/PublishProfiles/PATSWEBV2.pubxml.user
+/PATSWebV2/Properties/PublishProfiles/PATSWEBV2.pubxml
+/.vs/PATSWebV2/v15

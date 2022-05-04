@@ -1,0 +1,56 @@
+﻿@*//@model IdentityManagement.Entities.Assignment.AssignmentHistoryData*@
+<script>
+    function GetAssignmentEpisodeID() {
+        return {EpisodeID : $("#AllSelectedOffenderEpisodeResult").val()};
+    }
+</script>
+<div class="k-content color-success">
+    @(Html.Kendo().Grid<IdentityManagement.Entities.Assignment.AssignmentHistoryData>()
+.Name("gridClientHisAssignment")
+.Columns(columns =>
+{
+    columns.Bound(o => o.ID).Hidden(true);
+    columns.Bound(p => p.AssignmentDate).Title("Assigned/Updated Date").Width(80).Format("{0:MM/dd/yyyy h:mm tt}");
+    columns.Bound(p => p.SocialWorkerName).Width(100).Title("Social Worker");
+    //columns.Bound(p => p.CaseManagerName).Width(100).Title("Case Manager");
+    columns.Bound(p => p.PsychiatristName).Width(100).Title("Psychiatrist");
+    columns.Bound(p => p.PsychologistName).Width(100).Title("Psychologist");
+    columns.Bound(p => p.ParoleAgentName).Title("Parole Agent").Width(100);
+})
+.ToolBar(toolbar => toolbar.Excel().Text("Export To Excel"))
+.Excel(excel => { excel.FileName("ClientAssignmentHx.xlsx"); excel.Filterable(true); excel.AllPages(true); })
+.Sortable(sortable => sortable.AllowUnsort(false))
+.Scrollable(a => a.Height("56vh"))
+       .Selectable(selectable => selectable
+           .Mode(GridSelectionMode.Multiple))
+       .Navigatable()
+        .HtmlAttributes(new { style = "margin-top:5px;" })
+        .Pageable(pageable => pageable
+             .Refresh(true)
+             .PageSizes(new List<object> { 10, 20, 30, 50 })
+             .ButtonCount(5))
+        .EnableCustomBinding(true)
+        .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+            .StartsWith("Starts with")
+            .IsEqualTo("Is equal to")
+            .IsNotEqualTo("Is not equal to")
+            ))
+       )
+       .DataSource(dataSource => dataSource
+           .Ajax()
+           .Batch(true)
+           .PageSize(20)
+           .Read(read => read.Action("AssignmentHisRead", "Assignment").Data("GetAssignmentEpisodeID"))
+           .Model(model =>
+           {
+               model.Id(field => field.ID);
+           })
+       )
+    )
+</div>
+
+
+

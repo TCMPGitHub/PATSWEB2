@@ -1,0 +1,93 @@
+﻿@model PATSWebV2.ViewModels.Assignment.AssignmentViewModel
+@using (Ajax.BeginForm("GetClientAssignment", "Assignment", new { ActiveTab = "individualAssignmentEditor" }, new AjaxOptions
+{
+    HttpMethod = "Post",
+    UpdateTargetId = "viewPlaceHolder",
+    InsertionMode = InsertionMode.Replace,
+    OnSuccess = "OnAjaxSuccess"
+}, new { @id = "clientAssignmentForm", @name = "Client Assignment", @style = "min-height: 500px;", @class = "color-success" }))
+{
+    @Html.HiddenFor(m => m.EpisodeID, new { id = "hdEpisodeId" })
+    @Html.HiddenFor(m => m.CanEdit, new { id = "hdAssignEditable" })
+   
+        <div class="k-content">
+            <script>
+           function onDataBound(e) {
+                var edit = EditableEpisode($("#hdAssignEditable").val());
+               if (!edit)
+                   $(".k-grid-edit").removeClass("k-grid-edit")
+                                      .addClass("k-state-disabled")
+                                      .removeAttr("href");
+           }
+           function RefreshClientSummary(e) {
+               if (e.type == "create" || e.type == "update") {
+                   $('#gridClientAssignment').data('kendoGrid').dataSource.read({ EpisodeId: $("#hdEpisodeId").val() });
+                   LoadSummary($("#AllSelectedOffenderEpisodeResult").val());
+               }
+           }
+           function RefreshClientAssignment(e)
+           {
+               $('#gridClientAssignment').data('kendoGrid').refresh();
+           }
+           function client_error_handler(e) {
+               if (e.errors) {
+                   var message = "Errors:\n";
+                   $.each(e.errors, function (key, value) {
+                       if ('errors' in value) {
+                           $.each(value.errors, function () {
+                               message += this + "\n";
+                           });
+                       }
+                   });
+                   alert(message);
+                   var grid = $("#gridClientAssignment").data("kendoGrid");
+                   grid.one("dataBinding", function (e) {
+                       e.preventDefault();   // cancel grid rebind if error occurs
+                   });
+               }
+           }
+            </script>
+            @(Html.Kendo().Grid<PATSWebV2.ViewModels.Assignment.AssignmentViewModel>()
+           .Name("gridClientAssignment").Resizable(resize => resize.Columns(true))
+           .HtmlAttributes(new { style = "min-width:60%; width:99%;height:50%; min-height:30%; padding:5px;" })
+           .Scrollable(s => s.Height("35px"))
+           .Columns(columns =>
+           {
+               columns.Bound(o => o.Id).Hidden(true);
+               columns.Bound(o => o.EpisodeID).Hidden(true);
+               columns.ForeignKey(p => p.SocialWorkerUserId, (System.Collections.IEnumerable)ViewData["SWList"], "PATSUserId", "PATSUserName").Width(100).Title("Social Worker").EditorTemplateName("_SWGridForeignKey");
+               columns.ForeignKey(p => p.PsychiatristUserId, (System.Collections.IEnumerable)ViewData["PCTList"], "PATSUserId", "PATSUserName").Width(100).Title("Psychiatrist").EditorTemplateName("_PCTGridForeignKey");
+               columns.ForeignKey(p => p.PsychologistUserId, (System.Collections.IEnumerable)ViewData["PCOList"], "PATSUserId", "PATSUserName").Width(100).Title("Psychologist").EditorTemplateName("_PCOGridForeignKey");
+               columns.Bound(p => p.ParoleAgentName).Title("Parole Agent").Width(100);
+               columns.Command(command => { command.Edit().Text("Assign/Unassign"); }).Width(100);
+           })
+           .Editable(editable => editable.Mode(GridEditMode.InLine))
+           .Events(e => { e.Cancel("RefreshClientAssignment"); e.DataBound("onDataBound"); })
+           .Pageable(pageable => pageable
+                 .Refresh(true)
+                 .PreviousNext(false)
+                 .Info(false)
+                 .Numeric(false))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Batch(true)
+            .ServerOperation(false)
+            .Read(read => read.Action("ClientAssignmentRead", "Assignment", new { EpisodeId = Model.EpisodeID }))
+            .Update(update => update.Action("ClientAssignmentCreate", "Assignment"))
+            .Create(create => create.Action("ClientAssignmentCreate", "Assignment"))
+            .Events(e => { e.RequestEnd("RefreshClientSummary"); e.Error("client_error_handler"); })
+            .Model(model =>
+            {
+                model.Id(field => field.Id);
+                model.Field(field => field.EpisodeID);
+                model.Field(field => field.SocialWorker).DefaultValue(Model.SocialWorker);
+                model.Field(field => field.Psychiatrist).DefaultValue(Model.Psychiatrist);
+                model.Field(field => field.Psychologist).DefaultValue(Model.Psychologist);
+                model.Field(field => field.ParoleAgentName).DefaultValue(Model.ParoleAgentName);
+            })
+          )
+            )
+
+        </div>
+    @*</div>*@
+}

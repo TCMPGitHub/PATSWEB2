@@ -1,0 +1,290 @@
+﻿@using Kendo.Mvc.UI
+@model PATSWebV2.ViewModels.Client.ClientHealthBenefitViewModel
+
+
+
+@using (Ajax.BeginForm("GetHealthCareBenefits", "ClientProfile", new { ActiveTab = "healthBenefits" }, new AjaxOptions
+{
+    HttpMethod = "Post",
+    UpdateTargetId = "viewPlaceHolder",
+    InsertionMode = InsertionMode.Replace,
+    OnSuccess = "OnAjaxSuccess",
+    OnFailure = "OnAjaxFailure"
+}, new { @id = "healthCareForm", @name = "Health Care Benefits", @style = "min-height: 56vh;", @class = "color-primary" }))
+{
+    <div id="healthCareBenefitpane" class="color-primary" style="padding:0;">
+        @Html.HiddenFor(m => m.EpisodeId, new { id = "hdEpisodeID" })
+        @Html.HiddenFor(m => m.ErrorMessage, new { id = "hdError" })
+        @Html.HiddenFor(m => m.CanEditHCB, new { id = "hdCanEditHCB" })
+        @*<h5 style="float:left;margin-left:10px;margin-top:5px;">
+            <strong>HEALTH CARE BENEFITS</strong>
+            <button id="addBnt" type="button" class="btn btn-link btn-group-lg" data-toggle="collapse" data-target="#divViewInstructionHCB"
+                    style="width:20px; height:20px;float:right; margin-left: 4px; margin-top:-3px;" title="View Instructions">
+                <img style="width:14px; height:14px;" src="~/Content/themes/base/images/i_icon.png" />
+            </button>
+        </h5><br />
+        <div id="divViewInstructionHCB" class="collapse">
+            <table id="casemanagementtb" class="table table-condensed" style="margin-left:10px; padding-left:2px; padding-top:3px; width:99%;">
+                <tr><td><center><h5><strong>INSTRUCTIONS</strong></h5></center></td></tr>
+                <tr>
+                    <td>
+                        <ul>
+                            <li>
+                                To add a health care benefit, check the name of the benefit and enter the outcome (status) and outcome date in the appropriate row. Click Save to submit changes.
+                            </li>
+                            <li>
+                                To edit a health care benefit, make updates in the appropriate row. Click Save to submit changes.
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+        </div><br />*@
+        <script>
+             $(".hcbdatepicker").kendoValidator({
+                 rules: {
+                     dateValidation: function (e) {
+                         var currentDate = kendo.parseDate($(e).val());
+                         // Check if date parse was successful
+                         if (!currentDate) {
+                             return false;
+                         }
+                         return true;
+                     }
+                 },
+                 messages: {
+                     dateValidation: "Invalid Date!"
+                 }
+             });
+             function TextAreaClick(e) { TextarePopup(e, false, "color-primary"); }
+             function TextArearKeyUp(e) { //key : F4
+                 if (e.keyCode == '90' && e.ctrlKey) {
+                     TextarePopup(e, false, "color-primary");
+                 }
+             }
+             //$('#healthCareForm').on('dblclick', '.textareaforcasemanngement', function (e) {
+             //    TextarePopup(e, false, "color-primary");
+             //});
+             //$('#healthCareForm').on('keypress', '.textareaforcasemanngement', function (e) {
+             //    var keycode = (e.keyCode ? e.keyCode : e.which);
+             //    if (keycode == '10' && e.ctrlKey) {
+             //        $(this).trigger('click');
+             //    }
+             //})
+          function GridBenefitReload(e) {
+              if(e.type != "read")
+                  $("#gridHCSet").data('kendoGrid').dataSource.read({ EpisodeID: $("#hdEpisodeID").val() })
+          }
+          function hcb_error_handler(e) {
+              if (e.errors) {
+                  var message = "Errors:\n";
+                  $.each(e.errors, function (key, value) {
+                      if ('errors' in value) {
+                          $.each(value.errors, function () {
+                              message += this + "\n";
+                          });
+                      }
+                  });
+
+                  alert(message);
+                  var grid = $("#gridHCSet").data("kendoGrid");
+                  grid.one("dataBinding", function (e) {
+                      e.preventDefault();   // cancel grid rebind if error occurs
+                  });
+              }
+          }
+          function insertHeaderCaption(e) {
+              if (e.model.isNew()) {
+                  $('.k-window-title').text("Add New Benefit");
+              }
+              var hcn = $(".hcbdatepicker");
+              hcn.kendoMaskedTextBox({
+                       mask: "00/00/0000"
+              });
+              hcn.closest(".k-datepicker")
+               .add(hcn)
+               .removeClass("k-textbox");
+          }
+
+          function HCBenefitGridData(data) {
+              data.EpisodeID = $("#hdEpisodeID").val();
+              data.AppliedOrRefused = $(".AppliedOrRefused").val();
+              data.AppliedOrRefusedOnDate = $("#AppliedOrRefusedOnDate").val();
+              data.BenefitTypeID = $("#BenefitTypeID").val();
+              data.BICNum = $("#txtBicNum").val();
+              data.OutcomeID = $("#OutcomeID").val();
+              data.OutcomeDate = $("#OutcomeDate").val();
+              data.IssuedOnDate = $("#IssuedOnDate").val();
+              data.PhoneInterviewDate = $("#PhoneInterviewDate").val();
+              data.ArchivedOnDate = $("#ArchivedOnDate").val();
+              data.NoteorComment = $("#txtNoteorComment").val();
+          }
+          function hiddenhcbColumn(e) {
+              var typeId = e.sender._data[0].BenefitTypeID;
+              var grid = $("#grid_" + typeId.toString()).data("kendoGrid");
+              if (typeId == 3) {
+                  grid.showColumn(6);
+                  grid.showColumn(5);
+                  grid.hideColumn(7);
+              }
+              else if (typeId == 2) {
+                  grid.hideColumn(7);
+                  grid.hideColumn(5);
+                  grid.hideColumn(6);
+              }
+              else if (typeId == 1) {
+                  grid.showColumn(7);
+                  grid.hideColumn(6);
+                  grid.hideColumn(5);
+              }
+              //for (var i = 0; i < grid.columns.length; i++) {
+              //    grid.Column[i].MinTextArea;
+              //}
+
+          }
+          function beforesave(e) {          
+              if (confirm("Are you sure you want to save the Health Care Bnefit?") == false) {
+                  e.preventDefault();
+                  return;
+              }
+              e.model.OutcomeDate = $("#OutcomeDate").val();
+              e.model.AppliedOrRefusedOnDate = $("#AppliedOrRefusedOnDate").val();
+              e.model.IssuedOnDate = $("#IssuedOnDate").val();
+              e.model.PhoneInterviewDate = $("#PhoneInterviewDate").val();
+              e.model.EpisodeID = $("#hdEpisodeID").val();
+              e.model.AppliedOrRefused = $(".AppliedOrRefused").val();
+              e.model.BenefitTypeID = $("#BenefitTypeID").val();
+              e.model.BICNum = $("#txtBicNum").val();
+              e.model.OutcomeID = $("#OutcomeID").val();
+              e.model.ArchivedOnDate = $("#ArchivedOnDate").val();
+              e.model.NoteorComment = $("#txtNoteorComment").val();
+              return e.model;
+          }
+
+          function dataBound() {
+              var edit = EditableEpisode($("#hdCanEditHCB").val());
+              if (!edit)
+                  $(".k-grid-add").removeClass("k-grid-add")
+                                     .addClass("k-state-disabled")
+                                     .removeAttr("href");
+              var grid = this;
+              grid.tbody.find("tr[role='row']").each(function () {
+                  var model = grid.dataItem(this);
+                  if (model.UpdateExpired || !edit) {
+                      $(this).find(".k-grid-edit").hide();
+                  }
+                  if (!edit) {
+                      $(this).find(".k-grid-delete").hide();
+                  }
+                  if (model.Totals == 1)
+                      $(this).find(".k-i-expand").hide();
+              });
+
+              grid.thead.find('th').each(function () {
+                  $(this).prop('title', $(this).data('title'));
+              })
+          }
+          function GetHBParam() {
+              return { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val() == "" ? -1 : $("#AllSelectedOffenderEpisodeResult").val() };
+          }
+          function GetHBSubParam(obj) {
+              return { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val(), BenefitTypeID: obj };
+          }
+        </script>
+        @(Html.Kendo().Grid<IdentityManagement.Entities.HealthBenefit>()
+                .Name("gridHCSet").NoRecords("No Health Care Benefit...")
+                .Columns(columns =>
+                {
+                    columns.Bound(p => p.ID).Hidden();
+                    columns.Bound(p => p.BenefitTypeID).Hidden();
+                    columns.Bound(p => p.EpisodeId).Hidden();
+                    columns.Bound(p => p.OutcomeID).Hidden();
+                    columns.Bound(p => p.AppliedOrRefused).Hidden();
+                    columns.Bound(p => p.BenefitTypeDesc).Title("Coverage Name").Width(60);
+                    columns.Bound(p => p.AgreeType).Title("Applied/Refused").Width(20);
+                    columns.Bound(p => p.AppliedOrRefusedOnDate).Format("{0:MM/dd/yyyy}").Title("Applied/Refused Date").Width(80);
+                    columns.Bound(p => p.Outcome).Title("Outcome").Width(80);
+                    columns.Bound(p => p.OutcomeDate).Format("{0:MM/dd/yyyy}").Title("Outcome Date").Width(80);
+                    columns.Bound(p => p.BICNum).Title("BIC Number").Width(100);
+                    columns.Bound(p => p.IssuedOnDate).Format("{0:MM/dd/yyyy}").Title("Issued Date").Width(80);
+                    columns.Bound(p => p.PhoneInterviewDate).Format("{0:MM/dd/yyyy}").Title("Phone Interview Date").Width(80);
+                    columns.Bound(p => p.ArchivedOnDate).Format("{0:MM/dd/yyyy}").Title("Archived Date").Width(80);
+                    columns.Bound(p => p.NoteorComment).Title("Note/Comment").ClientTemplate(@"<textarea class='textareaforcasemanngement' placeholder = 'details/notes here...' 
+                        style='border-style:none;background-color:transparent!important;' readonly='readonly' ondblClick='TextAreaClick(event)' 
+                        onKeyup='TextArearKeyUp(event)'>#if(NoteorComment == null) {# #='' # #} else {# #=NoteorComment # #} #</textarea>")
+                       .Width(300).HtmlAttributes(new { @style = "line-height:12px!important;white-space:pre-wrap;" });
+                    columns.Bound(p => p.ActionByName).Title("Entered By").Width(100).HtmlAttributes(new { @style = "line-height:14px!important;" });
+                    columns.Command(command => { command.Edit(); command.Destroy(); }).Width(120);
+                })
+        .ToolBar(toolbar =>
+        {
+            { toolbar.Create().Text("Add New Benefit").HtmlAttributes( new { @style="background-color:yellow;"}); }
+        })
+        .ToolBar(toolbar => toolbar.Excel().Text("Export To Excel")).Excel(exl => exl.FileName("HCBenefit.xlsx").Filterable(true).AllPages(true))
+        .Editable(editable => editable.Mode(GridEditMode.PopUp).TemplateName("_GridHCBenefitTemplate").Window(w => w.Title("Edit Benefit").Width(550).Height(400).Resizable()))
+        .Events(e => { e.Edit("insertHeaderCaption"); e.DataBound("dataBound"); e.Save("beforesave"); })
+     .ClientDetailTemplateId("hcbenefittemplate")
+     .HtmlAttributes(new { @style = "min-width:60%; min-height:50%; padding:0px;" })
+    .Scrollable(s => s.Enabled(true).Height("55vh"))
+    .Sortable(sortable => sortable.AllowUnsort(false))
+    .Resizable(resize => resize.Columns(true))
+    .Pageable(pageable => pageable
+          .Refresh(false)
+          .PageSizes(new List<object> { 5, 10, 20, 30, 50 })
+          .ButtonCount(5))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Batch(true)
+        .Sort(s => { s.Add("AppliedOrRefusedOnDate").Descending(); })
+        .ServerOperation(false)
+        .PageSize(10)
+        .Events(events => { events.Error("hcb_error_handler"); events.RequestEnd("GridBenefitReload"); })
+        .Create(create => create.Action("HCBenefitCreate", "Client").Data("HCBenefitGridData"))
+        .Read(read => read.Action("HCBenefitRead", "Client").Data("GetHBParam"))
+        .Update(update => update.Action("HCBenefitUpdate", "Client").Data("HCBenefitGridData"))
+        .Destroy(destroy => destroy.Action("HCBenefitDestroy", "Client"))
+        .Model(model =>
+        {
+            model.Id(g => g.ID);
+            model.Field(field => field.BenefitTypeID).DefaultValue(3);
+            model.Field(field => field.OutcomeID).DefaultValue(0);
+            model.Field(field => field.AppliedOrRefusedOnDate).DefaultValue(DateTime.Now);
+            model.Field(field => field.OutcomeDate);
+            model.Field(field => field.PhoneInterviewDate);
+            model.Field(field => field.IssuedOnDate);
+            model.Field(field => field.ArchivedOnDate);
+            model.Field(field => field.AppliedOrRefused).DefaultValue(true);
+            model.Field(field => field.BICNum);
+        })))
+        <script id="hcbenefittemplate" type="text/kendo-tmpl">
+            @(Html.Kendo().Grid<IdentityManagement.Entities.HealthBenefit>()
+   .Name("grid_#=BenefitTypeID#")
+   .Resizable(r => r.Columns(true)).HtmlAttributes(new { style = "width:99%;" })
+   .Scrollable()
+   .Events(e => { e.DataBound("hiddenhcbColumn"); })
+       .Columns(columns =>
+       {
+           columns.Bound(p => p.BenefitTypeID).Hidden();
+           columns.Bound(p => p.AgreeType).Title("Applied/Refused").Width(20);
+           columns.Bound(p => p.AppliedOrRefusedOnDate).Format("{0:MM/dd/yyyy}").Title("Applied/Refused Date").Width(100);
+           columns.Bound(s => s.Outcome).Title("Outcome").Width(150);
+           columns.Bound(s => s.OutcomeDate).Format("{0:MM/dd/yyyy}").Title("Outcome Date").Width(100);
+           columns.Bound(s => s.BICNum).Title("BIC Number").Width(100);
+           columns.Bound(s => s.IssuedOnDate).Format("{0:MM/dd/yyyy}").Title("Issued Date").Format("{0:MM/dd/yyyy}").Width(100);
+           columns.Bound(p => p.PhoneInterviewDate).Format("{0:MM/dd/yyyy}").Title("Phone Interview Date").Width(100);
+           columns.Bound(p => p.ArchivedOnDate).Format("{0:MM/dd/yyyy}").Title("Archived Date").Width(100);
+           columns.Bound(s => s.NoteorComment).Title("Note/Comment").ClientTemplate("<textarea class='textareaforcasemanngement' placeholder = 'Note or Comment...' style='border-style:none;background-color:transparent!important;' readonly='readonly'>\\#if(NoteorComment == null) {\\# \\#=''\\# \\#} else {\\#  \\#=NoteorComment \\# \\#} \\#</textarea>").Width(400).HtmlAttributes(new { @style = "line-height:12px!important;white-space:pre-wrap;" });
+           columns.Bound(s => s.ActionByName).Title("Entered By").Width(200);
+           columns.Bound(s => s.DateAction).Format("{0:MM/dd/yyyy}").Title("Entered Date");
+       }).DataSource(dataSource => dataSource
+                 .Ajax()
+                 .PageSize(5)
+                 .Read(read => read.Action("HierarchyBinding_HCBenefit", "Client").Data("GetHBSubParam(#=BenefitTypeID#)"))
+              ).Pageable()
+              .Sortable()
+              .ToClientTemplate()
+            )
+        </script>
+    </div>
+}
+

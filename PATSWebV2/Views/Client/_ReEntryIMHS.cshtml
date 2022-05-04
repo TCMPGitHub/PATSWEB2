@@ -1,0 +1,641 @@
+﻿@using Kendo.Mvc.UI
+@model PATSWebV2.ViewModels.SocialWork.ReEntryIMHSViewModel
+    <style>
+#customers {
+  border-collapse: collapse;
+}
+
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  height: 10px!important;
+  font-size:14px  /*x-small*/;
+}
+#customers td {     
+  background-color: white;
+}
+
+#customers th {     
+  padding:0px;          
+  text-align: center;
+  background-color: dimgray;
+  color: white;
+  font-weight:bold;
+}
+#customers1 {
+  border-collapse: collapse;
+}
+
+#customers1 td, #customers1 th {
+  border: 1px solid #ddd;
+  height: 12px!important;
+  font-size:14px  /*x-small*/;
+}
+
+#customers1 th {     
+  padding:0px;          
+  text-align: center;
+  background-color: dimgray;
+  color: white;
+  font-weight:bold;
+}
+.popupBarColor{
+    background-color:purple;
+}
+</style>
+@using (Ajax.BeginForm("SaveReEntryIMHS", "Client", null, new AjaxOptions { HttpMethod = "Post", OnSuccess = "OnAjaxSuccess" }, new
+{
+    @id = "reentryform",
+    @name = "Case Re-entry Initial Mental Health Screening",
+    @style = "min-height: 500px;min-width:1200px;padding:0px",
+    @class = "color-danger"
+}))
+{
+   
+    @*<div id="appointmentdiv" class="color-danger">*@
+        @Html.HiddenFor(m => m.EpisodeID, new { @id = "hdEpisodeID" })
+        @Html.HiddenFor(m => m.CanEdit, new { @id = "hdEditable" })
+        @Html.HiddenFor(m => m.CaseReEntryIMHSSet.CaseReEntryID, new { @id = "hdInitailId" })
+        @Html.HiddenFor(m => m.CaseReEntryIMHSSet.IsLastReentrySet, new { id = "hdIsLastReentrySet" })
+        @Html.HiddenFor(m => m.CaseReEntryIMHSSet.CurrentDESCCCCMS)
+        @Html.HiddenFor(m => m.CaseReEntryIMHSSet.CurrentDESCEOP)
+        @Html.HiddenFor(m => m.CaseReEntryIMHSSet.CurrentDESCNone)
+        @Html.HiddenFor(m => m.CaseReEntryIMHSSet.MHChronoCompletedYes)
+        @Html.HiddenFor(m => m.CaseReEntryIMHSSet.MHChronoCompletedNo)
+
+  <div style="height:8vh;">
+      @{
+          var show = (Model.CaseReEntryIMHSSet != null && Model.CaseReEntryIMHSSet.CaseReEntryID > 0) ? "visible" : "hidden";
+       }
+    <div style="width:35vw;float:left">
+        <table>
+            <tr style="line-height:10px!important;"><td id="customers">@Html.Label("STATE OF CALIFORNIA", new { style = "float:left;font-size:14px;" })</td></tr>
+            <tr style="line-height:10px!important;"><td>@Html.Label("CASE MANAGEMENT RE-ENTRY INITIAL MENTAL HEALTH SCREENING", new { style = "float:left;font-weight:bold;font-size:14px;" })</td></tr>&nbsp;&nbsp;
+            <tr style="line-height:10px!important;"><td>@Html.Label("CDCR 2277(11/14)", new { style = "float:left;font-size:14px;" })&nbsp;&nbsp;
+                     <a style="visibility:@show;" href="javascript:printPATSPDF(@Model.EpisodeID, @Model.CaseReEntryIMHSSet.CaseReEntryID, 'Case Re-entry Initial MH Screening','color-danger')">
+                         <img style="width:22px; height:22px;margin-top:-5px;" title="Case ReEntry initial MH Screening" src='@Url.Content("~/Content/images/printer-icon.png")' /></a>&nbsp;&nbsp;@Model.NoEditAllowed</td>
+            </tr>
+        </table>     
+    </div>
+            <div style="width:60vw;float:right;margin-top:5px;">
+                <table id="customers">
+                   <tr style="background-color:silver;text-align:center">
+                        <th width="12%">CLINICIAN NAME:</th>
+                        <th width="10%">RE-ENTRY DATE:</th>
+                        <th width="13%">MENTAL STATUS:</th>
+                        <th width="12%">HIST of MH TREAT?</th>
+                        <th width="20%">Current MH Designation (DECS):</th>
+                        <th width="20%">OBSERVATION:</th>
+                    </tr>
+                    <tr>
+                        <td>@Html.DisplayFor(m => m.CaseReEntryIMHSSet.ActionName)</td>
+                        <td><script>
+                            var edit = ($("#hdIsLastReentrySet").val() == "True" && $("#hdEditable").val() == "True");
+                            $('#reentryform').on('dblclick', '.textareaforcasemanngement', function (e) {
+                                TextarePopup(e, edit, "color-danger");
+                            });
+                            $('#reentryform').on('keyup', '.textareaforcasemanngement', function (e) {
+                                if (e.keyCode == '90' && e.ctrlKey) {
+                                    $(this).trigger('dblclick');
+                                }
+                            });                       
+                            
+                            function PopulatePreviousRIMHSSet(e) {
+                                if (this.select() == 0) {
+                                    DisableAllInputFields("#reentryform :input", $("#hdEditable").val(), false);
+                                    return;
+                                }
+                                var object = this.dataItem(this.select());
+                                var id = (object == undefined || object.CaseRIMHSID == "") ? 0 : object.CaseRIMHSID;
+                                $.ajax({
+                                       url: "@Url.Action("GetReEntryIMHS", "Client")",
+                                      data: { EpisodeID: $("#hdEpisodeID").val(), CaseReEntryIMHSID: object.CaseRIMHSID == "" ? 0 : object.CaseRIMHSID },
+                                     cache: false,
+                                      type: "POST",
+                                  dataType: "html",
+                                   success: function (data, textStatus, XMLHttpRequest) {
+                                                 $("#reentryform").replaceWith(data); // HTML DOM replace
+                                            }
+                                });
+                          }
+                          function onDataBound(e) {
+                              if (this.selectedIndex == 0)
+                                  this.select(1);
+                          }
+                   </script>
+                @(Html.Kendo().DropDownListFor(m => m.CaseReEntryIMHSSet.CaseReEntryID)
+                .Name("AllRIMHSDates")
+                .OptionLabel("Select Dates...")
+                .DataTextField("CaseReEntryDate")
+                .DataValueField("CaseRIMHSID")
+                .HtmlAttributes(new { style = "width:90px;text-align:left;", @class = "neverDisable" })
+                .Filter(FilterType.Contains)
+                .Height(290)
+                .Events(e => { e.Change("PopulatePreviousRIMHSSet"); e.DataBound("onDataBound"); })
+                .DataSource(source =>
+                {
+                    source.Read(read => read.Action("GetRIMHSDateList", "Client", new { EpisodeID = Model.EpisodeID }));
+
+                }))</td>
+                        <td>@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.MHStatusWNL).Label("WNL").Checked(Model.CaseReEntryIMHSSet.MHStatusWNL).HtmlAttributes(new { @class = "clsMHStatus", style="margin-top:3px;" }))&nbsp;&nbsp;
+                            @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.MHStatusABWNL).Checked(Model.CaseReEntryIMHSSet.MHStatusABWNL).Label("ABNL").HtmlAttributes(new { @class = "clsMHStatus", style="margin - top:3px;" }))</td>
+                        <td>
+                            @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.HisMHTreatmentYes).Label("YES").HtmlAttributes(new { @class = "hisMHTreatment" }))&nbsp;&nbsp;
+                            @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.HisMHTreatmentNo).Label("NO").HtmlAttributes(new { @class = "hisMHTreatment" }))
+                        </td>
+                        <td>
+                            @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.CurrentDESCCCCMS).HtmlAttributes(new { @id = "chkCurrentCcc", @class = "currentlevel alwayDisabled" }).Label("CCCMS"))&nbsp;&nbsp;
+                            @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.CurrentDESCEOP).HtmlAttributes(new { @id = "chkCurrentEop", @class = "currentlevel alwayDisabled" }).Label("EOP"))&nbsp;&nbsp;
+                            @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.CurrentDESCNone).HtmlAttributes(new { @id = "chkCurrentNone", @class = "currentlevel alwayDisabled" }).Label("NONE"))
+                        </td>
+                        <td>@Html.TextAreaFor(m => m.CaseReEntryIMHSSet.Observasion, new { @id = "txt1", @refID = 1, @class = "textareaforcasemanngement", placeholder = "Observasion ...", @maxLength = "500" })</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <table id="customers1" style="background-color:white;width:99.5%;padding:2px;">
+            <tr style="background-color:darkgrey;"><td colspan="5" style="height:2px!important;width:100%;"></td></tr>
+            <tr>
+                <td width="35%" colspan="2" >@Html.Label("", String.Format("1."))&nbsp;&nbsp;@Html.Label("Communication barrier?")</td>
+                <td width="12%">
+                    @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.CommunicationBarrierYes).Label("YES").HtmlAttributes(new { @class = "communicationBarrier" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.CommunicationBarrierNo).Label("NO").HtmlAttributes(new { @class = "communicationBarrier" }))
+                </td>
+                <td width="52%"  colspan="2"> @Html.Label("Corrective Action:") <br /> @Html.TextAreaFor(m => m.CaseReEntryIMHSSet.CommunicationBarrierNote, new { @id = "txt2", @refID = 2, @class = "textareaforcasemanngement", placeholder = "Communication Barrier Note ...", @maxLength = "500" }) </td>
+            </tr>
+            <tr>
+                <td width="35%"  colspan="2"> @Html.Label("", String.Format("2."))&nbsp;&nbsp;@Html.Label("Recent bad news or worries causing stress?") </td>
+                <td width="12%">
+                    @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.BadNewsWorriesStressYes).Label("YES").HtmlAttributes(new { @class = "badNewsWorriesStress" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.BadNewsWorriesStressNo).Label("NO").HtmlAttributes(new { @class = "badNewsWorriesStress" }))
+                <td width="52%"  colspan="2"> @Html.TextAreaFor(m => m.CaseReEntryIMHSSet.BadNewsWorriesStressNote, new { @id = "txt3", @refID = 3, @class = "textareaforcasemanngement", placeholder = "Bad News or Worries Note ...", @maxLength = "500" }) </td>
+           </tr>
+                <tr>
+                    <td width="35%"  colspan="2">@Html.Label("", String.Format("3."))&nbsp;&nbsp;@Html.Label("Are you or have you been hearing voices?")</td>
+                    <td width="12%">
+                        @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.HearingVoiceYes).Label("YES").HtmlAttributes(new { @class = "hearingVoice" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.HearingVoiceNo).Label("NO").HtmlAttributes(new { @class = "hearingVoice" }))
+                    </td>
+                    <td width="52%"  colspan="2"> @Html.TextAreaFor(m => m.CaseReEntryIMHSSet.HearingVoice_Note, new { @id = "txt4", @refID = 4, @class = "textareaforcasemanngement", placeholder = "Hearing Voices Note ...", @maxLength = "500" }) </td>
+                </tr>
+                <tr>
+                    <td width="35%"  colspan="2">@Html.Label("", String.Format("4."))&nbsp;&nbsp;@Html.Label("Are you or have you been seeing things that are not there?")</td>
+                    <td width="12%">
+                        @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.SeeingThingsNotThereYes).Label("YES").HtmlAttributes(new { @class = "seeingThingsNotThere" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.SeeingThingsNotThereNo).Label("NO").HtmlAttributes(new { @class = "seeingThingsNotThere" }))
+                    </td>
+                    <td width="52%"  colspan="2"> @Html.TextAreaFor(m => m.CaseReEntryIMHSSet.SeeingThingsNotThereNote, new { @id = "txt5", @refID = 5, @class = "textareaforcasemanngement", placeholder = "Seeing things not there Note ...", @maxLength = "500" }) </td>
+                </tr>
+                <tr>
+                    <td width="35%"  colspan="2">
+                        <b>5.&nbsp;&nbsp;Are you taking any&nbsp;<u>psychotropic</u>&nbsp;medications?</b><br /><br />&nbsp;&nbsp;&nbsp;&nbsp;@Html.Label("Do you have a supply of your medications?")<br />
+                        &nbsp;&nbsp; &nbsp; &nbsp; @Html.Label("How much medication do you have?")&nbsp;&nbsp;
+                        @(Html.Kendo().TextBoxFor(m => m.CaseReEntryIMHSSet.MedicationNumber).HtmlAttributes(new
+                         {
+                             @value = @Model.CaseReEntryIMHSSet.MedicationNumber,
+                             @class = "numericonly"
+                         }))&nbsp;@Html.Label("days")
+                     </td>
+         
+                     <td width="12%">
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.TakingPsychotropicMedYes).Label("YES").HtmlAttributes(new { @class = "takingPsychotropicMed" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.TakingPsychotropicMedNo).Label("NO").HtmlAttributes(new { @class = "takingPsychotropicMed" }))
+                <br /><br />
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.DoSupplyMedYes).Label("YES").HtmlAttributes(new { @class = "doSupplyMed" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.DoSupplyMedNo).Label("NO").HtmlAttributes(new { @class = "doSupplyMed" }))
+            </td>
+            <td width="52%"  colspan="2" class="fillwidth">
+                @Html.Label("List Medications:")<br />@Html.TextAreaFor(m => m.CaseReEntryIMHSSet.TakingPsychotropicMedNote, new { @id = "txt6", @refID = 6, @class = "textareaforcasemanngement", placeholder = "Taking Psychotropic Med Note ...", @maxLength = "500" })<br />
+                <table id="grid" class="table table-condensed table-bordered k-grid" style="width:90%;">
+                    <tr class="k-grid-header" style="background-color:silver;">
+                        <th class="k-grid-header">Date last time medication taken?</th>
+                        <th class="k-grid-header">Bridge meds requested?</th>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left">
+                            @(Html.Kendo().DatePickerFor(m => m.CaseReEntryIMHSSet.LastTimeMedTakenDate).Format("MM/dd/yyyy").HtmlAttributes(new { @id = "LastTimeMedTakenDate", @class = "caseReenterdp", @style = "width:120px;" }))
+                        </td>
+                        <td>
+                            <div class="alignleft">
+                                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.BridgeMedsRequestedYes).Label("YES").HtmlAttributes(new { @class = "bridgeMedsRequested" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.BridgeMedsRequestedNo).Label("NO").HtmlAttributes(new { @class = "bridgeMedsRequested" }))
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td width="35%"  colspan="2">@Html.Label("", String.Format("6."))&nbsp;&nbsp;@Html.Label("Have you had any thoughts of hurting yourself or committing suicide?")</td>
+            <td width="12%">
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.ThoughtsHurtingOrCommittimgSuicideYes).Label("YES").HtmlAttributes(new { @class = "thoughtsHurtingOrCommittimgSuicide" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.ThoughtsHurtingOrCommittimgSuicideNo).Label("NO").HtmlAttributes(new { @class = "thoughtsHurtingOrCommittimgSuicide" }))
+            </td>
+            <td width="52%"  colspan="2">@Html.Label("If yes, plan, intent, and means:")<br />@Html.TextAreaFor(m => m.CaseReEntryIMHSSet.ThoughtsHurtingOrCommittimgSuicide_Note, new { @id = "txt7", @refID = 7, @class = "textareaforcasemanngement", placeholder = "Thoughts of Hurting Or Committing Suicide Note ...", @maxLength = "500" })</td>
+        </tr>
+        <tr>
+            <td width="35%"  colspan="2">
+                @Html.Label("", String.Format("7."))&nbsp;&nbsp;@Html.Label("Have you had any thoughts of hurting someone else?")
+                <br />&nbsp;&nbsp;@Html.Label("If yes, who is this person?")&nbsp;&nbsp;
+                @(Html.Kendo().TextBoxFor(m => m.CaseReEntryIMHSSet.ThoughtsHurtingWho).HtmlAttributes(new { @style = "width:200px", @spellcheck = "true", onkeypress = "IgnoreEnterKey(event)", @maxlength = "70" }))
+            </td>
+            <td width="12%">
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.ThoughtsHurtingSomeElseYes).Label("YES").HtmlAttributes(new { @class = "thoughtsHurtingSomeElse" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.ThoughtsHurtingSomeElseNo).Label("NO").HtmlAttributes(new { @class = "thoughtsHurtingSomeElse" }))
+            </td>
+            <td width="52%"  colspan="2">@Html.Label("Current plan, intent, and means:")<br /> @Html.TextAreaFor(m => m.CaseReEntryIMHSSet.ThoughtsHurtingSomeElse_Note, new { @id = "txt8", @refID = 8, @class = "textareaforcasemanngement", placeholder = "Thoughts of Hurting Someone Else Note ...", @maxLength = "500" }) </td>
+        </tr>
+        <tr>
+            <td width="35%"  colspan="2"><b>8.&nbsp;&nbsp;Do you take any medications for <u>medical</u> issues?</b></td>
+            <td width="12%">
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.TakeMedicationForMedicalIssuesYes).Label("YES").HtmlAttributes(new { @class = "takeMedicationForMedicalIssues" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.TakeMedicationForMedicalIssuesNo).Label("NO").HtmlAttributes(new { @class = "takeMedicationForMedicalIssues" }))
+            </td>
+            <td width="52%"  colspan="2"> @Html.Label("List Medications:")<br />@Html.TextAreaFor(m => m.CaseReEntryIMHSSet.TakeMedicationForMedicalIssues_Note, new { @id = "txt9", @refID = 9, @class = "textareaforcasemanngement", placeholder = "Medications For Medical Issues Note ...", @maxLength = "500" })</td>
+        </tr>
+        <tr>
+            <td width="35%"  colspan="2">@Html.Label("", String.Format("9."))&nbsp;&nbsp; @Html.Label("Do you have a follow-up appointment/plan?") </td>
+            <td width="12%">
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.FollowupAppointmentYes).Label("YES").HtmlAttributes(new { @class = "followupAppointment" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.FollowupAppointmentNo).Label("NO").HtmlAttributes(new { @class = "followupAppointment" }))
+            </td>
+            <td width="52%"  colspan="2"> @Html.TextAreaFor(m => m.CaseReEntryIMHSSet.FollowupAppointmentNote, new { @id = "txt10", @refID = 10, @class = "textareaforcasemanngement", placeholder = "Follow up Appointment/Plan Note ...", @maxLength = "500" }) </td>
+        </tr>
+        <tr>
+            <td width="35%"  colspan="2">@Html.Label("", String.Format("10."))&nbsp;&nbsp;@Html.Label("Do you have any allergies to medications?")</td>
+            <td width="12%">
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.AllergiesToMedicationYes).Label("YES").HtmlAttributes(new { @class = "allergiesToMedication" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.AllergiesToMedicationNo).Label("NO").HtmlAttributes(new { @class = "allergiesToMedication" }))
+            </td>
+            <td width="52%"  colspan="2"> @Html.TextAreaFor(m => m.CaseReEntryIMHSSet.AllergiesToMedicationNote, new { @id = "txt11", @refID = 11, @class = "textareaforcasemanngement", placeholder = "Allergies To Medications Note ...", @maxLength = "500" }) </td>
+        </tr>
+        <tr>
+            <td width="35%"  colspan="2">@Html.Label("", String.Format("11."))&nbsp;&nbsp;@Html.Label("Do you or other people close to you believe that drugs or alcohol have caused your problems?")</td>
+            <td width="12%">
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.DrugOrAlcoholProblemYes).Label("YES").HtmlAttributes(new { @class = "drugOrAlcoholProblem" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.DrugOrAlcoholProblemNo).Label("NO").HtmlAttributes(new { @class = "drugOrAlcoholProblem" }))
+            </td>
+            <td width="52%"  colspan="2">@Html.Label("Corrective Action:")<br /> @Html.TextAreaFor(m => m.CaseReEntryIMHSSet.DrugOrAlcoholProblemNote, new { @id = "txt12", @refID = 12, @class = "textareaforcasemanngement", @placeholder = "Drug Or Alcohol Problem Note ...", @maxLength = "500" }) </td>
+        </tr>
+        <tr>
+            <td width="10%" >&nbsp;&nbsp;&nbsp;&nbsp;<b>ACUTE</b></td>
+            <td width="40%"  colspan="2">&#8226;&nbsp;@Html.Label("Danger to self or others")&nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;@Html.Label("Grave Disability")&nbsp;&nbsp;&nbsp;&nbsp;&#8226;&nbsp;@Html.Label("5150 Eligible") </td>
+            <td width="50%"  colspan="2">@Html.Label("Remanded To:")<br />@Html.TextAreaFor(m => m.CaseReEntryIMHSSet.AcuteRemandedTo, new { @id = "txt13", @refID = 13, @class = "textareaforcasemanngement", @placeholder = "Remanded to ...", @maxLength = "70" })</td>
+        </tr>
+        <tr>
+            <td width="10%" >
+                &nbsp;&nbsp;
+                &nbsp;&nbsp;<b>URGENT</b>
+            </td>
+            <td width="40%"  colspan="2">
+                &#8226;&nbsp;@Html.Label("Currently experiencing significant distress due to psychotic symptoms")<br />
+                &#8226;&nbsp;@Html.Label("Not 5150 Eligible")
+            </td>
+            <td width="50%" colspan="2">
+                <div class="row" style="width:300px">
+                    <a class="appointmentLink" onclick="GetAjaxForm('@Url.Action("GetClientDailyActivity", "Appointment", new { EpisodeId = @Model.EpisodeID,
+                                                SchedulerDate = string.IsNullOrEmpty(Model.CaseReEntryIMHSSet.UrgentNextAppointmentNote) ? DateTime.Now.AddDays(3) : Convert.ToDateTime(Model.CaseReEntryIMHSSet.UrgentNextAppointmentNote.Substring(0, 10)),
+                                                Init = 3, Mod = "Clinic" })');" onmouseover="">Next Appointment (Within 3 Working Days):</a>
+                </div>
+
+                @Html.TextAreaFor(m => m.CaseReEntryIMHSSet.UrgentNextAppointmentNote, new { @id = "txt14", @refID = 14, @class = "textareaforcasemanngement alwayReadonly", @placeholder = "Appointment Note ...", @readonly = "readonly", @maxLength = "70" })
+            </td>
+        </tr>
+        <tr>
+            <td width="10%" >&nbsp;&nbsp;&nbsp;&nbsp;<b>INTERMEDIATE</b></td>
+            <td width="40%"  colspan="2">
+                <table class="tab-content table-borderless">
+                    <tr><td style="line-height:10px!important;border-style:none!important;">&#8226;&nbsp;@Html.Label("Currently experiencing some emotional or psychiatric concerns;")</td></tr>
+                    <tr><td style="line-height:10px!important;border-style:none!important;">&nbsp;&nbsp;&nbsp;@Html.Label("", String.Format("Hallucinations, thoughts of using substances, depression, etc."))</td></tr>
+                    <tr><td style="line-height:10px!important;border-style:none!important;">&#8226;&nbsp;@Html.Label("No thoughts of self-harm or harm to others")</td></tr>
+                </table>
+            </td>
+            <td width="50%"  colspan="2">
+                <div class="row" style="width:200px">
+                    <a class="appointmentLink" onclick="GetAjaxForm('@Url.Action("GetClientDailyActivity", "Appointment", new { EpisodeId = @Model.EpisodeID,
+                                                SchedulerDate = string.IsNullOrEmpty(Model.CaseReEntryIMHSSet.IntermediateNextAppointmentNote) ? DateTime.Now.AddDays(7) : Convert.ToDateTime(Model.CaseReEntryIMHSSet.IntermediateNextAppointmentNote.Substring(0, 10)),
+                                                Init = 7, Mod = "Clinic" })');" onmouseover="">Next Appointment (7-14 Calendar Days):</a>
+                </div>
+
+                @Html.TextAreaFor(m => m.CaseReEntryIMHSSet.IntermediateNextAppointmentNote, new { @id = "txt15", @refID = 15, @class = "textareaforcasemanngement alwayReadonly", @placeholder = "Appointment Note ...", @readonly = "readonly", @maxLength = "70" })
+            </td>
+        </tr>
+        <tr>
+            <td width="10%" >&nbsp;&nbsp;&nbsp;&nbsp;<b>ROUTINE</b></td>
+            <td width="40%"  colspan="2">
+                &#8226;&nbsp;@Html.Label("Stable")<br />
+                &#8226;&nbsp;@Html.Label("", String.Format("CCCMS with no major mental health or environmental concerns."))
+            </td>
+            <td width="50%"  colspan="2">
+                <div class="row" style="width:200px">
+                    <a class="appointmentLink" onclick="GetAjaxForm('@Url.Action("GetClientDailyActivity", "Appointment", new { EpisodeId = @Model.EpisodeID,
+                                                SchedulerDate = string.IsNullOrEmpty(Model.CaseReEntryIMHSSet.RoutineNextAppointmentNote) ? DateTime.Now.AddDays(30) : Convert.ToDateTime(Model.CaseReEntryIMHSSet.RoutineNextAppointmentNote.Substring(0, 10)),
+                                                Init = 30, Mod = "Clinic" })');" onmouseover="">Next Appointment (Within 30 Calendar Days):</a>
+                </div>
+                @Html.TextAreaFor(m => m.CaseReEntryIMHSSet.RoutineNextAppointmentNote, new { @id = "txt16", @refID = 16, @class= "textareaforcasemanngement alwayReadonly", @placeholder = "Appointment Note ...", @readonly = "readonly", @maxLength = "70" })
+            </td>
+        </tr>
+        <tr>
+            <td width="10%" >&nbsp;&nbsp;&nbsp;&nbsp;<b>UNNECESSARY</b></td>
+            <td width="40%"  colspan="2">
+                &#8226;&nbsp;@Html.Label("", String.Format("No symptoms present and not currently in MHSDS."))
+            </td>
+            <td width="50%">@Html.Label("No Appointment Necessary")&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.UnApptNecessary).HtmlAttributes(new { style = "margin-top:-25px;" }))
+            </td>
+        </tr>
+        <tr>
+            <td width="50%" colspan="3">
+                <table class="table-borderless">
+                    <tr>
+                        <td width="12%">
+                            @Html.Label("Mental Health Chrono Completed?")
+                        </td>
+                        <td width="28%">
+                            @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.MHChronoCompletedYes).Label("YES").HtmlAttributes(new { @class = "alwayDisabled" }))&nbsp;&nbsp;&nbsp;&nbsp;@(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.MHChronoCompletedNo).Label("NO").HtmlAttributes(new { @class = "alwayDisabled" }))
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td width="50%" colspan="2">
+                <table class="table-borderless">
+                    <tr>
+                        <td width="14%">@Html.Label("New Level of Care?")</td>
+                        <td width="28%">
+                            @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.NewLevelCareEOP).HtmlAttributes(new { @id = "chkEop", @class = "nextlevel" }).Label("EOP"))&nbsp;&nbsp;&nbsp;&nbsp;
+                            @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.NewLevelCareCCCMS).HtmlAttributes(new { @id = "chkCcc", @class = "nextlevel" }).Label("CCCMS"))&nbsp;&nbsp;&nbsp;&nbsp;
+                            @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.NewLevelCareMedNecessity).HtmlAttributes(new { @id = "chkNcs", @class = "nextlevel" }).Label("Meds Necessity"))
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <br />
+    <div id="divViewGuideline" style="font-size:14px">
+        <div style="font-weight:bold;margin-left:20px">Parolee-patients will receive a psychiatric appointment for medication management based on the following treatment needs guideline?</div>
+        <ul>
+            <li>
+                <strong>Urgent -</strong>Severe psychiatric symptoms (such as severe depression, debilitating anxiety/daily panic attacks, frequent hallucinations, specific delusions/specific paranoia, crippling concentration problems, severe psychomotor agitation or retardation, severe insomnia/essentially no restful sleep), or changing/worsening psychiatric symptoms.
+            </li>
+            <li>
+                <strong>Intermediate -</strong>Moderate symptoms (such as depressive or anxiety symptoms, occasional bothersome hallucinations or illusions, or general but significant paranoia).
+            </li>
+            <li>
+                <strong>Routine -</strong>Chronic but stable psychiatric symptoms such as blunted affect, chronic suspiciousness, infrequent auditory illusions. Some mild symptoms such as occasional insomnia, mild intermittent depressed mood. Transient symptoms or expectable reactions to psychosocial stressors.
+            </li>
+            <li>
+                <strong>Unnecessary –</strong>Not on psychiatric medications and no significant signs/symptoms or complaints.
+            </li>
+        </ul>
+    </div>
+    <center><strong>PSYCHIATRIST APPOINTMENT SCHEDULING ALGORITHM AND BRIDGE MEDICATIONS NEEDS</strong></center>
+    
+    <table id="gird" class="table table-condensed table-bordered" style="width: 99.5%;background-color:white; font-size:14px">
+        <tr style="background-color:silver;height:10px!important;font-size:14px;text-align:center" class="k-grid-header k-header table-bordered">
+            <th style="text-align:center">@Html.Label("SCREENING LEVEL")</th>
+            <th style="text-align:center">@Html.Label("APPOINTMENT GUIDELINE")</th>
+            <th style="text-align:center">@Html.Label("CURRENTLY PRESCRIBED MEDICATIONS")</th>
+            <th style="text-align:center">@Html.Label("HAS MEDICATIONS")</th>
+            <th style="text-align:center">@Html.Label("BRIDGE MEDICATIONS REQUESTED")</th>
+        </tr>
+        <tr>
+            <td with="20%">@Html.Label("URGENT")</td>
+            <td with="20%">@Html.Label("Within 3 Days - (same day if available)")</td>
+            <td with="20%">
+                &nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.UrgentCurrentlyPreScribedMedYes).Label("YES").HtmlAttributes(new { @class = "urgentCurrentlyPreScribedMed" }))
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.UrgentCurrentlyPreScribedMedNo).Label("NO").HtmlAttributes(new { @class = "urgentCurrentlyPreScribedMed" }))
+            </td>
+            <td with="20%">
+                &nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.UrgentHasMedYes).Label("YES").HtmlAttributes(new { @class = "urgentHasMed" }))
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.UrgentHasMedNo).Label("NO").HtmlAttributes(new { @class = "urgentHasMed" }))
+            </td>
+            <td with="20%">
+                &nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.UrgentBridgeMedRequestedYes).Label("YES").HtmlAttributes(new { @class = "urgentBridgeMedRequested" }))
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.UrgentBridgeMedRequestedNo).Label("NO").HtmlAttributes(new { @class = "urgentBridgeMedRequested" }))
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.Label("INTERMEDIATE")</td>
+            <td>@Html.Label("Within 14 Days")</td>
+            <td>
+                &nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.InterMediateCurrentlyPreScribedMedYes).Label("YES").HtmlAttributes(new { @class = "interMediateCurrentlyPreScribedMed" }))
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.InterMediateCurrentlyPreScribedMedNo).Label("NO").HtmlAttributes(new { @class = "interMediateCurrentlyPreScribedMed" }))
+            </td>
+            <td>
+                &nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.InterMediateHasMedYes).Label("YES").HtmlAttributes(new { @class = "interMediateHasMed" }))
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.InterMediateHasMedNo).Label("NO").HtmlAttributes(new { @class = "interMediateHasMed" }))
+            <td>
+                &nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.InterMediateBridgeMedRequestedYes).Label("YES").HtmlAttributes(new { @class = "interMediateBridgeMedRequested" }))
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.InterMediateBridgeMedRequestedNo).Label("NO").HtmlAttributes(new { @class = "interMediateBridgeMedRequested" }))
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.Label("ROUTINE")</td>
+            <td>@Html.Label("Within 28 Days")</td>
+            <td>
+                &nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.RoutineCurrentlyPreScribedMedYes).Label("YES").HtmlAttributes(new { @class = "routineCurrentlyPreScribedMed" }))
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.RoutineCurrentlyPreScribedMedNo).Label("NO").HtmlAttributes(new { @class = "routineCurrentlyPreScribedMed" }))
+            <td>
+                &nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.RoutineHasMedYes).Label("YES").HtmlAttributes(new { @class = "routineHasMed" }))
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.RoutineHasMedNo).Label("NO").HtmlAttributes(new { @class = "routineHasMed" }))
+            </td>
+            <td>
+                &nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.RoutineBridgeMedRequestedYes).Label("YES").HtmlAttributes(new { @class = "routineBridgeMedRequested" }))
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                @(Html.Kendo().CheckBoxFor(m => m.CaseReEntryIMHSSet.RoutineBridgeMedRequestedNo).Label("NO").HtmlAttributes(new { @class = "routineBridgeMedRequested" }))
+            </td>
+        </tr>
+    </table>
+
+    <br />
+    <div class="padded aligncenter form-actions" id="caseIMHSButtonDiv">
+        @*@{
+                var bntcolor = Model.ModelAction == "CASE" ? "pats-button" : "danger-button";
+            }*@
+        @if (Model.CanEdit)
+                {
+            <button type="submit" class="btn btn-group-lg danger-button" id="imhsSave">Submit</button>
+        }&nbsp; &nbsp;
+        <button type="button" class="btn btn-group-lg danger-button" id="imhsCancel">Cancel</button>&nbsp;&nbsp;
+        <button type="button" class="btn btn-group-lg danger-button" id="imhsReset">Reset</button>&nbsp;&nbsp;
+        <a style="visibility:@show;" href="javascript:printPATSPDF(@Model.EpisodeID, @Model.CaseReEntryIMHSSet.CaseReEntryID, 'Case Re-entry Initial MH Screening','color-danger')">
+            <img style="width:22px; height:22px;" title="Case ReEntry initial MH Screening" src='@Url.Content("~/Content/images/printer-icon.png")' /></a>
+    </div>
+    <br />
+    <br />
+    @*</div>*@
+
+    }
+
+    <script type="text/javascript">
+        function IMHSButtonDisable(disabled) {
+            $("#imhsSave").prop('disabled', disabled);
+            $("#imhsCancel").prop('disabled', disabled);
+            $("#imhsReset").prop('disabled', disabled);
+        }
+        $(function () {
+            //var initdata = $('#reentryform').serializeAllArray();
+            var initdata = $('#reentryform').serialize();
+            $('#reentryform').submit(function (e) {
+                e.preventDefault();
+                var nowdata = $('#reentryform').serialize();
+                if (initdata === nowdata) {
+                    NotifyMessage();
+                    e.stopPropagation();
+                    return false;
+                }
+                if (confirm("Are you sure you want to save this Case Re-entry Initial Mental Health Screening?") == false) {
+                    e.stopPropagation();
+                    return false;
+                }
+                initdata = nowdata;
+                IMHSButtonDisable(true);
+                postFormAndReplaceDivHtmlPats($('#reentryform'));
+                var tabstrip = $("#swTabstrip").data("kendoTabStrip");
+                var tab = tabstrip.select();
+                tabstrip.reload(tab);
+                return true;
+            });
+            $("#reentryform :input").change(function (e) {
+                var nowdata = $('#reentryform').serialize();
+                if (initdata === nowdata) {
+                    IMHSButtonDisable(true);
+                }
+                else {
+                   IMHSButtonDisable(false);
+                }
+            });
+        });
+        $('#printLink').on('click', function () {
+            var url = document.getElementById('printLink').href;
+            var substr = "CaseREIMHSID=";
+            var caseID = $("#AllRIMHSDates").val();
+            if (url.indexOf("CaseREIMHSID") > 0) {
+                substr = url.substring(url.indexOf("CaseREIMHSID"));
+                url = url.substring(0, url.indexOf("&"));
+                var oldcaseId = substr.substring(substr.indexOf('=') + 1);
+                substr = substr.replace(oldcaseId, caseID);
+            }
+            else {
+                substr = substr + caseID;
+            }
+            url = url + "&" + substr;
+            this.href = url;
+        })
+
+        //$('#reentryform').on('focus', '.textareaforcasemanngement', function (e) {
+        //    ResizeTextArea($(this), e);
+        //})
+        //$('#reentryform').on('blur', '.textareaforcasemanngement', function (e) {
+        //    MinTextArea($(this), e, 30, this.maxLength);
+
+        //})
+
+        $(".caseReenterdp").kendoValidator({
+            rules: {
+                dateValidation: function (element) {
+                    $(this).removeClass('field-validation-error');
+                    $(this).parent().find('span[data-valmsg-for]').remove();
+                    if (element.is("[data-val-date]") && element.val() != "") {
+                        var value = $(element).val();
+                        return is_valid_date(value);
+                    }
+                    return true;
+                }
+            },
+            messages: {
+                dateValidation: "must be a valid date",
+            }
+        });
+        $(".caseReenterdp").kendoMaskedTextBox({
+            mask: "00/00/0000"
+        });
+        $(".caseReenterdp").closest(".k-datepicker")
+              .add($(".caseReenterdp"))
+              .removeClass("k-textbox")
+
+        var editableIMHS = EditableEpisode($("#hdEditable").val()) && $("#hdIsLastReentrySet").val() == "True";
+        DisableAllInputFields("#reentryform :input", $("#hdEditable").val(), editableIMHS);
+        IMHSButtonDisable(true);
+        $(".nextlevel").click(function (e) { checkBoxChecked(e, ".nextlevel") })
+        $(".currentlevel").click(function (e) { checkBoxChecked(e, ".currentlevel") })
+        $(".hisMHTreatment").click(function (e) { checkBoxChecked(e, ".hisMHTreatment") })
+        $(".chkApptType").click(function (e) { checkBoxChecked(e, ".chkApptType") })
+        $(".clsMHStatus").click(function (e) { checkBoxChecked(e, ".clsMHStatus") })
+        //=====================================
+        //communicationBarrier
+        //badNewsWorriesStress
+        //hearingVoice
+        //seeingThingsNotThere
+        //takingPsychotropicMed
+        //doSupplyMed
+        //bridgeMedsRequested
+        //thoughtsHurtingOrCommittimgSuicide
+        //thoughtsHurtingSomeElse
+        //takeMedicationForMedicalIssues
+        //followupAppointment
+        //allergiesToMedication
+        //drugOrAlcoholProblem
+        //urgentCurrentlyPreScribedMed
+        //urgentHasMed
+        //urgentBridgeMedRequested
+        //interMediateCurrentlyPreScribedMed
+        //interMediateHasMed
+        //interMediateBridgeMedRequested
+        //routineCurrentlyPreScribedMed
+        //routineHasMed
+        //routineBridgeMedRequested
+        $(".communicationBarrier").click(function (e) { checkBoxChecked(e, ".communicationBarrier") })
+        $(".badNewsWorriesStress").click(function (e) { checkBoxChecked(e, ".badNewsWorriesStress") })
+        $(".hearingVoice").click(function (e) { checkBoxChecked(e, ".hearingVoice") })
+        $(".seeingThingsNotThere").click(function (e) { checkBoxChecked(e, ".seeingThingsNotThere") })
+        $(".takingPsychotropicMed").click(function (e) { checkBoxChecked(e, ".takingPsychotropicMed") })
+        $(".doSupplyMed").click(function (e) { checkBoxChecked(e, ".doSupplyMed") })
+        $(".bridgeMedsRequested").click(function (e) { checkBoxChecked(e, ".bridgeMedsRequested") })
+        $(".thoughtsHurtingOrCommittimgSuicide").click(function (e) { checkBoxChecked(e, ".thoughtsHurtingOrCommittimgSuicide") })
+        $(".thoughtsHurtingSomeElse").click(function (e) { checkBoxChecked(e, ".thoughtsHurtingSomeElse") })
+        $(".takeMedicationForMedicalIssues").click(function (e) { checkBoxChecked(e, ".takeMedicationForMedicalIssues") })
+        $(".followupAppointment").click(function (e) { checkBoxChecked(e, ".followupAppointment") })
+        $(".allergiesToMedication").click(function (e) { checkBoxChecked(e, ".allergiesToMedication") })
+        $(".drugOrAlcoholProblem").click(function (e) { checkBoxChecked(e, ".drugOrAlcoholProblem") })
+        $(".urgentCurrentlyPreScribedMed").click(function (e) { checkBoxChecked(e, ".urgentCurrentlyPreScribedMed") })
+        $(".urgentHasMed").click(function (e) { checkBoxChecked(e, ".urgentHasMed") })
+        $(".urgentBridgeMedRequested").click(function (e) { checkBoxChecked(e, ".urgentBridgeMedRequested") })
+        $(".interMediateCurrentlyPreScribedMed").click(function (e) { checkBoxChecked(e, ".interMediateCurrentlyPreScribedMed") })
+        $(".interMediateHasMed").click(function (e) { checkBoxChecked(e, ".interMediateHasMed") })
+        $(".interMediateBridgeMedRequested").click(function (e) { checkBoxChecked(e, ".interMediateBridgeMedRequested") })
+        $(".routineCurrentlyPreScribedMed").click(function (e) { checkBoxChecked(e, ".routineCurrentlyPreScribedMed") })
+        $(".routineHasMed").click(function (e) { checkBoxChecked(e, ".routineHasMed") })
+        $(".routineBridgeMedRequested").click(function (e) { checkBoxChecked(e, ".routineBridgeMedRequested") })
+        //=====================================
+
+
+        //only allow numeric
+        $('.numericonly').keypress(function (e) {
+            var verified = (e.which == 8 || e.which == undefined || e.which == 0) ? null : String.fromCharCode(e.which).match(/[^0-9]/);
+            if (verified) { e.preventDefault(); }
+        });
+
+        $("#imhsCancel").click(function () {
+            document.getElementById("reentryform").reset();
+            IMHSButtonDisable(true);
+        })
+
+        $("#imhsReset").click(function () {
+            $("#reentryform :input").each(function () {
+                if (this.type == "checkbox")
+                    $(this).prop('checked', false);
+
+                if (this.type == "text" || this.type == "textarea" || this.type == "number")
+                    $(this).val('');
+
+                if (this.type == "radio")
+                    this.checked = false;
+            })
+        });
+
+    </script>
+

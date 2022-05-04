@@ -1,0 +1,172 @@
+﻿@using PATSWebV2.DataAccess
+@using Kendo.Mvc.UI
+@model PATSWebV2.ViewModels.Client.ClientSummaryViewModel
+@*<!DOCTYPE html>*@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+@*<!DOCTYPE html class="js flexbox no-flexboxlegacy canvas canvastext webgl no-touch geolocation postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients no-cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers applicationcache svg inlinesvg no-smil svgclippaths k-ie k-ie11 js ">*@
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv='cache-control' content='no-cache, must-revalidate, post-check=0, pre-check=0'/>
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewBag.Title</title>
+    <script>
+        var loginPage = '@Url.Action("Login", "PATSAccount")';
+    </script>
+    <style>
+    .k-icon {
+        -webkit-animation: spin 2s infinite linear;
+        animation: spin 2s infinite linear;
+    }
+    .ui-widget-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.ui-front {
+    z-index: 100;
+}
+.ui-dialog{
+    border:thin solid gray;
+}
+.ui-dialog-buttonset {
+    height:35px;
+}
+.ui-dialog-button{
+    float:right!important;
+    border-style:none;
+    margin-right:2px;
+    margin-top:15px;
+}
+
+.ui-dialog-title{
+    font-weight:bold;
+    color:darkblue;
+    margin-left:2px;
+}
+        .ui-dialog-titlebar-close {
+            height: 22px;
+            width: 22px;
+            float: right;
+            margin-right: 2px;
+            border-style: none;
+            background: url('../../Content/Images/24_close.png') no-repeat;
+        }
+
+    </style>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+
+    @Scripts.Render("~/bundles/modernizr")    
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/kendo")
+    @Scripts.Render("~/bundles/PATS")
+
+    @RenderSection("styles", required: false)
+    @RenderSection("scripts", required: false)
+</head>
+<body onload="initSession()" style="overflow:hidden;">
+    <div id="patsdialog"></div>
+     @if (ViewBag.CurrentUser != null)
+     {
+        <script>
+            var currentUserID = @ViewBag.CurrentUser.UserID;
+        </script>
+         using (Html.BeginForm("Logout", "PATSAccount", FormMethod.Post, new { @id = "logoutForm" }))
+         { @Html.AntiForgeryToken()}
+      }
+      <div style="margin-top:0px;">@RenderSection("HeaderSection", true)</div>    
+      <div class="body-content">
+           <center>
+               <div id="loading" style="height:175px; width:250px;">
+                   <span><img id="loading-image" src="~/Content/images/loading_pleasewait.gif" alt="Loading" style="position:center" /></span>
+               </div>
+            </center>
+           @RenderSection("ContentBody", true)
+      </div>
+     <script>
+         $(document).ready(function ($) {
+             let hrefWithoutQueryString = window.location.href.split('?')[0];
+             var query = window.location.search.substring(1)
+             if(query.length > 0)
+                 $("#txtSearchString").val(query.substring(query.indexOf("=") + 1));
+             if($("#txtSearchString").val().length > 0){
+                 $("#hdRequestByOtherModel").val("True");
+                 $("#searchButton").trigger('click');
+             }
+             history.pushState({ }, '', hrefWithoutQueryString);
+         });
+    </script>
+</body>
+@RenderSection("FooterSection", true)
+<script type="text/javascript">
+    var sess_pollInterval = 60000;
+    var sess_expirationMinutes = 120;
+    var sess_warningMinutes = sess_expirationMinutes - 5;
+    var sess_intervalID;
+    var sess_lastActivity;
+
+    function initSession() {
+        sess_lastActivity = new Date();
+        sessSetInterval();
+        $(document).bind('keypress.session', function (ed, e) {
+            sessKeyPressed(ed, e);
+        });
+    }
+    function sessSetInterval() {
+        sess_intervalID = setInterval('sessInterval()', sess_pollInterval);
+    }
+    function sessClearInterval() {
+        clearInterval(sess_intervalID);
+    }
+    function sessKeyPressed(ed, e) {
+        sess_lastActivity = new Date();
+    }
+    function sessLogOut() {
+         $("#logoutButton").trigger('click');
+    }
+    function sessInterval() {
+        var now = new Date();
+        //get milliseconds of differneces
+        var diff = now - sess_lastActivity;
+        //get minutes between differences
+        var diffMins = (diff / 1000 / 60);
+        if (diffMins >= sess_warningMinutes) {
+            //warn before expiring
+            //stop the timer
+            sessClearInterval();
+            //prompt for attention
+            var active = confirm('Your session will expire in ' +
+            //alert('Your session will expire in ' +
+            (sess_expirationMinutes - sess_warningMinutes) +
+            ' minutes (as of ' + now.toTimeString() + ')' +
+            ' press OK to remain logged in ' +
+            'or press Cancel to log out.' +
+            '\nIf you are logged out any changes will be lost.');
+            if (active == true) {
+                now = new Date();
+                diff = now - sess_lastActivity;
+                diffMins = (diff / 1000 / 60);
+                if (diffMins > sess_expirationMinutes) {
+                    alert("Your session has been expired.");
+                    sessLogOut();
+                }
+                else {
+                    initSession();
+                    sessSetInterval();
+                    sess_lastActivity = new Date();
+                }
+            }
+            else {
+                sessLogOut();
+            }
+        }
+    }
+</script>

@@ -1,0 +1,19 @@
+﻿@model PATSWebV2.ViewModels.Client.EditingPaneViewModel
+
+ <div class="space5" ></div>
+@if (Model.AllSmy.Where(x => x.ClientSmy == "EveSmy").FirstOrDefault() != null)
+{
+@(Html.Kendo().Grid<IdentityManagement.Entities.SummaryCollection>().Name("gridEveSummary")
+            .NoRecords("No Data Found.")
+            .HtmlAttributes(new { style = "background-color:#DCDCDC;margin-left:5px;width:97%;white-space : nowrap;" })
+           .Columns(column =>
+           {
+               column.Bound(m => m.DateEnrolled).Title("Date").Width(70);
+               column.Bound(m => m.smydesc).Title("Evaluated By").Width(70);
+               column.Template(@<text><a href='javascript:printPATSPDF(@Model.EpisodeID, "@item.DateType", "Client Evaluation","color-default")'>Print</a></text>).Title("...").Width(50);
+           }).BindTo(Model.AllSmy.Where(x => x.ClientSmy == "EveSmy").OrderByDescending(o => o.Id)))
+}
+else
+{
+    <div style="text-align:center;color:orange; vertical-align:central;"><b><i>No Evaluation Found.</i></b></div>
+}
