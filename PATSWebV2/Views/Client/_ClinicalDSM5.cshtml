@@ -1,0 +1,292 @@
+﻿@using Kendo.Mvc.UI
+@model PATSWebV2.ViewModels.SocialWork.DSM5ViewModel
+@using (Ajax.BeginForm("SaveClinicalDSM5", "Client", null, new AjaxOptions
+{
+    HttpMethod = "Post",
+    UpdateTargetId = "viewPlaceHolder",
+    InsertionMode = InsertionMode.Replace,
+    OnSuccess = "OnAjaxSuccess"
+}, new
+{
+    @id = "dsm5form",
+    @name = "DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure",
+    @style = "min-height: 500px;overflow:hidden;",
+    @class = "color-danger"
+}))
+{
+    <div id="appointmentdiv" class="color-danger" style="height:100%;min-width:1200px;width:99.5%">
+        @Html.HiddenFor(m => m.EpisodeID, new { id = "hdEpisodeID" })
+        @Html.HiddenFor(m => m.CanEdit, new { @id = "hdEditable" })
+        @Html.HiddenFor(m => m.IsLastDSM5Set, new { id = "hdIsLastDSM5Set" })
+        @{
+            var show = (Model.EpisodeDSM5 != null && Model.EpisodeDSM5[0].DSM5ItemID > 0) ? "visible" : "hidden";
+        }
+        <script>
+            var edit = ($("#IsLastDSM5Set").val() == "True" && $("#hdEditable").val() == "True");
+            function PopulatePreviousDSM5Set(e) {
+                if (this.select() == 0) {
+                     DisableAllInputFields("#dsm5form :input", $("#hdEditable").val(), edit);
+                     return;
+                 }
+                 var object = this.dataItem(this.select());
+                 var id = (object == undefined || object.DSM5ID == "") ? 0 : object.DSM5ID;
+                 $.ajax({
+                     url: "@Url.Action("GetClinicalDSM5", "Client")",
+                     data: {
+                         EpisodeID: $("#hdEpisodeID").val(), DSM5ID: id },
+                     cache: false,
+                     type: "POST",
+                     dataType: "html",
+
+                     success: function (data, textStatus, XMLHttpRequest) {
+                         $("#dsm5form").replaceWith(data); // HTML DOM replace
+                     }
+                 })
+             }
+        </script>
+
+        <table style="background-color:transparent;min-width:600px">
+            <tr>
+                <td style="width:99vw;">
+                    <table>
+                        <tr style="line-height: 14px !important;">
+                            <td>@Html.Label("DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult", new { style = "float:left;font-weight:bold;font-size:14px;float:left;" })</td>
+                            <td ><span style="width:40px;"></span></td>
+                            <td><a style="visibility:@show;float:left;" href="javascript:printPATSPDF(@Model.EpisodeID, @Model.DSM5ID, 'DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult','color-danger')">
+                                    <img style="width:22px; height:22px;" title="Print Clinical DSM-5" src='@Url.Content("~/Content/images/printer-icon.png")' />
+                                </a>
+                            </td>
+                            <td style="width:80px;">@Model.NoEditAllowed</td>
+                            <td>DMS-5 DATE:</td>
+                            <td style="font-size:11px">                              
+                                @(Html.Kendo().DropDownListFor(m => m.DSM5ID)
+                .Name("AllDSM5Dates")
+                .OptionLabel("Select Dates...")
+                .DataTextField("DSM5Date")
+                .DataValueField("DSM5ID")
+                .HtmlAttributes(new { style = "width:120px;text-align:left;", @class = "neverDisable" })
+                .Filter(FilterType.Contains)
+                .Height(290)
+                .Events(e => { e.Change("PopulatePreviousDSM5Set"); })
+                .DataSource(source =>
+                {
+                    source.Read(read => read.Action("GetDSM5DateList", "Client", new { EpisodeID = Model.EpisodeID }));
+                }))
+                            </td>                  
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <div id="c" style="border:1px solid #ccc;margin-bottom:5px;background-color:white;">
+              <p style="line-height:16px;color:red;padding:0px 5px 0px 5px;">
+                  <b>INSTRUCTIONS:</b>&nbsp;&nbsp;@Html.Raw("The questions below ask about things that might have bothered you. For each question, circle the number that best describes how much (or how often) you have been bothered by each problem during the past TWO (2) WEEKS.")
+              </p>
+        </div>
+        <table id="gird" class="k-grid" style="background-color:white;min-width:1200px;width:99.8%;">
+            <tr style="background-color:silver;font-size:small;text-align:center;">
+                <th style="text-align:center;width:30px;"><span style="width:30px;"></span></th>
+                <th style="text-align:center;width:60%;">During the past TWO (2) WEEKS, how much (or how often) have you been bothered by the following problems?</th>
+                <th style="text-align:center;width:60px;">None Not at all</th>
+                <th style="text-align:center;width:60px;">Slight Rare,<br />less than a day or two</th>
+                <th style="text-align:center;width:60px;"> Mild Several days</th>
+                <th style="text-align:center;width:60px;">Moderate More than half the days</th>
+                <th style="text-align:center;width:60px;">Severe Nearly every day</th>
+                <th style="text-align:center;width:60px;">Highest Domain Score (clinician)</th>
+            </tr>
+            @for (int i = 0; i < Model.EpisodeDSM5.Count; i++)
+            {
+                <tr>
+                    @Html.HiddenFor(m => m.EpisodeDSM5[i].GroupID, new { @id = "hdGroup" + Model.EpisodeDSM5[i].DSM5ItemID })
+                    @Html.HiddenFor(m => m.EpisodeDSM5[i].DSM5ItemID, new { @id = "hdDSM5DSM5ItemID" + Model.EpisodeDSM5[i].DSM5ItemID })
+                    @Html.HiddenFor(m => m.EpisodeDSM5[i].DSM5ItemDesc, new { @id = "hdDSM5ItemDesc" + Model.EpisodeDSM5[i].DSM5ItemID })
+                    @Html.HiddenFor(m => m.EpisodeDSM5[i].ItemScore, new { @id = "hdItemScore" + Model.EpisodeDSM5[i].DSM5ItemID })
+                    @{
+                        var row = "";
+                        var nm = "item_" + Model.EpisodeDSM5[i].GroupID + "_" + Model.EpisodeDSM5[i].DSM5ItemID;
+                        var ttgscls = "TotalGroupScore_" + (Model.EpisodeDSM5[i].GroupID - 1);
+                        var rows = 1;
+                        var needColsSpan = false;
+                        if (Model.EpisodeDSM5[i].DSM5ItemID == 1  || Model.EpisodeDSM5[i].DSM5ItemID == 3  || Model.EpisodeDSM5[i].DSM5ItemID == 4 || Model.EpisodeDSM5[i].DSM5ItemID == 6 ||
+                            Model.EpisodeDSM5[i].DSM5ItemID == 9  || Model.EpisodeDSM5[i].DSM5ItemID == 11 || Model.EpisodeDSM5[i].DSM5ItemID == 12 ||
+                            Model.EpisodeDSM5[i].DSM5ItemID == 14 || Model.EpisodeDSM5[i].DSM5ItemID == 15 || Model.EpisodeDSM5[i].DSM5ItemID == 16 ||
+                            Model.EpisodeDSM5[i].DSM5ItemID == 18 || Model.EpisodeDSM5[i].DSM5ItemID == 19 || Model.EpisodeDSM5[i].DSM5ItemID == 19 ||
+                            Model.EpisodeDSM5[i].DSM5ItemID == 21) { needColsSpan = true;  }
+                                                 
+                        switch (Model.EpisodeDSM5[i].GroupID)
+                        {
+                            case 1: { row = "I."; rows = 2; break; }
+                            case 2: { row = "II."; rows = 1; break; }
+                            case 3: { row = "III."; rows = 2; break; }
+                            case 4: { row = "IV."; rows = 3; break; }
+                            case 5: { row = "V."; rows = 2; break; }
+                            case 6: { row = "VI."; rows = 1; break; }
+                            case 7: { row = "VII."; rows = 2; break; }
+                            case 8: { row = "VIII."; rows = 1; break; }
+                            case 9: { row = "IX."; rows = 1; break; }
+                            case 10: { row = "X."; rows = 2; break; }
+                            case 11: { row = "XI."; rows = 1; break; }
+                            case 12: { row = "XII."; rows = 2; break; }
+                            case 13: { row = "XIII."; rows = 3; break; }
+                        };
+                    }
+                    @if (@needColsSpan)
+                    {
+                      <td valign="top" rowspan="@rows">
+                          <div style="font-size:12px;line-height:14px;">
+                            @Html.Raw(string.Format("<b>{0}</b>", @row))
+                          </div>
+                      </td>
+                    }
+                    <td style="width:40%;line-height:1.2!important;word-wrap:break-word;">@Html.Raw(string.Format("<b>{0}.{1}{2}</b>", Model.EpisodeDSM5[i].DSM5ItemID, " ", Model.EpisodeDSM5[i].DSM5ItemDesc))</td>
+                    <td>&nbsp;@(Html.Kendo().CheckBoxFor(m => m.EpisodeDSM5[i].ItemScore).Checked(Model.EpisodeDSM5[i].ItemScore == 0).HtmlAttributes(new { @class = @nm, @id = @nm + "_0" }).Label("0"))</td>
+                    <td>&nbsp;@(Html.Kendo().CheckBoxFor(m => m.EpisodeDSM5[i].ItemScore).Checked(Model.EpisodeDSM5[i].ItemScore == 1).HtmlAttributes(new { @class = @nm, @id = @nm + "_1" }).Label("1"))</td>
+                    <td>&nbsp;@(Html.Kendo().CheckBoxFor(m => m.EpisodeDSM5[i].ItemScore).Checked(Model.EpisodeDSM5[i].ItemScore == 2).HtmlAttributes(new { @class = @nm, @id = @nm + "_2" }).Label("2"))</td>
+                    <td>&nbsp;@(Html.Kendo().CheckBoxFor(m => m.EpisodeDSM5[i].ItemScore).Checked(Model.EpisodeDSM5[i].ItemScore == 3).HtmlAttributes(new { @class = @nm, @id = @nm + "_3" }).Label("3"))</td>
+                    <td>&nbsp;@(Html.Kendo().CheckBoxFor(m => m.EpisodeDSM5[i].ItemScore).Checked(Model.EpisodeDSM5[i].ItemScore == 4).HtmlAttributes(new { @class = @nm, @id = @nm + "_4" }).Label("4"))</td>
+                    @if (@needColsSpan)
+                    {
+                        <td rowspan="@rows"><span class="@ttgscls" style="color: green;font-weight:bold;font-size:large">@Html.Raw("")</span></td>
+                    }
+                </tr> 
+             }
+        </table>
+        <br />
+            <div class="padded aligncenter form-actions" id="casedsm5ButtonDiv">
+                @if (Model.CanEdit)
+                {
+                    <button type="submit" class="btn btn-group-lg danger-button" id="dsm5Save">Submit</button>
+                }&nbsp;&nbsp;
+                <button type="button" class="btn btn-group-lg danger-button" id="dsm5Cancel">Cancel</button>
+                <button type="button" class="btn btn-group-lg danger-button" id="dsm5Reset">Reset</button>&nbsp;&nbsp;
+                @if ((Model.EpisodeDSM5 != null && Model.EpisodeDSM5.Count() > 0 && Model.EpisodeDSM5[0].DSM5ItemID > 0))
+                {
+                    <a href="javascript:printPATSPDF(@Model.EpisodeID, '@Model.DSM5ID', 'DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult')">
+                        <img style="width:22px; height:22px;margin-top:15px;" title="Print Case dsm-5" src='@Url.Content("~/Content/images/printer-icon.png")' />
+                    </a>
+                }
+            </div>     
+    </div>         
+    <br />
+    }
+<script type="text/javascript">
+    function DSM5ButtonDisable(disabled) {
+        $("#dsm5Save").prop('disabled', disabled);
+        $("#dsm5Cancel").prop('disabled', disabled);
+        $("#dsm5Reset").prop('disabled', disabled);
+    }
+    $(function () {
+        var initdata = $('#dsm5form').serialize();  //AllArray();
+        $('#dsm5form').submit(function (e) {
+            e.preventDefault();
+            var nowdata = $('#dsm5form').serialize();
+            if (initdata === nowdata) {
+                NoticeNoChanges();
+                e.stopPropagation();
+                return false;
+            }
+            if (confirm("Are you sure you want to save this DSM-s Form?") == false) {
+                e.stopPropagation();
+                return false;
+            }
+            initdata = nowdata;
+            DSM5ButtonDisable(true);
+            postFormAndReplaceDivHtmlPats($('#dsm5form'));
+            var tabstrip = $("#swTabstrip").data("kendoTabStrip");
+            var tab = tabstrip.select();
+            tabstrip.reload(tab);
+            return true;
+        });
+        $("#dsm5form :input").change(function (e) {
+            var nowdata = $('#dsm5form').serialize();
+            if (initdata === nowdata) {
+                DSM5ButtonDisable(true);
+            }
+            else {
+                DSM5ButtonDisable(false);
+            }
+        });
+    });
+   
+    $("#dsm5form :input[type='checkbox']").change(function (e) {
+        var itemlist = e.target.id.split('_');
+        var itemscore = -1;
+        if ($(this).prop('checked')) {
+           var clsname = "";
+            for (var i = 0; i < this.classList.length; i++) {
+                if (this.classList[i].indexOf("_") > 0) {
+                    clsname = this.classList[i];
+                    break;
+                }
+            }
+
+            var selectId = this.id;
+            $("." + clsname).each(function () {
+                if (this.id != selectId) {
+                    $(this).prop('checked', false);
+                }
+            })       
+            itemscore  = itemlist[3];
+        }
+        $("#hdItemScore" + itemlist[2]).val(itemscore);
+        var score  = GetGroupScore(itemlist[1], itemscore);
+        if(score > -1)
+            $(".TotalGroupScore_" + (itemlist[1] - 1)).html(score);
+        else
+            $(".TotalGroupScore_" + (itemlist[1] - 1)).html("");
+        //var total = 0;
+        //for(i=0; i< 13; i++)
+        //{
+        //    if($(".TotalGroupScore_" + i).html() != "")
+        //        total += parseInt($(".TotalGroupScore_" + i).html());
+        //} 
+        //if(total == 0)
+        //    $(".ttscls").html("");
+        //else
+        //    $(".ttscls").html(total);
+    })
+
+    var editabledsm5 = EditableEpisode($("#hdEditable").val()) && $("#hdIsLastDSM5Set").val() == "True";
+    DisableAllInputFields("#dsm5form :input", $("#hdEditable").val(), editabledsm5);
+    DSM5ButtonDisable(true);
+    GetAllGroupScore();
+    $("#dsm5Reset").click(function () {
+        $("#dsm5form :input").each(function () {
+            if (this.type == "checkbox")
+                 $(this).prop('checked', false);
+            })
+    });
+    $("#dsm5Cancel").click(function () {
+        document.getElementById("dsm5form").reset();
+        DSM5ButtonDisable(true);
+    });
+    function GetAllGroupScore(){
+        for(i = 0; i< 13; i++)
+        {
+            var score  = GetGroupScore(i + 1, -1);
+            if(score > -1)
+                $(".TotalGroupScore_" + i).html(score);
+            else
+                $(".TotalGroupScore_" + i).html("");
+        }
+    }
+    function GetGroupScore(groupid, itemscore){
+        var model = $.grep(@Html.Raw(Json.Encode(Model.EpisodeDSM5)), function (el) {
+            return el.GroupID == groupid;
+        });
+        var scroe = -1;
+        $(model).each(function(index, item){
+            var ct = $("#hdItemScore" + item.DSM5ItemID).val();
+            if (ct > -1 && ct > scroe)
+                scroe = ct;
+        });
+        return scroe;
+    }
+</script>
+
+
+
+
+
+
+

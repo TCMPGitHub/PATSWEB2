@@ -1,0 +1,95 @@
+﻿@model PATSWebV2.ViewModels.Assignment.AssignmentViewModel
+<style>
+    .k-tabstrip-items {
+        padding: 0px;
+    }
+
+    .k-tabstrip-items .k-item {
+        height: 25px;
+        font-size: 13px;
+        font-weight: bolder;
+        background-color: #D9EDD1;
+    }
+
+    .k-tabstrip .k-content.k-state-active {
+        padding: 0px;
+        background-color: #D9EDD1 !important;
+    }
+
+    #asstTabstrip {
+        margin: 0;
+        padding: 0;
+        border-width: 0;
+        height: 100vh; /* DO NOT USE !important for setting the Grid height!*/
+    }
+
+    .k-grid tr td {
+        line-height: 18px !important;
+        min-height: 18px !important;
+        height: 18px !important;
+        font-size: 14px;
+        border-bottom: 0.5px solid silver !important;
+    }
+
+    .ui-dialog-titlebar {
+        background-color: #D9EDD1;
+    }
+</style>
+
+
+@Html.HiddenFor(m => m.EpisodeID, new { @id = "hdEpisodeId" })
+@Html.HiddenFor(m => m.ActiveTabIn, new { @id = "hdAsstActiveTab" })
+<script>
+        function asstTabChanged(e) {
+            WaitDialog(1);
+           if (e.item.textContent == "Back to dashboard") {
+                url = '@Url.Action("GetEditingPaneBack", "Client")';
+                fndata = { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val() };
+                LoadSelectedTab(url, fndata, "#editingpane");
+            }
+            else
+                reloadTab(e);
+
+            WaitDialog(0);
+        }
+        function reloadTab(e) {
+            $('#asstTabstrip').data('kendoTabStrip').reload(e.item);
+        }
+</script>
+
+<div id="dsmtabs" class="k-content">
+    @(Html.Kendo().TabStrip()
+         .Name("asstTabstrip")
+         .Events(e =>
+         {
+             e.Select("asstTabChanged");
+         })
+         .HtmlAttributes(new { style = "padding:0; height:auto;width:98vw;background-color:#E6E6FA;" })
+         .Animation(animation =>
+             animation.Open(effect =>
+                 effect.Fade(FadeDirection.In)))
+      .Items(tabstrip =>
+      {
+          tabstrip.Add().Text("SINGLE CLIENT ASSIGNMENTS")
+           .LoadContentFrom("GetClientAssignment", "Assignment", new
+           {
+               EpisodeId = Model.EpisodeID
+           });
+          tabstrip.Add().Text("CLIENT ASSIGNMENT HISTORY")
+                 .LoadContentFrom("GetAssignmentHistory", "Assignment", new { EpisodeID = Model.EpisodeID });
+          tabstrip.Add().Text("Back to dashboard").HtmlAttributes(new { style = "float:right;" });
+      }
+    ))
+</div>
+<script type="text/javascript">
+        $(document).ready(function () {
+            var tabidex = 0;
+            switch ($("#hdAsstActiveTab").val())
+            {
+                case "individualAssignment": { tabidex = 1; break; }
+                case "singleAssignmentHistory": { tabidex = 2; break; }
+            }
+            $("#asstTabstrip").kendoTabStrip().data("kendoTabStrip").activateTab($("#asstTabstrip-" + tabidex.toString()));
+            $('#asstTabstrip').getKendoTabStrip().select(tabidex -1);
+      });
+</script>

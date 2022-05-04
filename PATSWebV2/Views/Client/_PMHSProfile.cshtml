@@ -1,0 +1,538 @@
+﻿@model PATSWebV2.ViewModels.SocialWork.PMHProfileViewModel
+ 
+<style>
+    .table-bordered-1 {
+        border: 1px solid darkgrey;
+    }
+
+        .table-bordered-1 > thead > tr > th,
+        .table-bordered-1 > tbody > tr > th,
+        .table-bordered-1 > tfoot > tr > th,
+        .table-bordered-1 > thead > tr > td,
+        .table-bordered-1 > tbody > tr > td,
+        .table-bordered-1 > tfoot > tr > td {
+            border: 1px solid darkgrey;
+        }
+</style>
+@using (Ajax.BeginForm("SavePMHProfile", "Client", null, new AjaxOptions
+{
+    HttpMethod = "Post",
+    UpdateTargetId = "viewPlaceHolder",
+    InsertionMode = InsertionMode.Replace,
+    OnSuccess = "OnAjaxSuccess"
+}, new { @id = "pmhsprofileform", @name = "PMHS Profile", @style = "min-height: 500px;", @class = "color-danger" }))
+{
+    @*<div id="appointmentdiv" class="color-danger" style="height:100%;min-width:1200px;">*@
+        @Html.HiddenFor(m => m.EpisodeId)
+        @Html.HiddenFor(m => m.CanEdit, new { @id = "hdEditable" })
+        <table style="background-color:transparent;min-width:600px;margin-top:5px;">
+            <tr>
+                <td style="width:75vw;">
+                    <table>
+                        <tr style="line-height: 10px !important;"><td id="customers">@Html.Label("STATE OF CALIFORNIA", new { style = "float:left;font-size:12px;" })</td></tr>
+                        <tr style="line-height: 10px !important;"><td>@Html.Label("CASE MANAGEMENT RE-ENTRY PARTICIPANT PROFILE", new { style = "float:left;font-weight:bold;font-size:14px;" })&nbsp;&nbsp;@Model.NoEditAllowed</td></tr>
+                        <tr style="line-height: 10px !important;">
+                            <td>
+                                @Html.Label("CDCR 2287 (11/14)", new { style = "float:left;font-size:12px;" })&nbsp;&nbsp;
+                                <a href="javascript:printPATSPDF(@Model.EpisodeId, 0, 'Client Profile','color-danger')">
+                                    <img style="width:22px; height:22px;" title="Print Client Profile" src='@Url.Content("~/Content/images/printer-icon.png")' /></a>&nbsp;&nbsp;
+                                <a style="" onclick="GetAjaxForm('@Url.Action("GetClientProfileIndex","Client", new { EpisodeId = Model.EpisodeId, ActiveTabIn = "address", NewClient = false, FromCMRequested = true })')"><u style="font-weight:normal;font-size:12px;color:Highlight">Click here to Add/Update PAROLEE Address & Phone</u></a>
+                                &nbsp;&nbsp;@Model.NoEditAllowed
+                            </td>
+                        </tr>
+                    </table>
+                  </td>
+                <td style="width:25vw;">
+                    <table>
+                        <tr style="line-height: 10px !important;"><td id="customers">@Html.Label("DEPARTMENT OF CORRECTIONS AND REHABILITATION", new { style = "float:left;font-size:12px;" })</td></tr>
+                        <tr style="line-height: 10px !important;"><td id="customers">@Html.Label("DIVISION OF ADULT PAROLE OPERATIONS", new { style = "float:left;font-size:12px;" })</td></tr>
+                        <tr><td height="20"></td></tr>
+                    </table>
+                </td>
+                </tr>
+            </table>
+                   <br/>
+         <script>
+             $('#pmhsprofileform').on('dblclick', '.textareaforcasemanngement', function (e) {
+                 TextarePopup(e, ($("#hdEditable").val() == "True"), "color-danger");
+             });
+             $('#pmhsprofileform').on('keyup', '.textareaforcasemanngement', function (e) {
+                 if (e.keyCode == '90' && e.ctrlKey) {
+                     $(this).trigger('dblclick');
+                 }
+             })
+         </script>
+        <table id="mmatable" style="width:99.5%;min-width:1200px;background-color:transparent;">
+            <tr>
+                <td width="30%">
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td colspan="2">@Html.Label("PAROLEE ADDRESS:")</td></tr>
+                        <tr>
+                            <td with="30%">@Html.Label("ADDRESS:", new { @style = "font-weight:normal" })</td>
+                            <td width="70%">@Html.DisplayFor(m => m.PMHProfileSet.StreetAddress)</td>
+                        </tr>
+                        <tr>
+                            <td>@Html.Label("CITY:", new { @style = "font-weight:normal" })</td>
+                            <td>@Html.DisplayFor(m => m.PMHProfileSet.City)</td>
+                        </tr>
+                        <tr>
+                            <td>@Html.Label("STATE ZIP CODE:", new { @style = "font-weight:normal" })</td>
+                            <td>@Html.DisplayFor(m => m.PMHProfileSet.State) @Html.DisplayFor(m => m.PMHProfileSet.ZIPCode)</td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="30%">
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td>@Html.Label("DATE OF BIRTH:")</td></tr>
+                        <tr><td class="space"></td></tr>
+                        <tr>
+                            <td align="center">
+                                <center>
+                                    @(Html.Kendo().DatePickerFor(m => m.PMHProfileSet.DOB).HtmlAttributes(new { @id= "dpPMHProfileDOB", @class = "caseProfiledp", @style = "width:140px" }).Format("MM/dd/yyyy"))
+                                </center>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td>@Html.Label("SOCIAL SECURITY NUMBER:")</td></tr>
+                        <tr><td class="space"></td></tr>
+                        <tr>
+                            <td style="text-align:center">@(Html.Kendo().MaskedTextBoxFor(m => m.PMHProfileSet.SOCIALSECURITYNUMBER).HtmlAttributes( new { @placeholder = "SSN...", @style = "text-align:center", type="text", onkeypress = "IgnoreEnterKey(event)" }).Mask("000-00-0000"))</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%">
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr>
+                            <td colspan="2">@Html.Label("PAROLEE PHONE NUMBER(S):")</td>
+                        </tr>
+                        <tr>
+                            <td with="30%">@Html.Label("RESIDENCE:", new { @style = "font-weight:normal" })</td>
+                            <td width="70%">@Html.DisplayFor(m => m.PMHProfileSet.ParoleePhoneResidence)</td>
+                        </tr>
+                        <tr>
+                            <td>@Html.Label("WORK:", new { @style = "font-weight:normal" })</td>
+                            <td>@Html.DisplayFor(m => m.PMHProfileSet.ParoleePhoneWork)</td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="35%">
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr>
+                            <td colspan="2">@Html.Label("EMERGENCY CONTACT:")</td>
+                        </tr>
+                        <tr>
+                            <td width="30%">@Html.Label("NAME:", new { @style = "font-weight:normal" })</td>
+                            <td width="70%">@Html.DisplayFor(m => m.PMHProfileSet.EmergencyContactName)</td>
+                        </tr>
+                        <tr>
+                            <td>@Html.Label("RESIDENCE PHONE #:", new { @style = "font-weight:normal" })</td>
+                            <td>@Html.DisplayFor(m => m.PMHProfileSet.EmergencyContactPhoneResidence)</td>
+                        </tr>
+                        <tr>
+                            <td>@Html.Label("WORK PHONE #:", new { @style = "font-weight:normal" })</td>
+                            <td>@Html.DisplayFor(m => m.PMHProfileSet.EmergencyContactPhoneWork)</td>
+                        </tr>
+                    </table>
+                </td>
+
+                <td>
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td colspan="3">@Html.Label("MARITAL STATUS:")</td></tr>
+                        <tr>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.Single).HtmlAttributes(new { @class = "maritalStatus", @style = "font-weight:normal" }).Label("SINGLE"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.Married).HtmlAttributes(new { @class = "maritalStatus", @style = "font-weight:normal" }).Label("MARRIED"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.Divorced).HtmlAttributes(new { @class = "maritalStatus", @style = "font-weight:normal" }).Label("DIVORCED"))</td>
+                        </tr>
+                        <tr>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.Separated).HtmlAttributes(new { @class = "maritalStatus", @style = "font-weight:normal" }).Label("SEPARATED"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.Widowed).HtmlAttributes(new { @class = "maritalStatus", @style = "font-weight:normal" }).Label("WIDOWED"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.Cohabitating).HtmlAttributes(new { @class = "maritalStatus", @style = "font-weight:normal" }).Label("COHABITATING"))</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.DomesticPartner).HtmlAttributes(new { @class = "maritalStatus", @style = "font-weight:normal" }).Label("DOMESTIC PARTNER"))</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td colspan="3">@Html.Label("ETHNIC BACKGROUND:")</td></tr>
+                        <tr>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.White).HtmlAttributes(new { @class = "ethnicBg", @style = "font-weight:normal" }).Label("WHITE"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.AmericanIndian).HtmlAttributes(new { @class = "ethnicBg", @style = "font-weight:normal" }).Label("AMERICAN INDIAN"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.Asian).HtmlAttributes(new { @class = "ethnicBg", @style = "font-weight:normal" }).Label("ASIAN"))</td>
+                        </tr>
+                        <tr>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.Hispanic).HtmlAttributes(new { @class = "ethnicBg", @style = "font-weight:normal" }).Label("HISPANIC"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.AfricanAmerican).HtmlAttributes(new { @class = "ethnicBg", @style = "font-weight:normal" }).Label("AFRICAN AMERICAN"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.Other).HtmlAttributes(new { @class = "ethnicBg", @style = "font-weight:normal" }).Label("OTHER"))</td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td colspan="3">@Html.Label("CURRENT MENTAL HEALTH DESIGNATION:")</td></tr>
+                        <tr>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.CCCMS).HtmlAttributes(new { @class = "mhStatus", @style = "font-weight:normal" }).Label("CCCMS").Name("CasePMHProfileSet.CCCMS"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.EOP).HtmlAttributes(new { @class = "mhStatus", @style = "font-weight:normal" }).Label("EOP").Name("CasePMHProfileSet.EOP"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.MHNONE).HtmlAttributes(new { @class = "mhStatus", @style = "font-weight:normal" }).Label("NONE").Name("CasePMHProfileSet.MHNONE"))</td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td colspan="4">@Html.Label("DDP STATUS:")</td></tr>
+                        <tr>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.NCF).HtmlAttributes(new { @class = "ddpStatus", @style = "font-weight:normal" }).Label("NCF"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.NDD).HtmlAttributes(new { @class = "ddpStatus", @style = "font-weight:normal" }).Label("NDD"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.DD0).HtmlAttributes(new { @class = "ddpStatus", @style = "font-weight:normal" }).Label("DD 0"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.DD1).HtmlAttributes(new { @class = "ddpStatus", @style = "font-weight:normal" }).Label("DD 1"))</td>
+                        </tr>
+                        <tr>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.DD2).HtmlAttributes(new { @class = "ddpStatus", @style = "font-weight:normal" }).Label("DD 2"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.DD3).HtmlAttributes(new { @class = "ddpStatus", @style = "font-weight:normal" }).Label("DD 3"))</td>
+                            <td colspan="2">@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.DDPNone).HtmlAttributes(new { @class = "ddpStatus", @style = "font-weight:normal" }).Label("NONE"))</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="2">
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td colspan="4">@Html.Label("DPP STATUS:")</td></tr>
+                        <tr>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.Mobility).HtmlAttributes(new { @class = "dppStatus",  @style = "font-weight:normal;readonly:readonly" }).Label("MOBILITY"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.Hearing).HtmlAttributes(new { @class = "dppStatus", @style = "font-weight:normal" }).Label("HEARING"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.Vision).HtmlAttributes(new { @class = "dppStatus", @style = "font-weight:normal" }).Label("VISION"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.DPPSTATUSNone).HtmlAttributes(new { @class = "dppStatus", @style = "font-weight:normal" }).Label("NONE"))</td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td>@Html.Label("CSRA SCORE:")</td></tr>
+                        <tr>
+                            <td style="text-align:center">@Html.EditorFor(m => m.PMHProfileSet.CSRASCORE, new { htmlAttributes = new { @spellcheck = "true", @placeholder = "CSRA Score...", @style = "text-align:center",@class="" } })</td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td>@Html.Label("RECENT RELEASE DATE:")</td></tr>
+                        <tr>
+                            <td align="center">
+                                @(Html.Kendo().DatePickerFor(m=>m.PMHProfileSet.RECENTRELEASEDATE).HtmlAttributes( new { @id = "dpPMHProfileRelease", @class = "caseProfiledp", @style="width:140px"}).Format("MM/dd/yyyy"))
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td>@Html.Label("DISCHARGE REVIEW DATE:")</td></tr>
+                        <tr>
+                            <td align="center">
+                                @(Html.Kendo().DatePickerFor(m => m.PMHProfileSet.DISCHARGEREVIEWDATE).HtmlAttributes(new { @id = "dpPMHProfileDCH", @class = "caseProfiledp", @style = "width:140px" }).Format("MM/dd/yyyy"))
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td colspan="4">@Html.Label("TYPE OF RELEASE:")</td></tr>
+                        <tr>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.Prison).HtmlAttributes(new { @class = "releaseType", @style = "font-weight:normal" }).Label("PRISON"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.CountyJail).HtmlAttributes(new { @class = "releaseType", @style = "font-weight:normal" }).Label("COUNTYJAIL"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.CourtWalkover).HtmlAttributes(new { @class = "releaseType", @style = "font-weight:normal" }).Label("COURT WALKOVER"))</td>
+                            <td>@(Html.Kendo().CheckBoxFor(m => m.PMHProfileSet.ReleaseTypeNone).HtmlAttributes(new { @class = "releaseType", @style = "font-weight:normal" }).Label("NONE"))</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td>@Html.Label("COMPAS-CRIMINOGENIC NEEDS:")</td></tr>
+                        <tr>
+                            <td>
+                                @Html.TextAreaFor(m => m.PMHProfileSet.COMPASCRIMINOGENICNEEDS, new { @class = "textareaforcasemanngement", @placeholder = "Compas criminogenic needs...", @maxLength = "100", style="height:60px;background-color:white;width:95%;" })
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr><td>@Html.Label("CONTROLLING DISCHARGE DATE:")</td></tr>
+                        <tr>
+                            <td align="center">
+                                @(Html.Kendo().DatePickerFor(m => m.PMHProfileSet.CONTROLLINGDISCHARGEDATE).HtmlAttributes(new { @id = "dpPMHProfileCDE", @class = "caseProfiledp", @style = "width:140px" }).Format("MM/dd/yyyy"))
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <script>
+                        function ResetFacility(e) {
+                           if (this.select() == 0)
+                                return;
+                            var object = this.dataItem(this.select());
+                            $("#txtFacilityName").val(object.Name);
+                            $("#hdFacilityID").val(object.FacilityID)
+                        }
+                    </script>
+                    <table style="margin-left:5px; margin-bottom:5px;width:100%;">
+                        <tr>
+                            <td>
+                                @Html.Label("CCI/INSTITUTION INFORMATION:")&nbsp;&nbsp;
+                            @(Html.HiddenFor(m=>m.PMHProfileSet.FacilityID, new { id = "hdFacilityID" }))
+                            @(Html.Kendo().DropDownListFor(m => m.PMHProfileSet.FacilityID)
+                            .Name("FacilityList")
+                            .OptionLabel("Select Institute ...")
+                            .DataTextField("Abbr")
+                            .DataValueField("FacilityID")
+                            .HtmlAttributes(new { style = "width:120px;text-align:left;" })
+                            .Filter(FilterType.Contains)
+                            .Height(290)
+                            .Events(e => { e.Change("ResetFacility"); })
+                            .DataSource(source =>
+                            {
+                                source.Read(read => read.Action("GetFacilityList", "Client"));
+                            }))
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="middle">
+                            @(Html.Kendo().TextBoxFor(m => m.PMHProfileSet.CCIINSTITUTIONINFORMATION)
+                                  .HtmlAttributes(new { id = "txtFacilityName", @placeholder = "CCI insitution information...",
+                                      @maxLength = "100",
+                                      @style = "text-align:center; Width:350px;"
+                                  }).Enable(false))
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3" style="margin-left:5px; margin-bottom:5px">
+            @Html.Label("ADDITIONAL INFORMATION:")@Html.TextAreaFor(m => m.PMHProfileSet.ADDITIONALINFORMATION, new { @class = "textareaforcasemanngement", @placeholder = "Additional information...", @maxLength = "255", style = "height:60px;background-color:white;" })
+        </td>
+    </tr>
+</table>
+
+<h6 style="margin-top:2px;font-size:12px;">&nbsp;&nbsp;&nbsp;&nbsp;DISTRIBUTION: ORIGINAL TO REENTRY CASE FILE</h6>
+<div class="padded aligncenter form-actions" id="caseProfileButtonDiv" style="border:none">
+    @if (Model.CanEdit)
+    {
+        <button type="submit" class="btn btn-group-lg danger-button" id="caseProfileSave">Submit</button>
+    }&nbsp;&nbsp;
+    <button type="button" class="btn btn-group-lg danger-button" id="caseProfileCancel">Cancel</button>&nbsp;&nbsp;
+    <button type="button" class="btn btn-group-lg danger-button" id="caseProfileReset">Reset</button>&nbsp;&nbsp;
+    <a href="javascript:printPATSPDF(@Model.EpisodeId, 0, 'Client Profile','color-danger')">
+        <img style="width:22px; height:22px;" title="Print Client Profile" src='@Url.Content("~/Content/images/printer-icon.png")' /></a>
+</div>
+<br />
+
+}
+<script type="text/javascript">
+    function PROFILEButtonDisable(disabled) {
+        $("#caseProfileSave").prop('disabled', disabled);
+        $("#caseProfileCancel").prop('disabled', disabled);
+        $("#caseProfileReset").prop('disabled', disabled);
+    }
+    $(function () {
+        var initdata = $('#pmhsprofileform').serialize();
+        $('#pmhsprofileform').submit(function (e) {
+             e.preventDefault();
+            var nowdata = $('#pmhsprofileform').serialize();
+            if (initdata === nowdata) {
+                NotifyMessage();
+                e.stopPropagation();
+                return false;
+            }
+            if (confirm("Are you sure you want to save this CASE MANAGEMENT RE-ENTRY PARTICIPANT PROFILE?") == false) {
+                e.stopPropagation();
+                return false;
+            }
+            initdata = nowdata;
+            PROFILEButtonDisable(true);
+            postFormAndReplaceDivHtmlPats($('#pmhsprofileform'));
+            var tabstrip = $("#swTabstrip").data("kendoTabStrip");
+            var tab = tabstrip.select();
+            tabstrip.reload(tab);
+            return true;
+        });
+        $("#pmhsprofileform :input").change(function (e) {
+            var nowdata = $('#pmhsprofileform').serialize();
+            if (initdata === nowdata) {
+                PROFILEButtonDisable(true);
+            }
+            else {
+                PROFILEButtonDisable(false);
+            }
+        });
+    });
+   
+    DisableAllInputFields("#pmhsprofileform :input", $("#hdEditable").val());
+    PROFILEButtonDisable(true);
+    $(".caseProfiledp").kendoValidator({
+        rules: {
+            dateValidation: function (element) {
+                $(this).removeClass('field-validation-error');
+                $(this).parent().find('span[data-valmsg-for]').remove();
+                if (element.is("[data-val-date]") && element.val() != "") {
+                    var value = $(element).val();
+                    return is_valid_date(value);
+                }
+                return true;
+            }
+        },
+        messages: {
+            dateValidation: "must be a valid date",
+        }
+    });
+    $(".caseProfiledp").kendoMaskedTextBox({
+        mask: "00/00/0000"
+    });
+    $(".caseProfiledp").closest(".k-datepicker")
+          .add($(".caseProfiledp"))
+          .removeClass("k-textbox")
+
+    $("#CasePMHProfileSet_CSRASCORE").keypress(function (e) {
+        var verified = (e.which == 8 || e.which == undefined || e.which == 0) ? null : String.fromCharCode(e.which).match(/[^0-9]/);
+        if (verified) { e.preventDefault(); }
+    });
+
+    $(".dppStatus").each(function () {
+        $(this).prop('disabled', true);
+    });
+
+        $(".releaseType").click(function (e) {
+            if($(this).prop('checked'))
+            {
+                var obj = $(this);
+                $(".releaseType").each( function(){
+                    if(this.id != obj[0].id)
+                        $(this).prop('checked', false);
+                });
+            }
+        })
+
+        $(".ddpStatus").click(function (e) {
+            if($(this).prop('checked'))
+            {
+                var obj = $(this);
+                $(".ddpStatus").each( function(){
+                    if(this.id != obj[0].id)
+                        $(this).prop('checked', false);
+                });
+            }
+        })
+
+        $(".mhStatus").prop('disabled', true);
+
+        $(".ethnicBg").click(function (e) {
+            if ($(this).prop('checked')) {
+                var obj = $(this);
+                $(".ethnicBg").each(function () {
+                    if (this.id != obj[0].id)
+                        $(this).prop('checked', false);
+                });
+            }
+        })
+       //marital status
+        $(".maritalStatus").click(function (e) {
+            if ($(this).prop('checked')) {
+                var obj = $(this);
+                $(".maritalStatus").each(function () {
+                    if (this.id != obj[0].id)
+                        $(this).prop('checked', false);
+                });
+            }
+        })
+
+
+
+        //dpp status
+        $("#dppStatus1").click(function () {
+            if ($(this).prop('checked')) {
+                CheckBoxUnchecked(this.id, 1, 5);
+            }
+        });
+        $("#dppStatus2").click(function () {
+            if ($(this).prop('checked')) {
+                CheckBoxUnchecked(this.id, 2, 5);
+            }
+        });
+        $("#dppStatus3").click(function () {
+            if ($(this).prop('checked')) {
+                CheckBoxUnchecked(this.id, 3, 5);
+            }
+        });
+        $("#dppStatus4").click(function () {
+            if ($(this).prop('checked')) {
+                CheckBoxUnchecked(this.id, 4, 5);
+            }
+        });
+        //ethnicBg1
+        $("#ethnicBg1").click(function () {
+            if ($(this).prop('checked')) {
+                CheckBoxUnchecked(this.id, 1, 7);
+            }
+        });
+        $("#ethnicBg2").click(function () {
+            if ($(this).prop('checked')) {
+                CheckBoxUnchecked(this.id, 2, 7);
+            }
+        });
+        $("#ethnicBg3").click(function () {
+            if ($(this).prop('checked')) {
+                CheckBoxUnchecked(this.id, 3, 7);
+            }
+        });
+        $("#ethnicBg4").click(function () {
+            if ($(this).prop('checked')) {
+                CheckBoxUnchecked(this.id, 4, 7);
+            }
+        });
+        $("#ethnicBg5").click(function () {
+            if ($(this).prop('checked')) {
+                CheckBoxUnchecked(this.id, 5, 7);
+            }
+        });
+        $("#ethnicBg6").click(function () {
+            if ($(this).prop('checked')) {
+                CheckBoxUnchecked(this.id, 6, 7);
+            }
+        });
+
+        $("#profileReset").click(function () {
+            $("#pmhsprofileform :input").each(function () {
+                if (this.type == "checkbox" || this.type == "radio" )
+                    $(this).prop('checked', false);
+
+                if (this.type == "text" || this.type == "textarea" || this.type== "number") {
+                    $(this).val('');
+                }
+            })
+        });
+
+        $("#profileCancel").click(function () {
+            document.getElementById("pmhsprofileform").reset();
+            PROFILEButtonDisable(true);
+        })
+
+</script>
+
+
+
+
+
+
+

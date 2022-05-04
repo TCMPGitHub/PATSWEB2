@@ -1,0 +1,1457 @@
+﻿@using Kendo.Mvc.UI;
+@using PATSWebV2.DataAccess;
+@model PATSWebV2.ViewModels.AppointmentViewModel
+
+<script>
+    $("#loading").hide();
+    $(".apptdp").kendoValidator({
+        rules: {
+            dateValidation: function (element) {
+                $(this).removeClass('field-validation-error');
+                $(this).parent().find('span[data-valmsg-for]').remove();
+                if (element.is("[data-val-date]") && element.val() != "") {
+                    var value = $(element).val();
+                    return is_valid_date(value);
+                }
+                return true;
+            }
+        },
+        messages: {
+            dateValidation: "must be a valid date",
+        }
+    });
+    $(".apptdp").kendoMaskedTextBox({
+        mask: "00/00/0000"
+    });
+    $(".apptdp").closest(".k-datepicker")
+          .add($(".apptdp"))
+          .removeClass("k-textbox")
+
+</script>
+<div id="pdfdialog" style="display: none"/>
+
+@Html.HiddenFor(m => m.SelectedStaffs.Where(x => x.IsCurrentUser).FirstOrDefault().StaffId, new { @id = "hdSelectedStaffId" })
+@Html.HiddenFor(m => m.SelectedStaffs.Where(x => x.IsCurrentUser).FirstOrDefault().StaffName, new { @id = "hdSelectedStaffName" })
+@Html.HiddenFor(m => m.SelectedClients[0].EpisodeID, new { @id = "hdSelectedEpisodeId" })
+@Html.HiddenFor(m => m.Start, new { @id = "hdStart" })
+
+<div>
+    <table>@*<tr><td height="5px;"></td></tr>*@
+        <tr style="padding:10px;height:22px">
+            <td>
+                @Html.Label("Appointment Date:")
+            </td>
+            <td>
+                <style>
+                   #gridScheduler tr td{
+                      font-size:14px;
+                       padding:0px;
+                       text-indent:2px;
+                    }
+                    #gridScheduler tr th{
+                       font-size:14px;
+                       /*line-height:12px;*/
+                       padding:0px;
+                       text-align:center;
+                    }
+                    .empty-grid::before {
+                        padding: 0.5em;
+                        border-style: solid;
+                        border-width: 1px;
+                        line-height: 3em;
+                        margin-top: 10px;
+                        color: red;
+                        content: "No Appointment";
+                    }
+                    .k-i-arrow-60-down {
+                        margin-top:5px;
+                    }
+                    .k-i-calendar {
+                        margin-top:3px!important;
+                    }
+                    .k-state-default k-header k-nav-next{
+                        height: 22px;
+                    }
+                    .apptdp{
+                        line-height:18px!important;
+                        height:22px;
+                    }
+
+                    .CanceledColor {
+                        background: #8673CA;
+                        color: white;
+                    }
+
+                    .CanceledColor>k-alt {
+                        background: #8673CA;
+                        color: white;
+                    }
+                    .CanceledColor:hover {
+                        color: #8673CA;
+                        font-weight:bold;
+                    }
+                    #DayTimeLine .k-scheduler-navigation{
+                        display: none;
+                    }
+                    .ui-dialog-titlebar {
+                        background-color: #E6E6FA;
+                    }                
+                    .k-pager-wrap > .k-link > .k-icon{
+                        margin-top:5px;
+                    }  
+                </style>
+                &nbsp;&nbsp;
+                @(Html.Kendo().DatePickerFor(m => m.StartTime).DisableDates("disableDates")
+                    .Name("apptdatepicker").Format("MM/dd/yyyy")
+                    .Events(e => e.Change("DateChanged"))
+                    .HtmlAttributes(new { @class = "apptdp", @style = "height:22px;width:130px;z-index:1;" }))
+                <Button id="customCommandPre" title="Go to the previous day" type="button"
+                        style="height:22px;width:40px;z-index:1;" class="k-button">
+                    <span class="k-icon k-i-arrow-60-left"></span>
+                </Button>
+                <Button id="customCommandNext" title="Go to the next day" type="button"
+                        style="height:22px;width:40px;z-index:1;" class="k-button">
+                    <span class="k-icon k-i-arrow-60-right"></span>
+                </Button>
+            </td>
+            <td style="height:10px;"></td>
+            <td colspan="2">
+                &nbsp;&nbsp;&nbsp;&nbsp;@Html.Label("Select Staff:")&nbsp;&nbsp;
+                @(Html.Kendo().DropDownListFor(m => m.SelectedStaffs.Where(x => x.IsCurrentUser).FirstOrDefault().StaffId)
+                    .Name("DarStaffIDs")
+                    .DataValueField("StaffId")
+                    .DataTextField("StaffName")
+                    .HtmlAttributes(new { style = "width:300px;text-align:left;" })
+                    .Filter(FilterType.Contains)
+                    .Value(Model.SelectedStaffs.Where(x => x.IsCurrentUser).FirstOrDefault().StaffId.ToString())
+                    .Height(290)
+                    .Events(e => { e.Change("DataChanged"); })
+                    .DataSource(source =>
+                    {
+                        source.Read(read => read.Action("GetApptStaffs", "Appointment"));
+                    })
+                )
+            </td>
+        </tr>
+</table>
+    <script>
+        function CancelScheduler(obj) {
+            var title = $(".k-popup-edit-form").data("kendoWindow").title();
+            if(title == "Appointment")
+                $("#DayTimeLine").data("kendoScheduler").cancelEvent();
+            else
+                $("#OfficeTimeLine").data("kendoScheduler").cancelEvent();
+        }
+        
+        function UpdateScheduler() {
+            var title = $(".k-popup-edit-form").data("kendoWindow").title();
+            var scheduler = $("#OfficeTimeLine").data("kendoScheduler");
+            if (title == "Appointment")
+            {
+                scheduler = $("#DayTimeLine").data("kendoScheduler");
+            }
+            //scheduler.dataSource.sync();
+            scheduler.saveEvent();
+        }
+       
+        function GoToDay(e) {
+            if (e.action == "changeView" && e.view == "day") {
+                var currStaffId = $("#hdSelectedStaffId").val();
+                var scheduler = $("#DayTimeLine").data("kendoScheduler");
+                var datectrl = kendo.toString(e.date, 'MM/dd/yyyy');
+                $("#apptdatepicker").data("kendoDatePicker").value(datectrl);
+                scheduler.setOptions({ date: e.date });
+                scheduler.date(e.date);
+
+                var start = scheduler.view().startDate();
+                var end = scheduler.view().endDate();
+                scheduler.resources[0].dataSource.read({ StaffId: currStaffId, StartDate: start, EndDate: end }).then(
+                    function (e) {
+                        scheduler.view("timeline");
+                    });
+            }
+        };
+        function GridDataBound(e) {
+            var grid = $("#gridScheduler").data("kendoGrid");
+            var gridData = grid.dataSource.view();
+            for (var i = 0; i < gridData.length; i++) {
+                if (gridData[i].Eventstatus == "Canceled") {
+                    grid.table.find("tr[data-uid='" + gridData[i].uid + "']").addClass("CanceledColor");
+                }
+            }
+
+            grid.thead.find('th').each(function () {
+                $(this).prop('title', $(this).data('title'));
+            })
+            var IsSysAdmin = @Html.Raw(Json.Encode(ViewBag.CurrentUser.IsSysAdmin));
+            grid.tbody.find("tr[role='row']").each(function () {
+                var model = grid.dataItem(this);
+                //T68921
+                if (model.AppointmentId == model.AppointmentTraceId || !IsSysAdmin)
+                    $(this).find(".k-i-expand").hide();
+            });
+            if($(window).width()>=1700)
+                $(".k-grid-content").css("height", ($("#appttabs").height() - 210))
+            else
+                $(".k-grid-content").css("height", ($("#appttabs").height() - 230))
+        };
+
+        function CheckAvailability(obj) {
+            var startdate = $("#startApptDate").val();
+            var startDateTime = startdate + ' ' + $("#startApptTime").val();
+            var endDateTime = startdate + ' ' + $("#endApptTime").val();
+             var clients = $("#SelectedClients").val()== null ? "" : $("#SelectedClients").val().join(",");
+             var staffs = $("#SelectedStaffs").val().join(",");
+             startDateTime = new Date(startDateTime);
+             endDateTime = new Date(endDateTime);
+
+             $.ajax({
+                 url: "@Url.Action("GetAvailability", "Appointment")",
+                 data: { StartDate: startDateTime.toISOString(), EndDate: endDateTime.toISOString(), ClientIds: clients, StaffIds: staffs },
+                type: "POST",
+             success: function (listItems, textStatus, XMLHttpRequest) {
+                 var dropdown = $("#Availability").data("kendoDropDownList");
+                 dropdown.setDataSource(listItems);
+                 if (listItems[0].Text == "No Availability Found.") {
+                     dropdown.value("1");
+                 }
+                 else
+                     dropdown.enable(true);
+             },
+             error: function (listItems, textStatus, XMLHttpRequest) {
+                 alert(textStatus + "No Availability Found.")
+             },
+            });};
+        function CancelRefresh(e) {
+            $('#gridScheduler').data('kendoGrid').dataSource.read();
+        }
+
+        function ExcelCellFormat(e) {
+            var sheet = e.workbook.sheets[0];
+            sheet.rows[0].cells[0].value = "Client(Name, Attend, CDCR#, Agent, Unit, Followup Appt)";
+            for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
+                var row = sheet.rows[rowIndex];
+                var client = row.cells[0].value;
+                var data = "";
+                if (client.length > 0) {
+                    for (var item = 0; item < client.length; item++) {
+                        var status = "Pending";
+                        switch (client[item].ClientStatus) {
+                            case 1: "Absent"; break;
+                            case 3: "Present"; break;
+                            case 4: "Excused"; break;
+                            case 5: "Canceled"; break;
+                        }
+                        data += kendo.format("{0} {1} {2} {3} {4} {5} {6}\n", client[item].ClientName, status, client[item].CDCRNumber, client[item].Agent, client[item].Unit, client[item].FollowupAppt,client[item].ContactPh)
+                    }
+                }
+
+                row.cells[0].value = data;
+                row.cells[0].wrap = true;
+                row.cells[4].format = "h:mm AM/PM";
+                row.cells[5].format = "h:mm AM/PM";
+                row.cells[10].value = "";
+            }
+        }
+        function schChanged(e) {
+            WaitDialog(1);
+            var currStaffId = $("#DarStaffIDs").data("kendoDropDownList").value();
+            if (currStaffId == -1)
+                currStaffId = $("#hdSelectedStaffId").val();
+               
+            var date = new Date($("#apptdatepicker").val());
+            var start = date;
+            var end = start;
+            if (e.item.textContent == "Detail") {              
+                $('#gridScheduler').data('kendoGrid').dataSource.read({ StaffId: currStaffId, StartDate: date })
+                //SchedulerChange('Current', $("#dartabstrip1").kendoTabStrip().data("kendoTabStrip").select().index());
+            }
+            else if (e.item.textContent == "Timeline") {
+                var scheduler = $("#DayTimeLine").data("kendoScheduler");
+                if (scheduler.view() == undefined || scheduler._selectedViewName != scheduler.view().name) {
+                    scheduler = $('#DayTimeLine').getKendoScheduler();
+                    scheduler.view("timeline");
+                }
+
+                scheduler.setOptions({ date: date });
+                scheduler.date(date);
+
+                //start = scheduler.view().startDate();
+                //end = scheduler.view().endDate();
+
+                scheduler.resources[0].dataSource.read({ StaffId: currStaffId, StartDate: start, EndDate: end }).then(
+                    function (e) {
+                        scheduler.view(scheduler.view().name);
+                        scheduler.refresh();
+                    });
+            }
+            WaitDialog(0);
+        }
+        function BeforeSaveAppt(e){
+           if (confirm("Are you sure you want to save this Appointment?") == false) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    </script>
+    @*<div style="display:none">
+        @(Html.Kendo().Window().Name("MyPDF").Title("Staff Appointment List")
+            .Content(@<text><p>This is test</p></text>)
+             .Draggable().Width(900).Actions(action => action.Close()))
+    </div>*@
+    <div id="divAppointment">
+        @(Html.Kendo().TabStrip().Name("dartabstrip1").Events(e => { e.Select("schChanged"); }).Items(tabstrip =>
+ {
+        tabstrip.Add().Text("Detail").Selected(true).Content( @<text><div style="min-width:1700px;overflow:hidden;">
+                @(Html.Kendo().Grid<PATSWebV2.ViewModels.AppointmentViewModel>()
+        .Name("gridScheduler").NoRecords(x => x.Template("<div class='empty-grid'></div>"))
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.AppointmentId).Hidden();
+            columns.Bound(p => p.AppointmentTraceId).Hidden();
+            //columns.Bound(p => p.EpisodeId).Hidden();
+            columns.Bound(p => p.Title).Hidden();
+            columns.Bound(p => p.SelectedClients).ClientTemplate("#=BuildTableData(SelectedClients, Eventstatus)#").Sortable(false)
+            .HeaderTemplate(@"<table style='width:100%;border-style:none;padding:0px!important;'>
+              <tr>
+                  <td style='width:200px;text-align:center;inline-height:10px!important;font-size:14px; border-style: none solid none solid;padding:0px!important;'>Client Name</td>
+                  <td style='width:70px;text-align:center;inline-height:10px!important;font-size:14px; border-style: none solid none solid;padding:0px!important;'>Attend</td>
+                  <td style='width:70px;text-align:center;inline-height:10px!important;font-size:14px; border-style: none solid none solid;padding:0px!important;'>CDCR#</td>
+                  <td style='width:140px;text-align:center;inline-height:10px!important;font-size:14px; border-style: none solid none solid;padding:0px!important;'>Agent</td>
+                  <td style='width:100px;text-align:center;inline-height:10px!important;font-size:14px; border-style: none solid none solid;padding:0px!important;'>Unit</td>
+                  <td style='width:100px;text-align:center;inline-height:10px!important;font-size:14px; border-style: none solid none solid;padding:0px!important;'>FollowUp Appt.</td>
+                  <td style='width:100px;text-align:center;inline-height:10px!important;font-size:14px; border-style: none solid none solid;padding:0px!important;'>Primary#</td>
+             </tr></table>").Title("Client Info").Width(780);
+            columns.Bound(p => p.SelectedStaffNames).ClientTemplate("#=BuildFormatData(SelectedStaffNames)#").Title("Case Worker").Width(120);
+            columns.Bound(p => p.SelectedLocationDesc).Title("Appt. Office").Width(100);
+            columns.Bound(p => p.Start).Title("Appt. Date").Width(80).Sortable(false);
+            columns.Bound(p => p.StartTime).Format("{0:h:mm tt}").Title("Start Time").Width(70).Sortable(true);
+            columns.Bound(p => p.End).Title("End Date").Width(0).Hidden();
+            columns.Bound(p => p.EndTime).Format("{0:h:mm tt}").Title("End Time").Width(70);
+            columns.Bound(p => p.TypeDesc).Title("Type").Width(120);
+            columns.Bound(p => p.Eventstatus).Title("Status").Width(80).Hidden();
+            columns.Bound(p => p.ProcessStatus).Title("Progress").Width(80);
+            columns.Bound(p => p.SelectedADAItems).Title("ADA/EC").ClientTemplate("#=BuildADAEC(SelectedADAItems)#").HtmlAttributes(new { style = "line-height:12px;" }).Width(200).Hidden();
+            //columns.Bound(p => p.Description).Title("Purpose").Width(200).ClientTemplate("<textarea class='textareaforcasemanngement apptPurpose' placeholder = 'Purpose...' readonly='readonly' style='wordwrap:true;background-color:transparent;padding:0;'>#if(Description == null){# #='' # #}else{# #=Description # #} #</textarea>");
+            columns.Bound(p => p.AppointmentId).Title("Print Letter").ClientTemplate(
+                "<a href='javascript:printPATSPDF(\"#=AppointmentId#\",\"0\", \"Appointment Note\", \"color-continue\")'>Print</a>").Width(50);
+            columns.Command(command => { command.Edit(); command.Destroy(); });   //.Width(200);
+        })
+        .ToolBar(toolbar =>
+        {
+            toolbar.Template(
+              "<a href='#' class='k-button k-grid-add' style='height:25px;background-color:yellow;'><span class='k-icon k-i-add'></span>Add New Appointment</a>" +
+               "<a href='javascript:TriggerPDF(this)' class='k-button' style='height:25px;'><span class='k-icon k-i-pdf'></span>Export to PDF</a>"
+              );
+        }).ClientDetailTemplateId("appttemplate")
+         .Events(events =>
+         {
+             events.Save("BeforeSaveAppt");
+             events.Edit("GridEdit");
+             events.DataBound("GridDataBound");
+             events.Cancel("CancelRefresh");
+         })
+          .Editable(ed => ed.Mode(GridEditMode.PopUp)
+          .TemplateName("_GridAppointmentTemplate").Window(w => w.Title("Appointment").Width(750)))
+          .HtmlAttributes(new { @style = "padding:0px;cursor:default;width:100%;" })
+                .Scrollable(scrollable => scrollable.Enabled(true))
+                .Sortable(sortable => sortable.AllowUnsort(false))
+                .Resizable(resize => resize.Columns(true))
+                .Pageable(pageable => pageable
+                     .Refresh(true)
+                     .PageSizes(new List<object> { 5, 10, 20, 30, 50 })
+                     .ButtonCount(5))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    //.Sort(s => { s.Add("StartTime").Descending(); s.Add("EndTime").Descending(); })
+                    //.ServerOperation(true)
+                    .PageSize(20)
+                    .Events(events => { events.Error("appt_error_handler"); events.RequestEnd("GridReload"); })
+                    .Create(create => create.Action("AppointmentCreate", "Appointment").Data("updateData"))
+                    .Read(read => read.Action("AppointmentRead", "Appointment").Data("getGridAdditionalData"))
+                    .Update(update => update.Action("AppointmentUpdate", "Appointment").Data("updateFLData"))
+                    .Destroy(update => update.Action("AppointmentDestroy", "Appointment"))
+                    .Model(model =>
+                    {
+                        model.Id(field => field.AppointmentId);
+                        model.Field(field => field.AppointmentId).DefaultValue(0);
+                        model.Field(field => field.TypeID).DefaultValue(5);
+                        model.Field(field => field.SelectedStaffs).DefaultValue(Model.SelectedStaffs);
+                        model.Field(field => field.SelectedClients).DefaultValue(Model.SelectedClients);
+                        model.Field(field => field.StatusID).DefaultValue(2);
+                        model.Field(field => field.SelectedStaffIds).DefaultValue("0");
+                        model.Field(field => field.SelectedADAItems).DefaultValue(Model.SelectedADAItems);
+                        model.Field(field => field.IsAllDay).DefaultValue(false);
+                        model.Field(field => field.IsCompleted).DefaultValue(false);
+                        model.Field(field => field.SelectedLocationId).DefaultValue(Model.SelectedLocationId);
+                        model.Field(field => field.Start).DefaultValue(Model.Start);
+                        model.Field(field => field.StartTime).DefaultValue(Model.Start.Minute % 15 == 0 ? Model.Start : Model.Start.AddMinutes(15 - Model.Start.Minute % 15));
+                        model.Field(field => field.End).DefaultValue(Model.Start);
+                        model.Field(field => field.EndTime).DefaultValue(Model.Start.Minute % 15 == 0 ? Model.Start.AddMinutes(15) : Model.Start.AddMinutes(15 - Model.Start.Minute % 15).AddMinutes(15));
+                    })
+                  ))
+                <script id="appttemplate" type="text/kendo-tmpl">
+                    @(Html.Kendo().Grid<IdentityManagement.Entities.Appointment.ApptHistory>()
+            .Name("grid_#=AppointmentTraceId#") // template expression, to be evaluated in the master context
+            .Resizable(r => r.Columns(true))
+            .Scrollable()
+                    .Columns(columns =>
+                    {
+                        columns.Bound(o => o.ApptClient).Width(120);
+                        columns.Bound(o => o.ApptStaff).Title("Case Worker").Width(120);
+                        columns.Bound(o => o.Start).Format("{0:MM/dd/yyyy}").Title("Appt. Date").Width(80).Sortable(false);
+                        columns.Bound(o => o.StartTime).Format("{0:h:mm tt}").Title("Start Time").Width(70).Sortable(true);
+                        columns.Bound(o => o.EndTime).Format("{0:h:mm tt}").Title("End Time").Width(70);
+                        columns.Bound(o => o.EvtTShortDescr).Title("Type").Width(90);
+                        columns.Bound(o => o.ApptShortDescr).Title("Status").Width(90);
+                        columns.Bound(o => o.ActionBy).Title("Entered By").Width(90);
+                        columns.Bound(o => o.DateAction).Format("{0:MM/dd/yyyy}").Title("Date").Width(90);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(10)
+                        .Read(read => read.Action("HierarchyBinding_Appt", "Appointment", new { AppointmentTraceId = "#=AppointmentTraceId#" }))
+                    )
+                    .Pageable()
+                    .Sortable()
+                    .ToClientTemplate()
+                    )
+                </script>
+            </div></text>);
+          tabstrip.Add().Text("Timeline").Content(@<text> 
+                <div style="overflow:auto;padding-top:0px; padding-left:0px;padding-right:5px;padding-bottom:0px;min-width:1200px;">
+                    <script id="template1" type="text/x-kendo-template">
+                        #var uid = target.parent().attr("data-uid");#
+                        #var scheduler = target.closest("[data-role=scheduler]").data("kendoScheduler");#
+                        #var model = scheduler.occurrenceByUid(uid);#
+                        #if(model) {#
+                        @*////<strong>CDCR Number:   </strong> #=model.title#<br />*@
+                        <strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Client: </strong> #=kendo.format('{0:d}',BuildClientNames(model.SelectedClients))#
+                        <br />
+                        <strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type:</strong> #=kendo.format('{0:d}', model.TypeDesc)#
+                        <br />
+                        <strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Status:</strong> #=kendo.format('{0:d}',model.Eventstatus)#
+                        <br />
+                        <strong>&nbsp;&nbsp;&nbsp;&nbsp;BHR Office:</strong> #=model.SelectedLocationDesc#
+                        <br />
+                        #} else {#
+                        <strong>No event data is available</strong>
+                        #}#
+                    </script>
+                    @(Html.Kendo().Scheduler<PATSWebV2.ViewModels.AppointmentViewModel>()
+            .Name("DayTimeLine")
+            .Date(new DateTime(Model.Start.Year, Model.Start.Month, Model.Start.Day))
+            .StartTime(new DateTime(Model.Start.Year, Model.Start.Month, Model.Start.Day, 00, 00, 00))
+            .MajorTick(60)
+            .HtmlAttributes(new {  @style = "padding:0;cursor:default;min-width:1200px;height:77vh;" })
+            .Pdf(p => p.FileName("Appointmenttimeline.pdf"))
+            .Toolbar(t => t.Pdf())
+            .Views(views =>
+            {
+                views.TimelineView(timeView =>
+                  timeView.Selected(true)
+                          .Title("Location")
+                          .EventHeight(15)
+                          .ColumnWidth(20)
+                          .StartTime(new DateTime(Model.Start.Year, Model.Start.Month, Model.Start.Day, 07, 00, 00))
+                          .EndTime(new DateTime(Model.End.Year, Model.End.Month, Model.End.Day, 18, 15, 00))
+                          .MajorTick(15)
+                          .MinorTickCount(2));
+                views.WeekView(timeView =>
+                  timeView.StartTime(new DateTime(Model.Start.Year, Model.Start.Month, Model.Start.Day, 07, 00, 00))
+                          .EndTime(new DateTime(Model.End.Year, Model.End.Month, Model.End.Day, 18, 15, 00)));
+                views.MonthView();
+            }).HtmlAttributes(new { @style = "padding:0;cursor:default;height:77vh;" }).DateHeaderTemplate("")
+            .Editable(ed => { ed.TemplateName("_CustEditorTemplate").Window(w => w.Title("Appointment").Width(780)).Update(true);})
+        .Events(et => { et.DataBinding("scheduler_dataBound"); et.Edit("onLocEdit"); et.Navigate("GoToDay"); et.DataBound("SchDailyDataBound"); et.Cancel("Reload"); et.Save("BeforeSaveAppt"); })
+        //.Timezone("Etc/UTC")
+        .Group(group => group.Resources("Office").Orientation(SchedulerGroupOrientation.Vertical))
+        .Resources(resource => resource.Add(m => m.SelectedLocationId).ValuePrimitive(true)
+                .Title("Office")
+                .Name("Office")
+                .ValuePrimitive(true)
+                .DataTextField("OfficeName")
+                .DataValueField("LocationId")
+                .DataSource(ds => ds
+                .Custom()
+                .Type("aspnetmvc-ajax")
+                .Transport(transport => transport.Read(read => read.Action("GetPOCOfficeLocationByPerson", "Appointment").Data("getAdditionalData"))).Schema(schema => schema
+                .Data("Data")
+                .Total("Total")
+                .Errors("location_error_handler")
+                .Model(model =>
+                {
+                    model.Id("LocationId");
+                    model.Field("LocationId", typeof(string)).From("LocationId");
+                    model.Field("OfficeName", typeof(string));
+                })
+                )
+             )
+           )
+            // .Selectable(true)
+            .DataSource(d => d
+              .Model(m =>
+              {
+                  m.Id(f => f.AppointmentId);
+                  m.Field(f => f.AppointmentId).DefaultValue(0);
+                  m.Field(f => f.AppointmentTraceId).DefaultValue(0);
+                  m.Field(f => f.EpisodeId).DefaultValue(0);
+                  m.Field(f => f.SelectedStaffs).DefaultValue(Model.SelectedStaffs);
+                  m.Field(f => f.SelectedClients).DefaultValue(Model.SelectedClients);
+                  m.Field(f => f.Start).DefaultValue(Model.Start);
+                  m.Field(f => f.StartTime).DefaultValue(Model.Start.Minute % 15 == 0 ? Model.Start : Model.Start.AddMinutes(15 - Model.Start.Minute % 15));
+                  m.Field(f => f.End).DefaultValue(Model.Start);
+                  m.Field(f => f.EndTime).DefaultValue(Model.Start.Minute % 15 == 0 ? Model.Start.AddMinutes(15) : Model.Start.AddMinutes(15 - Model.Start.Minute % 15).AddMinutes(15));
+                  m.Field(field => field.SelectedADAItems).DefaultValue(Model.SelectedADAItems);
+                  m.Field(f => f.TypeID).DefaultValue(5);
+                  m.Field(f => f.StatusID).DefaultValue(2);
+                  m.Field(f => f.IsAllDay).DefaultValue(false);
+                  m.Field(f => f.IsCompleted).DefaultValue(false);
+                  m.Field(f => f.SelectedLocationId).DefaultValue(Model.SelectedLocationId);
+              })
+              .ServerOperation(true)
+              .Read(read => read.Action("AppointmentLocationRead", "Appointment").Data("getAdditionalData"))
+              .Create(create => create.Action("AppointmentLocationCreate", "Appointment").Data("updateData"))
+              .Update(update => update.Action("AppointmentLocationUpdate", "Appointment").Data("updateFLData"))
+              .Destroy("AppointmentLocationDestroy", "Appointment")
+              .Events(e => { e.Change("onEdit"); e.RequestEnd("Reload"); e.Error("location_error_handler");})
+          ) )
+                </div></text>); }))
+    </div>
+</div>
+
+<script>
+   function selectColumn(e, obj1) {
+        var obj2 = 2;
+        var dp = $("#StatusID").data('kendoDropDownList');
+        var dpValue = 2;
+        if (e.checked) {
+            if (e.id == "absent" + obj1) {
+                obj2 = 1;
+                $("#present" + obj1).prop('checked', false);
+                $("#excused" + obj1).prop('checked', false);
+                $("#canceled" + obj1).prop('checked', false);
+                dpValue = 1;
+            }
+            else if (e.id == "present" + obj1) {
+                obj2 = 3;
+                $("#absent" + obj1).prop('checked', false);
+                $("#excused" + obj1).prop('checked', false);
+                $("#canceled" + obj1).prop('checked', false);
+                dpValue = 4;
+            }
+            else if (e.id == "excused" + obj1) {
+                obj2 = 4;
+                $("#absent" + obj1).prop('checked', false);
+                $("#present" + obj1).prop('checked', false);
+                $("#canceled" + obj1).prop('checked', false);
+                dpValue = 5;
+            }
+            else if(e.id == "canceled" + obj1){
+                obj2 = 5;
+                $("#absent" + obj1).prop('checked', false);
+                $("#present" + obj1).prop('checked', false);
+                $("#excused" + obj1).prop('checked', false);
+                dpValue = 3;
+            }
+        }
+        else {
+            $("#absent" + obj1).prop('checked', false);
+            $("#present" + obj1).prop('checked', false);
+            $("#excused" + obj1).prop('checked', false);
+            $("#canceled" + obj1).prop('checked', false);
+            dpValue =  2;
+        }
+        var multiselect = $("#SelectedClients").data('kendoMultiSelect')
+        var data = multiselect.dataItems();
+
+        var Abstotal = 0;
+        var Cactotal = 0;
+        var Exttotal = 0;
+        var Pretotal = 0;
+        var total = 0;
+        for (var idx = 0; idx < data.length; idx++) {  
+            if($("#absent"  + data[idx].EpisodeID.toString())[0] == undefined)
+                break;
+            if($("#absent"  + data[idx].EpisodeID.toString())[0].checked) Abstotal++;
+            if($("#canceled"  + data[idx].EpisodeID.toString())[0].checked) Cactotal++;
+            if($("#present"  + data[idx].EpisodeID.toString())[0].checked) Pretotal++;
+            if($("#excused"  + data[idx].EpisodeID.toString())[0].checked) Exttotal++;
+            switch(dpValue){
+                case 1: {
+                    if($("#absent"  + data[idx].EpisodeID.toString())[0].checked) total++;
+                    break;
+                }
+                case 3: {
+                    if($("#canceled"  + data[idx].EpisodeID.toString())[0].checked) total++;
+                    break;
+                }
+                case 4: {
+                    if($("#present"  + data[idx].EpisodeID.toString())[0].checked) total++;
+                    break;
+                }
+                case 5: {
+                    if($("#excused"  + data[idx].EpisodeID.toString())[0].checked) total++;
+                    break;
+                }
+                default: total++;
+             }
+        }
+        var atotal  = Abstotal + Cactotal + Exttotal + Pretotal;
+        if( total == data.length || dpValue == 4){
+            dp.value(dpValue);
+        }            
+        else if (Pretotal > 0 && atotal == data.length){
+            dp.value(4);
+        }
+        else if ( atotal == data.length && (dpValue == 3 || dpValue == 1 || dpValue == 5))
+            dp.value(dpValue);
+        else dp.value(2);
+        dp.trigger('change');
+        for (var idx = 0; idx < data.length; idx++) {
+            if (data[idx].EpisodeID == obj1) {
+                data[idx].ClientStatus = obj2;
+                break;
+            }
+        }
+        multiselect.setDataSource(new kendo.data.DataSource({ data: data }));
+        multiselect.trigger('change');
+    };
+    function SetClientsStatus(e){
+        var ms = $("#SelectedClients").data('kendoMultiSelect');
+        var datas = ms.dataItems();
+        for (i = 0; i < datas.length; i++) {
+            switch(e.dataItem.Value){
+                case "1":{
+                    if (datas[i].ClientStatus != 5 && datas[i].ClientStatus != 4 )
+                    { 
+                        $("#absent" + datas[i].EpisodeID.toString()).prop('checked', true);
+                        $("#present" + datas[i].EpisodeID.toString()).prop('checked', false);
+                        $("#excused" + datas[i].EpisodeID.toString()).prop('checked', false);
+                        $("#canceled" + datas[i].EpisodeID.toString()).prop('checked', false);
+                        datas[i].ClientStatus = 1;
+                    }
+                    break;
+                }
+                case "3":
+                    {
+                        if (datas[i].ClientStatus != 5 && datas[i].ClientStatus != 4 )
+                        {
+                            $("#absent" + datas[i].EpisodeID.toString()).prop('checked', false);
+                            $("#present" + datas[i].EpisodeID.toString()).prop('checked', false);
+                            $("#excused" + datas[i].EpisodeID.toString()).prop('checked', false);
+                            $("#canceled" + datas[i].EpisodeID.toString()).prop('checked', true);
+                            datas[i].ClientStatus = 5;
+                        }
+                        break;
+                    }
+                case "4":
+                    {
+                        if (datas[i].ClientStatus != 5 && datas[i].ClientStatus != 4 )
+                        {
+                            $("#absent" + datas[i].EpisodeID.toString()).prop('checked', false);
+                            $("#present" + datas[i].EpisodeID.toString()).prop('checked', true);
+                            $("#excused" + datas[i].EpisodeID.toString()).prop('checked', false);
+                            $("#canceled" + datas[i].EpisodeID.toString()).prop('checked', false);
+                            datas[i].ClientStatus = 3;
+                        }
+                        break;
+                    }
+                case "5":
+                    {
+                        if (datas[i].ClientStatus != 5 && datas[i].ClientStatus != 4 )
+                        {
+                            $("#absent" + datas[i].EpisodeID.toString()).prop('checked', false);
+                            $("#present" + datas[i].EpisodeID.toString()).prop('checked', false);
+                            $("#excused" + datas[i].EpisodeID.toString()).prop('checked', true);
+                            $("#canceled" + datas[i].EpisodeID.toString()).prop('checked', false);
+                            datas[i].ClientStatus = 4;
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        if (datas[i].ClientStatus != 5 && datas[i].ClientStatus != 4 )
+                        {
+                            $("#absent" + datas[i].EpisodeID.toString()).prop('checked', false);
+                            $("#present" + datas[i].EpisodeID.toString()).prop('checked', false);
+                            $("#excused" + datas[i].EpisodeID.toString()).prop('checked', false);
+                            $("#canceled" + datas[i].EpisodeID.toString()).prop('checked', false);
+                            datas[i].ClientStatus = e.dataItem.Value;
+                        }
+                        break;
+                    }
+            }
+        }
+        ms.trigger('change');
+    }
+    function ClientStatusChange() {
+        var status = $("#StatusID").data("kendoDropDownList").value();
+        $("#hdStatusID").val(status);  
+    }
+    function ResetCheckboxSet(e) {
+        var ms = $("#SelectedClients").data('kendoMultiSelect');
+        var datas = ms.dataItems();
+        for (i = 0; i < datas.length; i++) {
+            if(datas[i] == e.dataItem)
+            {
+                datas.pop(datas[i]);
+            }
+        }
+        ClientStatusChange();
+        ms.trigger('change');
+    }
+    function SetCheckboxValue(e) {
+        var dataItems = this.dataItems();
+        this.tagList.children().each(function(index) {
+            //kendo.bind(this, dataItems[index]);
+            if (dataItems[index].ClientStatus == 1) {
+                $("#absent" + dataItems[index].EpisodeID.toString()).prop('checked', true);
+                $("#present" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#excused" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#canceled" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+            }
+            else if (dataItems[index].ClientStatus == 3) {
+                $("#absent" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#present" + dataItems[index].EpisodeID.toString()).prop('checked', true);
+                $("#excused" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#canceled" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+            }
+            else if (dataItems[index].ClientStatus == 4) {
+                $("#absent"  + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#present" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#excused" + dataItems[index].EpisodeID.toString()).prop('checked', true);
+                $("#canceled" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+            }
+            else if (dataItems[index].ClientStatus == 5) {
+                $("#absent"  + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#present" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#excused" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#canceled" + dataItems[index].EpisodeID.toString()).prop('checked', true);
+            }
+        });
+    }
+
+    function ADAECDataBound(e) {
+        var items = this.ul.find("li");
+        setTimeout(function () {
+            checkInputs(items);
+        });
+        //var items = $("#SelectedADAItems").data("kendoMultiSelect").ul.find("li");
+        //for (var i = 0; i < items.length; i++) {
+        //    if (e.sender._old.indexOf(items[i].children.cb.value) > -1) {
+
+        //        items[i].children.cb.checked = true;
+        //    }
+        //}
+    }
+    function onSelect(e) {
+        var items = $('#SelectedADAItems').data("kendoMultiSelect").ul.find("li");
+        items.each(function () {
+            var element = $(this);
+            var input = element.children("input");
+            if (input.val() === e.dataItem.Value) {
+                input.prop("checked", true);
+                return;
+            }
+        });
+    }
+    var checkInputs = function (elements) {
+        elements.each(function () {
+            var element = $(this);
+            var input = element.children("input");
+
+            input.prop("checked", element.hasClass("k-state-selected"));
+        });
+    };
+
+    function SetDefault() {
+        var items = $("#SelectedADAItems").data("kendoMultiSelect").ul.find("li");
+        checkInputs(items);
+    }
+    function onDeselect(e) {
+        var items = $('#SelectedADAItems').data("kendoMultiSelect").ul.find("li");
+        items.each(function () {
+            var element = $(this);
+            var input = element.children("input");
+            if (input.val() === e.dataItem.Value) {
+                input.prop("checked", false);
+                return;
+            }
+        });
+    }
+    function ADAECDataChange(e) {
+        var dataItems = $("#SelectedADAItems").data("kendoMultiSelect").dataItems();
+        var selectedItem = [];
+        for (var it = 0; it < dataItems.length; it++) {
+            selectedItem.push(dataItems[it].Value);
+        }
+
+        var items = $("#SelectedADAItems").data("kendoMultiSelect").ul.find("li");
+        for (var i = 0; i < items.length; i++) {
+            if (selectedItem.indexOf(items[i].children.cb.value) > -1) {
+                items[i].children.cb.checked = true;
+            }
+            else {
+                items[i].children.cb.checked = false;
+            }
+        }
+    }
+
+    function RefreshGridList(e) {
+        var multiselect = $("#SelectedStaffs").data('kendoMultiSelect');
+        if (e.response != undefined && e.response.length > 0) {
+            for (var i = 0; i < e.response.length; i++) {
+                multiselect.dataSource.add(e.response[i]);
+                var values = multiselect.value().slice();
+                $.merge(values, [e.response[i].StaffId.toString()]);
+                multiselect.value(values);
+            }
+        }
+    }
+    function updateData(data) {
+        var staffs = $("#SelectedStaffs").data("kendoMultiSelect").dataItems();
+        //remove all older ones
+        if (data.SelectedStaffs != null || data.SelectedStaffs != undefined) {
+            var len = data.SelectedStaffs.length;
+            for (i = 0; i < len; i++) {
+                data.SelectedStaffs.pop();
+            }
+        }
+        //add current ones
+        for (i = 0; i < staffs.length; i++) {
+            data.SelectedStaffs.push({ StaffId: staffs[i].StaffId, StaffName: staffs[i].StaffName, StaffType: "", StaffTypeId: 0, LocationId: 0 });
+        }
+
+        //get selected episodes
+        var episodes = $("#SelectedClients").data("kendoMultiSelect").dataItems();
+        //remove all older ones
+        if (data.SelectedClients != null || data.SelectedClients != undefined) {
+            var len = data.SelectedClients.length;
+            for (i = 0; i < len; i++) {
+                data.SelectedClients.pop();
+            }
+        }
+        else{
+            data.SelectedClients = [];
+        }
+        //add current ones
+        for (i = 0; i < episodes.length; i++) {
+            if (episodes[i].EpisodeID != "")
+               data.SelectedClients.push({ EpisodeID: episodes[i].EpisodeID, CDCRNumber: episodes[i].CDCRNumber, ClientName: "", AppointmentId: episodes[i].AppointmentId, Agent: "", Unit: "", ReleaseLoc: episodes[i].ReleaseLoc, ClientStatus: episodes[i].ClientStatus });
+        }
+        var startdate = new Date($("#startApptDate").val() + " " + $("#startApptTime").val());
+        data.StartDate = startdate;
+        data.Start = startdate;
+        data.StartTime = startdate;
+
+        var enddate = new Date($("#startApptDate").val() + " " + $("#endApptTime").val());
+        data.EndDate = enddate;
+        data.End = enddate;
+        data.EndTime = enddate;
+
+        data.SelectedADAIds = $("#SelectedADAItems").val()== null ? "" : $("#SelectedADAItems").val().join(",");
+        data.Description == data.Description;
+        var clients = $("#SelectedClients").val() == null ? "" : $("#SelectedClients").val().join(",");
+        var staffs = $("#SelectedStaffs").val().join(",");
+
+        return { model: JSON.stringify(data), ClientIDs: clients, WorkerIDs: staffs };
+    }
+    function updateFLData(data) {
+        var staffs = $("#SelectedStaffs").data("kendoMultiSelect").dataItems();
+        //remove all older ones
+        if (data.SelectedStaffs != null || data.SelectedStaffs != undefined) {
+            var len = data.SelectedStaffs.length;
+            for (i = 0; i < len; i++) {
+                data.SelectedStaffs.pop();
+            }
+        }
+        //add current ones
+
+        for (i = 0; i < staffs.length; i++) {
+            data.SelectedStaffs.push({ StaffId: staffs[i].StaffId, StaffName: staffs[i].StaffName, StaffType: "", StaffTypeId: 0, LocationId: 0 });
+        }
+
+        //get selected episodes
+        var episodes = $("#SelectedClients").data("kendoMultiSelect").dataItems();
+        //remove all older ones
+        if (data.SelectedClients != null || data.SelectedClients != undefined) {
+            var len = data.SelectedClients.length;
+            for (i = 0; i < len; i++) {
+                data.SelectedClients.pop();
+            }
+        }
+        else{
+            data.SelectedClients = [];
+        }
+        //add current ones
+        for (i = 0; i < episodes.length; i++) {
+            if (episodes[i].EpisodeID != "")
+              data.SelectedClients.push({ EpisodeID: episodes[i].EpisodeID, CDCRNumber: episodes[i].CDCRNumber, ClientName: "", AppointmentId: episodes[i].AppointmentId, Agent: "", Unit: "", ReleaseLoc: episodes[i].ReleaseLoc, ClientStatus: episodes[i].ClientStatus });
+        }
+        var startdate = new Date($("#startApptDate").val() + " " + $("#startApptTime").val());
+        data.StartDate = startdate;
+        data.Start = startdate;
+        data.StartTime = startdate;
+
+        var enddate = new Date($("#startApptDate").val() + " " + $("#endApptTime").val());
+        data.EndDate = enddate;
+        data.End = enddate;
+        data.EndTime = enddate;
+
+        data.SelectedADAIds = $("#SelectedADAItems").val() == null ? "" : $("#SelectedADAItems").val().join(",");
+        data.Description == data.Description;
+        var clients = $("#SelectedClients").val() == null ? "" : $("#SelectedClients").val().join(",");
+        var staffs = $("#SelectedStaffs").val().join(",");
+
+        var staffid = $("#DarStaffIDs").data("kendoDropDownList").value();
+        return { model: JSON.stringify(data),StaffID: staffid, ClientIDs: clients, WorkerIDs: staffs };
+    }
+    function SchDailyDataBound(e) {
+        var view = this.view();
+        var events = this.dataSource.view();
+        var eventElement;
+        var event;
+        if (events.length == 0) {
+            e.preventDefault();
+            return;
+        }
+        for (var idx = 0, length = events.length; idx < length; idx++) {
+            event = events[idx];
+            //get event element
+            eventElement = view.element.find("[data-uid=" + event.uid + "]");
+            eventElement.css("background-color", event.CellColor);
+            eventElement.css("border-color", event.CellColor);
+        }
+    }
+    //make color for holidays
+    function scheduler_dataBound(e) {
+        var scheduler = $("#DayTimeLine").data("kendoScheduler");
+        var view = this.view();
+
+        if (scheduler._selectedViewName == "timeline")
+            return;
+        //var view = scheduler._selectedView;
+        view.table.find("td[role='gridcell']").each(function () {
+            if ($(this) != null) {
+                var element = $(this);
+                if (element != null) {
+                    var slot = scheduler.slotByElement(element);
+                    if (slot != null) {
+                        if (disableDates(slot.startDate)) {
+                            element.addClass("holidaycolor");
+                            element[0].disabled = true;
+                        }
+                    }
+                }
+            }
+        });
+
+        scheduler.editable = false;
+    };
+
+    function onLocEdit(e) {
+        if (disableDates(e.event.start)) {
+            e.preventDefault();
+            return;
+        }
+    }
+
+    function AddToSelectedStaffs(e) {
+        var object = this.dataItem(this.select());
+        if (object == undefined || object == null || object.StaffId < 0 || object.StaffId == "")
+            return;
+        var ms = $("#SelectedStaffs").data('kendoMultiSelect');
+        ms.dataSource.add(object);
+        ms.value(ms.value().concat([object.StaffId]));
+        //var values = ms.value().slice();
+        //$.merge(values, [object.StaffId.toString()]);
+        //ms.value(values);
+        this.select(0);
+        $("#SelectedStaffs_validationMessage").hide();
+    }
+    function ChangeStaff(e){
+       var selObject = this.dataItem();
+        if (selObject != undefined)
+            $("#SelectedStaffs_validationMessage").hide();
+        else
+            $("#SelectedStaffs_validationMessage").show();
+    }
+    function AddToSelectedClients(e) {
+        var object = this.dataItem(this.select());
+        if (object == undefined || object == null || object.EpisodeID < 0 || object.EpisodeID == "")
+            return;
+        var ms = $("#SelectedClients").data('kendoMultiSelect');
+        var ds = ms.dataSource;
+        ds.add(object);
+        ms.value(ms.value().concat([object.EpisodeID]));
+        ds.sync();
+        var dataItems = ms.dataItems();
+        //reset checkbox values
+        ms.tagList.children().each(function (index) {
+            //kendo.bind(this, dataItems[index]);
+            if (dataItems[index].ClientStatus == 1) {
+                $("#absent" + dataItems[index].EpisodeID.toString()).prop('checked', true);
+                $("#present" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#excused" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#canceled" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+            }
+            else if (dataItems[index].ClientStatus == 3) {
+                $("#absent" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#present" + dataItems[index].EpisodeID.toString()).prop('checked', true);
+                $("#excused" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#canceled" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+            }
+            else if (dataItems[index].ClientStatus == 4) {
+                $("#absent" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#present" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#excused" + dataItems[index].EpisodeID.toString()).prop('checked', true);
+                $("#canceled" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+            }
+            else if (dataItems[index].ClientStatus == 5) {
+                $("#absent" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#present" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#excused" + dataItems[index].EpisodeID.toString()).prop('checked', false);
+                $("#canceled" + dataItems[index].EpisodeID.toString()).prop('checked', true);
+            }
+        });
+        this.select(0);
+    }
+    function DataChanged(e) {
+        var object = this.dataItem(this.select());
+        if (object == undefined || object == null || object.StaffId < 0)
+            return;
+        $("#hdSelectedStaffId").val(object.StaffId);
+        $("#hdLocationId").val(object.ComplexId)
+        SchedulerChange("current", $("#dartabstrip1").kendoTabStrip().data("kendoTabStrip").select().index());
+    };
+    $(function () {
+        var window = $("#window").data("EventEditorWindow");
+        $(".k-button.k-bare.k-button-icon.k-window-action").click(function (e) {
+            window.close();
+        });
+        
+       $("#DayTimeLine").kendoTooltip({
+           filter: ".k-event:not(.k-event-drag-hint) > div",
+           position: "top-left",
+           width: 350,
+           content: kendo.template($('#template1').html())
+       });
+    });
+
+    function GridEdit(e) {
+       if (e.model.isNew()) {
+            e.model.set("SelectedLocationId", $("#DarStaffIDs").data("kendoDropDownList").dataItem().ComplexId);
+            var date = new Date($("#apptdatepicker").val());
+            var starttime = new Date();
+            var endtime = new Date(starttime.getTime() + (15 * 60 * 1000));
+            e.model.set("Start", kendo.parseDate(date, 'MM/dd/yyyy'));
+            e.model.set("StartTime", kendo.parseDate(starttime, 'hh:mm tt'));
+            e.model.set("End", kendo.parseDate(date, 'MM/dd/yyyy'));
+            e.model.set("EndTime", kendo.parseDate(endtime, 'hh:mm tt'));
+            e.model.set("SelectedStaffIds", $("#DarStaffIDs").data("kendoDropDownList").dataItem().StaffId);
+        }
+    }
+    //timeline event for initial datetime
+    function onEdit(e) {//When we open or add an event
+        if (e.action != undefined && e.action == "add") {
+            if (e.sender._data.length > 0) {
+                var date = e.sender._data[e.sender._data.length - 1].start;
+                var endDate = new Date(e.sender._data[e.sender._data.length - 1].start);
+                endDate = new Date(endDate.setMinutes(endDate.getMinutes() + 15));
+                var minutes = date.getMinutes();
+                if (minutes % 15 != 0) {
+                    date = new Date(date.setMinutes(minutes + (15 - minutes % 15)));
+                    endDate = new Date(endDate.setMinutes(minutes + 15 + (15 - minutes % 15)));
+                }
+                e.sender._data[e.sender._data.length - 1].StartTime = date;
+                e.sender._data[e.sender._data.length - 1].EndTime = endDate;
+                e.sender._data[e.sender._data.length - 1].SelectedStaffs[0].StaffId = $("#DarStaffIDs").val();
+                e.sender._data[e.sender._data.length - 1].SelectedLocationId = $("#DarStaffIDs").data("kendoDropDownList").dataItem().ComplexId
+            }
+        }
+    }
+    //for build next appoinment string -- replace space with '/' so that string will notunterminatered
+    function replaceString(value) {
+        return value.replace(" ", "/");
+    }
+
+    function getAppointmentId() {
+        var row = $(event.srcElement).closest("tr");
+        var grid = $(event.srcElement).closest("[data-role=grid]").data("kendoGrid");
+
+        var dataItem = grid.dataItem(row);
+        var apptId = 0;
+        if (dataItem != null)
+            apptId = dataItem.AppointmentId;
+        return { AppointmentId: apptId };
+    }
+
+    function getStaffAppointmentId() {
+        var row = $(event.srcElement).closest("tr");
+        var grid = $(event.srcElement).closest("[data-role=grid]").data("kendoGrid");
+
+        var dataItem = grid.dataItem(row);
+        var apptId = 0;
+        if (dataItem != null)
+            apptId = dataItem.AppointmentId;
+
+        var selectUserId = $("#DarStaffIDs").data("kendoDropDownList").value();
+        if (selectUserId == -1)
+            selectUserId = $("#hdSelectedStaffId").val();
+
+        return { AppointmentId: apptId, StaffId: selectUserId };
+    }
+    function getGridAdditionalData() {
+        var selectUserId = $("#DarStaffIDs").data("kendoDropDownList").value();
+        if (selectUserId == -1)
+            selectUserId = $("#hdSelectedStaffId").val();
+
+        var datepicker = $("#apptdatepicker").data("kendoDatePicker");
+
+        var result = {
+            StaffId: selectUserId,
+            StartDate: $("#apptdatepicker").val()  //datepicker.value()
+        };
+
+        return result;
+    }
+    //get the current viewmodel data to server
+    function getAdditionalData() {
+        var selectUserId = $("#DarStaffIDs").data("kendoDropDownList").value();
+        if (selectUserId == -1)
+            selectUserId = $("#hdSelectedStaffId").val();
+        //var currStaffId = $("#hdSelectedStaffId").val();
+        var date = new Date($("#apptdatepicker").val());
+        var sch = $("#DayTimeLine").data("kendoScheduler");
+        if (sch.view() == undefined || sch._selectedViewName != sch.view().name) {
+            sch = $('#DayTimeLine').getKendoScheduler();
+            sch.view("timeline");
+            sch.setOptions({ date: date });
+            sch.date(date);
+        }
+
+        if (sch.view().name == "timeline" && sch.view().startDate().toString() != date.toString()) {
+            sch.setOptions({ date: date });
+            sch.date(date);
+        }
+        result = {
+            StaffId: selectUserId,
+            StartDate: sch.view().startDate(),
+            EndDate: sch.view().endDate()
+        };
+
+        return result;
+    }
+
+    function location_error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+            var scheduler = $("#DayTimeLine").data("kendoScheduler");
+            scheduler.one("dataBinding", function (e) {
+                //prevent saving if server error is thrown
+                e.preventDefault();
+            })
+        }
+    }
+    //handler error from server
+    function appt_error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+
+            alert(message);
+            var grid = $("#gridScheduler").data("kendoGrid");
+            grid.one("dataBinding", function (e) {
+                // cancel grid rebind if error occurs
+                e.preventDefault();
+            });
+        }
+    }
+    //reset date grid and scheduler
+    function staffChange(e) {
+        if (this.value() == "" || this.listView._dataItems[0] == undefined)
+            return;
+        var value = this.listView._dataItems[0].StaffId;
+        var date = new Date($("#apptdatepicker").val());
+        $("#hdSelectedStaffId").val(value);
+        $("#hdSelectedStaffName").val(value);
+        SchedulerChange("Current", $("#dartabstrip1").kendoTabStrip().data("kendoTabStrip").select().index());
+    }
+    //lnke to next appointment date
+    function GoToSelectedDate(obj) {
+        $("#apptdatepicker").val(kendo.toString(obj.substring(0, 10).replace(/-/g, "/"), "MM/dd/yyyy"));
+        SchedulerChange("Current", $("#dartabstrip1").kendoTabStrip().data("kendoTabStrip").select().index());
+    };
+    //previous button clicked
+    $("#customCommandPre").click(function (e) {
+        var date = new Date($("#apptdatepicker").val());
+        do {
+            date = new Date(date.setDate(date.getDate() - 1));
+        } while (disableDates(date))
+        $("#apptdatepicker").val(kendo.toString(date, 'MM/dd/yyyy'));
+        var dpicker = $("#apptdatepicker").data("kendoDatePicker");
+        dpicker.trigger("change");
+    });
+    //next button clicked
+    $("#customCommandNext").click(function (e) {
+        var date = new Date($("#apptdatepicker").val());
+        do {
+            date = new Date(date.setDate(date.getDate() + 1));
+        } while (disableDates(date))
+        $("#apptdatepicker").val(kendo.toString(date, 'MM/dd/yyyy'));
+        $("#apptdatepicker").data("kendoDatePicker").trigger("change");
+    });
+    function DateChanged(e) {
+        e.preventDefault()
+        var tab = $("#dartabstrip1").kendoTabStrip().data("kendoTabStrip").select().index();
+        try {
+            if ($("#apptdatepicker").val() == "") {
+                $("#apptdatepicker").val(kendo.toString(new Date(), 'MM/dd/yyyy'));
+                e.sender.dateView.options.value = kendo.toString(new Date(), 'MM/dd/yyyy')
+                SchedulerChange('Current', tab);
+                return false;
+            }
+            SchedulerChange('Current', tab);
+            return true;
+        }
+        catch (errobj) {
+            throw errobj;
+            return false;
+        }
+    }
+    //scheduler changes based on buttons, links fired
+    function SchedulerChange(obj, tab) {
+        var currStaffId = $("#DarStaffIDs").data("kendoDropDownList").value();
+        if (currStaffId == -1)
+            currStaffId = $("#hdSelectedStaffId").val();
+        var date = new Date($("#apptdatepicker").val());
+        var start = date;
+        var end = start;
+        if (tab == 0) {
+            $('#gridScheduler').data('kendoGrid').dataSource.read({ StaffId: currStaffId, StartDate: date })
+        }
+        else {
+            var scheduler = $("#DayTimeLine").data("kendoScheduler");
+            if (scheduler.view() == undefined || scheduler._selectedViewName != scheduler.view().name) {
+                scheduler = $('#DayTimeLine').getKendoScheduler();
+                scheduler.view("timeline");
+            }
+
+            scheduler.setOptions({ date: date });
+            scheduler.date(date);
+
+            start = scheduler.view().startDate();
+            end = scheduler.view().endDate();
+
+            scheduler.resources[0].dataSource.read({ StaffId: currStaffId, StartDate: start, EndDate: end }).then(
+                function (e) {
+                    scheduler.view(scheduler.view().name);
+                });
+        }
+        return true;
+    }
+    function convertValues(value) {
+        var data = {};
+        value = $.isArray(value) ? value : [value];
+        for (var idx = 0; idx < value.length; idx++) {
+            data["values[" + idx + "]"] = value[idx];
+        }
+        return data;
+    }
+    //get the selected episode from the dropdownlist input field
+    function onEpsAddtionalData() {
+        return {
+            text: $("#SelectedEpisodes").data("kendoMultiSelect").input.val()
+        };
+    }
+    function BuildADAEC(obj) {
+        var result = "";
+        if (obj != undefined && obj.length > 0 && obj[0] != null) {
+            for (var i = 0; i < obj.length; i++) {
+                if (result.length == 0)
+                    result = obj[i].Text;
+                else
+                    result += '<br/>' + obj[i].Text;
+            }
+        }
+        return result;
+    }
+    function BuildFormatData(obj) {
+        var result = "";
+        if (obj != undefined && obj != "") {
+            var data = obj.split(';');
+            var uniqueArr = $.unique(data.sort()).sort();
+            for (var i = 0; i < uniqueArr.length; i++) {
+                var temp = kendo.toString(uniqueArr[i]);
+                if (result.length == 0)
+                    result = temp;
+                else
+                    result += '<br/>' + temp;
+            }
+        }
+        return result;
+    }
+    String.prototype.lpad = function (padString, length) {
+        var str = this;
+        while (str.length < length)
+            str = padString + str;
+        return str;
+    }
+    function BuildClientNames(obj) {
+        var result = "";
+        if (obj != undefined && obj.length > 0) {
+            for (var i = 0; i < obj.length; i++) {
+                var statusID = obj[i].ClientStatus;
+                var status = "(Pending)";
+                if (statusID == 1) status = "(Absent)";
+                else if (statusID == 3) status = "(Present)";
+                else if (statusID == 4) status = "(Excused)";
+                else if (statusID == 5) status = "(Canceled)";
+                var temp = ("        " + obj[i].CDCRNumber + " " + obj[i].ClientName + " " + status).lpad(' ', 8);
+                // var temp = kendo.toString(str);
+                //kendo.toString(padLeft(obj[i].CDCRNumber + " " + obj[i].ClientName + " " + status), " ");
+                if (result.length == 0)
+                    result = temp;
+                else
+                    result += '<br/>' + temp;
+            }
+        }
+        return result;
+    }
+    function BuildNavDateLink(obj) {
+        var result = "";
+        if (obj != undefined && obj != "" && obj != " ") {
+            var data = obj.split(';');
+            var uniqueArr = $.unique(data.sort()).sort();
+            for (var i = 0; i < uniqueArr.length; i++) {
+                if (uniqueArr[i] === " " || uniqueArr[i] === "" || uniqueArr[i] == undefined)
+                    continue;
+                var temp = kendo.format("<a style='font-size:12px;color:Highlight;text-decoration: underline;' onclick=GoToSelectedDate('{0}')>{1}</a>", kendo.toString(uniqueArr[i].trim().substring(0, 10)), kendo.toString(uniqueArr[i].trim().substring(0, 16)));
+                if (result.length == 0)
+                    result = temp;
+                else
+                    result += '<br/>' + temp;
+            }
+        }
+        return result;
+    }
+    function BuildNavClientLink(CDCRNums) {
+        var result = "";
+        var action = '@Url.Action("Index", "Client")';
+        if (CDCRNums != undefined && CDCRNums != "") {
+            var data = CDCRNums.split(';');
+            var uniqueArr = $.unique(data.sort()).sort();
+            for (var i = 0; i < uniqueArr.length; i++) {
+                var temp = kendo.format("<a href='{0}?CDCRNum={1}'>" + uniqueArr[i] + "</a>",
+                                action,
+                                uniqueArr[i]
+                            );
+                if (result.length == 0)
+                    result = temp;
+                else
+                    result += '<br/>' + temp;
+            }
+        }
+        return result;
+    }
+
+    function GoToClient(obj)
+    {
+        $(".list-inline").removeClass('active');
+        $($(".list-inline")[0]).addClass('active');
+        window.location = window.location.protocol + "//" + window.location.host + "/Client?CDCRNum=" + obj
+    }
+    function BuildTableData(obj, status) {
+        var result = "";
+        if (obj != undefined && obj.length > 0) {
+            result = "<table style='width:100%;padding:0px!important;min-height:45px;' class='table table-condensed' >";
+            for (var i = 0; i < obj.length; i++) {
+                var status = "Pending";
+                switch (obj[i].ClientStatus) {
+                    case 1: status = "Absent"; break;
+                    case 3: status = "Present"; break;
+                    case 4: status = "Excused"; break;
+                    case 5: status = "Canceled"; break;
+                }
+                result += kendo.format(
+                    "<tr><td style='width:200px;text-align:left;inline-height:12px!important;font-size:14px; border-style: none solid none solid;padding:0px!important;'>{0}</td>" +
+                        "<td style='width:70px;text-align:left;inline-height:12px!important;font-size:14px; border-style: none solid none solid;padding:0px!important;'>{1}</td>" +
+                        "<td style='width:70px;text-align:left;inline-height:12px!important;font-size:14px;border-style: none solid none solid;padding:0px!important;'>{2}</td>" +
+                        "<td style='width:140px;text-align:left;inline-height:12px!important;font-size:14px;border-style: none solid none solid;padding:0px!important;'>{3}</td>" +
+                        "<td style='width:100px;text-align:left;inline-height:12px!important;font-size:14px;border-style: none solid none solid;padding:0px!important;'>{4}</td>" +
+                        "<td style='width:100px;text-align:left;inline-height:12px!important;font-size:14px;border-style: none solid none solid;padding:0px!important;'>{5}</td>" +
+                        "<td style='width:100px;text-align:left;inline-height:12px!important;font-size:12px;border-style: none solid none solid;padding:0px!important;text-decoration:none!important;'>{6}</td></tr>",
+                obj[i].ClientName,status, BuildNavClientLink(obj[i].CDCRNumber), obj[i].Agent, obj[i].Unit, BuildNavDateLink(obj[i].FollowupAppt),obj[i].ContactPh)
+            }
+            result += "</table>"
+        }
+        return result;
+    }
+    //reload timeline scheduler
+    function Reload(e) {
+       if (e.response != undefined && e.response.Errors != null) {
+            e.preventDefault();
+            return;
+        }
+        var date = new Date($("#apptdatepicker").val());
+        if (e.type == "create" || e.type == "update" || e.type == "destroy") {
+            var currStaffId = $("#hdSelectedStaffId").val();
+            var datestart = kendo.parseDate(e.response.Data[0].Start);
+            if (kendo.toString(datestart, 'MM/dd/yyyy') !== kendo.toString(date, 'MM/dd/yyyy')) {
+                $("#apptdatepicker").val(kendo.toString(datestart, 'MM/dd/yyyy'));
+            }
+            SchedulerChange("Current", $("#dartabstrip1").kendoTabStrip().data("kendoTabStrip").select().index());
+            if (e.response.Data[0].PrintAppointmentID > 0)
+                printPATSPDF(e.response.Data[0].PrintAppointmentID, 0, "Appointment Note", "color-continue");
+        }
+        //else if (e.type == "read") {
+        //    var scheduler = $("#DayTimeLine").data("kendoScheduler");
+        //    if (scheduler.view().name == "timeline" && scheduler.options.group.resources.length == 0) {
+        //        scheduler.options.group.resources[0] = "Office";
+        //        scheduler.view(scheduler.view().name);
+        //    }
+        //    else if (scheduler.view().name != "timeline" && scheduler.options.group.resources.length > 0) {
+        //        scheduler.options.group.resources = [];
+        //        scheduler.view(scheduler.view().name);
+        //    }
+        //}
+        e.preventDefault();
+    }
+
+    //reload grid date
+    function GridReload(e) {
+        if (e.response != undefined && e.response.Errors != null) {
+            e.preventDefault();
+            return;
+        }
+
+        if (e.type == "create" || e.type == "update" || e.type == "destroy") {
+            var currStaffId = $("#hdSelectedStaffId").val();
+            var date = new Date($("#apptdatepicker").val());
+
+            var datestart = kendo.parseDate(e.response.Data[0].Start);
+            if (kendo.toString(datestart, 'MM/dd/yyyy') !== kendo.toString(date, 'MM/dd/yyyy')) {
+                $("#apptdatepicker").val(kendo.toString(datestart, 'MM/dd/yyyy'));
+            }
+            SchedulerChange("Current", $("#dartabstrip1").kendoTabStrip().data("kendoTabStrip").select().index());
+            if (e.response.Data[0].PrintAppointmentID != 0)
+                printPATSPDF(e.response.Data[0].PrintAppointmentID, 0 , "Appointment Note", "color-continue");
+        }
+    }
+</script>
+

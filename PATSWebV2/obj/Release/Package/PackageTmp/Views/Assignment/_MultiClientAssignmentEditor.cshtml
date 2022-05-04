@@ -1,0 +1,486 @@
+﻿@using Kendo.Mvc.UI;
+@model PATSWebV2.ViewModels.Assignment.AssignmentViewModel
+<style>
+    .empty-grid::before {
+        padding: 0.5em;
+        border-style: solid;
+        border-width: 1px;
+        line-height: 3em;
+        margin-top: 10px;
+        color: red;
+        content: "No Assigned Cases";
+    }
+    .k-i-arrow-60-down{
+        margin-top:5px;
+    }
+    .k-pager-wrap > .k-link > .k-icon{
+        margin-top:5px;
+    }    
+    #gridAssignment  .k-grid-content
+    {
+        min-height: 400px;
+    }
+</style>
+    <table style="margin-left:5px;width:100%;">
+            <tr style="padding:2px;height:30px!important;">
+                <td colspan="3">
+                    <strong><span style="margin-top:6px;">MULTIPLE CLIENT ASSIGNMENTS</span></strong>&nbsp;&nbsp;<i><u style="font-size:x-small">Select/Deselect with Ctrl + mouse-click, while persisting previously selected cells</u></i>&nbsp;&nbsp;
+                    @if (!Model.CanEdit)
+            {
+                        <i><scan style='color:darkgoldenrod;font-size:x-small'>You do not have permission to edit.</scan></i>
+            }
+                </td>
+            </tr>
+            @Html.HiddenFor(m => m.DefaulCaseWorkTypeId, new { id = "hdDefaulCaseWorkTypeId" })
+            @Html.HiddenFor(m => m.DefaultFilterUserID, new { id = "hdDefaultFilterUserID" })
+            <tr style="padding:1px;height:25px!important;">
+                @Html.HiddenFor(m => m.ComplexID, new { id = "hdComplexId" })
+                <td style="width:380px;">
+                    <script>
+            $("#loading").hide();
+            $("#divUserShowHidden").hide()
+            function locationChange(e) {
+                var loc = $("#AssignmentPOCOffice").data("kendoDropDownList").value();
+                var userid = 0;
+                $("#hdComplexId").val(loc);
+                if (loc == -9999) {
+                    $("#divUserShowHidden").show();
+                    var userid = $("#StaffID").data("kendoDropDownList").value();
+                }
+                else
+                {
+                    $("#divUserShowHidden").hide();
+                    var ddl = $("#StaffID").data("kendoDropDownList").value($("#hdDefaultFilterUserID").val());
+                }
+                var grid = $("#gridAssignment").data("kendoGrid");
+                grid.clearSelection();
+                grid.dataSource.read({ LocationId: loc, StaffID : userid});
+
+                //var pagesize = grid.dataSource.pageSize();
+                //grid.dataSource.query({
+                //    sort: { field: 'CDCRNum', dir: 'Asc' },
+                //    page: 1,
+                //    filter: { field: "CaseStatus", operator: "eq", value: "ACTIVE" },
+                //    pageSize: pagesize
+                //});
+
+                //$("th.k-filterable[data-field='Location']").data().kendoFilterMultiCheck.checkSource.read({ LocationId: loc, StaffID: 0 });
+            }
+
+            function GetAssignParameters() {
+                return { LocationId: $("#hdComplexId").val(), StaffID : $("#StaffID").val() };
+            }
+            function GetLocationId() {
+                return { LocationId: $("#hdComplexId").val() };
+            }
+            function GetFilterParameter() {
+                return { LocationId: $("#hdComplexId").val(), StaffID : $("#StaffID").val() };
+            }
+            function ReloadAssignment(e) {
+                if (e.type != "read") {
+                    var loc = $("#AssignmentPOCOffice").data("kendoDropDownList").value();
+                    var userid = $("#StaffID").data("kendoDropDownList").value();
+                    var grid = $("#gridAssignment").data("kendoGrid");
+                    grid.dataSource.read({ LocationId: loc, StaffID: userid });
+                    grid.refresh();
+                }
+            }
+            function ColorAssignRow(e) {
+                var grid = $("#gridAssignment").data("kendoGrid");
+                var data = grid.dataSource.data();
+                $.each(data, function(i, row){
+                    if(row.CaseStatus == "BANKED" )
+                    {
+                        $('tr[data-uid="' + row.uid + '"]').css("background-color", "yellow");
+                    }
+                    else if (row.CaseStatus == "CLOSED")
+                    {
+                        $('tr[data-uid="' + row.uid + '"]').css("background-color", "#e74c3c"); //#f5b7b1
+                    }
+                });
+
+                grid.thead.find('th').each(function () {
+                    $(this).prop('title', $(this).data('title'));
+                });
+                //MakeMultipleAssignAvailable();
+            }
+            function RefreschGrid() {
+                var loc = $("#AssignmentPOCOffice").data("kendoDropDownList").value();
+                var userid = $("#StaffID").data("kendoDropDownList").value();
+                var grid = $('#gridAssignment').data('kendoGrid');
+                grid.dataSource.read({ LocationId: loc, StaffID: userid });
+                grid.refresh();
+            }
+
+            function StaffDataChanged(e) {
+                var loc = $("#AssignmentPOCOffice").data("kendoDropDownList").value();
+                var userid = $("#StaffID").data("kendoDropDownList").value();
+                var grid = $("#gridAssignment").data("kendoGrid");
+                grid.clearSelection();
+                grid.dataSource.read({ LocationId: loc, StaffID: userid });
+
+                //var pagesize = grid.dataSource.pageSize();
+                //grid.dataSource.query({
+                //    sort: { field: 'CDCRNum', dir: 'Asc' },
+                //    page: 1,
+                //    filter: { field: "CaseStatus", operator: "eq", value: "ACTIVE" },
+                //    pageSize: pagesize
+                //});
+                //$("th.k-filterable[data-field='Location']").data().kendoFilterMultiCheck.checkSource.read({ LocationId: -9999, StaffID: userid });
+            };
+                    </script>
+                    &nbsp;&nbsp;@Html.Label("Select BHR Location:")&nbsp;&nbsp;
+                    @(Html.Kendo().DropDownListFor(m => m.ComplexID)
+.Name("AssignmentPOCOffice")
+.DataValueField("ComplexID")
+.DataTextField("ComplexDesc")
+.HtmlAttributes(new { style = "width:180px;text-align:left;margin-top:0px;overflow:auto;" })
+.Filter(FilterType.Contains)
+.Height(290)
+.Value("-9999")
+.Events(e => { e.Change("locationChange"); })
+.DataSource(source =>
+{
+    source.Read(read => read.Action("GetAllComplex", "Assignment")).ServerFiltering(true);
+})
+                    )
+                </td>
+                <td style="width:350px;">
+                    <div id="divUserShowHidden">
+                        @Html.Label("Select Staff:")&nbsp;&nbsp;
+                        @(Html.Kendo().DropDownListFor(m => m.DefaultFilterUserID)
+            .Name("StaffID")
+            .DataValueField("StaffId")
+            .DataTextField("StaffName")
+            .HtmlAttributes(new { style = "width:180px;" })
+            .Filter(FilterType.Contains)
+            .Height(290)
+            .Value(Model.DefaultFilterUserID.ToString())
+            .Events(e => { e.Change("StaffDataChanged"); })
+            .DataSource(source =>
+            {
+                source.Read(read => read.Action("GetAllStaffs", "Assignment"));
+            })
+                        )
+                    </div>
+                </td>
+                <td>
+                    <button class="k-button" id="btnExcelExport" style="float:right;"><span class="k-icon k-i-excel"></span>Export to Excel</button>
+                    <button class="k-button" style="float:right;margin-right:10px;" onclick="clearGrid1Fiter()"><span class="k-icon k-i-filter"></span>Clear All Filters</button>
+                </td>
+                <td width="20"></td>
+            </tr>
+        </table>
+<div id="divAssignment">
+    @(Html.Kendo().Grid<PATSWebV2.ViewModels.Assignment.AssignmentViewModel>()
+.Name("gridAssignment")
+.NoRecords(x => x.Template("<div class='empty-grid'></div>"))
+.Columns(columns =>
+{
+    columns.Bound(o => o.Id).Hidden(true);
+    columns.Bound(o => o.CanEdit).Hidden(true);
+    columns.Bound(p => p.CDCRNum).Title("CDCR#").ClientTemplate("#=BuildNavClientLink(CDCRNum)#").Width(60);
+    columns.Bound(p => p.ClientName).Title("Last Name, First").Width(150);
+    columns.Bound(p => p.MHStatus).Title("MH Status").Width(40).Filterable(ftb => ftb.Multi(true).BindTo(new[] { new { MHStatus = "EOP" }, new { MHStatus = "CCCMS" }, new { MHStatus = "Med Nec" } }));
+    columns.Bound(p => p.CaseStatus).Title("Case Status").Width(50).Filterable(ftb => ftb.Multi(true).BindTo(new[] { new { CaseStatus = "ACTIVE" }, new { CaseStatus = "BANKED" }, new { CaseStatus = "CLOSED" } })).ClientTemplate("#=(CaseStatus == 'ACTIVE') ? '' : CaseStatus#");
+    columns.Bound(p => p.Location).Title("BHR Office").Width(80).Filterable(f => f.Enabled(false));/*.Filterable(f => f.Multi(true).DataSource(ds => ds.Read(r => r.Action("FilterPOCUnit_read", "ClientAssignment").Data("GetFilterParameter"))));*/
+    columns.ForeignKey(p => p.SocialWorkerUserId, (System.Collections.IEnumerable)ViewData["SWList"], "PATSUserId", "PATSUserName").Width(80).Title("Social Worker").EditorTemplateName("_SWGridForeignKey").Filterable(f => f.Multi(true));
+    //columns.ForeignKey(p => p.CaseManagerUserId, (System.Collections.IEnumerable)ViewData["CMList"], "PATSUserId", "PATSUserName").Width(80).Title("Case Manager").EditorTemplateName("_CMGridForeignKey").Filterable(f => f.Multi(true));
+    columns.ForeignKey(p => p.PsychiatristUserId, (System.Collections.IEnumerable)ViewData["PCTList"], "PATSUserId", "PATSUserName").Width(80).Title("Psychiatrist").EditorTemplateName("_PCTGridForeignKey").Filterable(f => f.Multi(true));
+    columns.ForeignKey(p => p.PsychologistUserId, (System.Collections.IEnumerable)ViewData["PCOList"], "PATSUserId", "PATSUserName").Width(80).Title("Psychologist").EditorTemplateName("_PCOGridForeignKey").Filterable(f => f.Multi(true));
+    columns.Bound(p => p.ParoleAgentName).Title("Parole Agent").Width(150);
+    columns.Command(command => { command.Edit().Text("Assign/Unassign"); }).Width(100).Visible(Model.CanEdit);
+})
+ .ToolBar(toolbar =>
+ {
+     toolbar.Template(@<text><div id="divToolbar" class="toolbar k-content borderless" style="width:99%;background-color:goldenrod">
+            <table style="width:98%">
+                <tr>
+                    <td width="5px"></td>
+                    <td width="300px">
+                        <div style="height:30px;">
+                            <label class="category-label" for="ddlSW" style="float:left">Social Worker:</label>
+                            @(Html.Kendo().DropDownList().OptionLabel("Select Social Worker  ...")
+.Name("ddlSW")
+.BindTo((System.Collections.IEnumerable)ViewData["SWList"])
+.DataTextField("PATSUserName")
+.DataValueField("PATSUserId")
+.Value("-1")
+.AutoBind(true).HtmlAttributes(new { style = "width:150px;float:left" }).Filter(FilterType.Contains)
+                            )
+                        </div>
+                    </td>
+                    @*<td width="300px">
+                        <div style="height:30px;">
+                            <label class="category-label" for="ddlCM" style="float:left">Case Manager:</label>
+                            @(Html.Kendo().DropDownList().OptionLabel("Select Case Mgr. ...")
+.Name("ddlCM")
+.DataTextField("PATSUserName")
+.DataValueField("PATSUserId")
+.AutoBind(true).HtmlAttributes(new { style = "width:150px;float:left" }).Filter(FilterType.Contains)
+.Value("-1")
+.BindTo((System.Collections.IEnumerable)ViewData["CMList"])
+                            )
+                        </div>
+                    </td>*@
+                    <td width="300px">
+                        <div style="height:30px;">
+                            <label class="category-label" for="ddlPCT" style="float:left">Psychiatrist:</label>
+                            @(Html.Kendo().DropDownList().OptionLabel("Select Psychiatrist ...")
+.Name("ddlPCT")
+.DataTextField("PATSUserName")
+.DataValueField("PATSUserId")
+.AutoBind(true).HtmlAttributes(new { style = "width:150px;float:left" }).Filter(FilterType.Contains)
+.Value("-1")
+.BindTo((System.Collections.IEnumerable)ViewData["PCTList"])
+                            )
+                        </div>
+                    </td>
+                    <td width="300px">
+                        <div style="height:30px;">
+                            <label class="category-label" for="ddlPCO" style="float:left">Psychologist:</label>
+                            @(Html.Kendo().DropDownList().OptionLabel("Select Psychologist ...")
+.Name("ddlPCO")
+.DataTextField("PATSUserName")
+.DataValueField("PATSUserId")
+.AutoBind(true).HtmlAttributes(new { style = "width:150px;float:left" }).Filter(FilterType.Contains)
+.Value("-1")
+.BindTo((System.Collections.IEnumerable)ViewData["PCOList"])
+                            )
+                        </div>
+                    </td>
+                    <td>
+                        <button name="create" class='k-button k-button-icontext' onClick='saveChanges();' style="float:right">
+                            Assign/Unassign ALL
+                        </button>
+                    </td>
+                    <td width="5px"></td>
+                </tr>
+            </table>
+        </div>
+    </text>);
+ }).Excel(e => e.FileName("Assignment.xlsx").Filterable(true).ProxyURL(Url.Action("Excel_Export_Save", "Assignment")).AllPages(true).ForceProxy(true))
+ .Resizable(size => size.Columns(true))
+ .Events(e =>
+ {
+     e.DataBound("ColorAssignRow"); e.Cancel("RefreschGrid");
+     e.Change("MakeMultipleAssignAvailable"); e.Page("ClearSelection"); e.Sort("ClearSelection");
+ })
+ .Sortable(sortable => sortable.AllowUnsort(false))
+ .Scrollable(s => s.Enabled(true))
+ .Selectable(selectable => selectable
+ .Mode(GridSelectionMode.Multiple))
+ .Editable(editable => editable.Mode(GridEditMode.InLine)).HtmlAttributes(new { style = "min-width:300px;width:99.2%;margin-left:5px;min-height:300px" })
+ .Pageable(pageable => pageable
+ .Refresh(true)
+ .PageSizes(new List<object>
+     { 20, 30, 50, 100 })
+     .ButtonCount(5))
+     .EnableCustomBinding(true)
+     .Filterable(filterable => filterable
+     .Extra(false)
+     .Operators(operators => operators
+     .ForString(str => str.Clear()
+     .StartsWith("Starts with")
+     .IsEqualTo("Is equal to")
+     .Contains("Contains")
+     .IsNotEqualTo("Is not equal to")
+     ))
+     )
+     .DataSource(dataSource => dataSource
+     .Ajax()
+     .Batch(true)
+     .Filter(f => { f.Add(x => x.CaseStatus).IsEqualTo("ACTIVE"); })
+    .ServerOperation(true)
+    .Events(events => { events.Error("assign_error_handler"); /*events.Change("ColorAssignRow"); */})
+    .PageSize(100)
+    .Read(read => read.Action("AssignmentRead", "Assignment").Data("GetAssignParameters"))
+    .Update(update => update.Action("AssignmentCreate", "Assignment"))
+    .Create(create => create.Action("AssignmentCreate", "Assignment"))
+    .Destroy(update => update.Action("AssignmentDestroy", "Assignment"))
+    .Model(model =>
+    {
+        model.Id(field => field.Id);
+        model.Field(field => field.EpisodeID).Editable(false);
+        model.Field(field => field.CDCRNum).Editable(false);
+        model.Field(field => field.ClientName).Editable(false);
+        model.Field(field => field.MHStatus).Editable(false);
+        model.Field(field => field.CaseStatus).Editable(false);
+        model.Field(field => field.Location).Editable(false);
+        //model.Field(field => field.CaseManager).DefaultValue(Model.CaseManager);
+        model.Field(field => field.SocialWorker).DefaultValue(Model.SocialWorker);
+        model.Field(field => field.Psychiatrist).DefaultValue(Model.Psychiatrist);
+        model.Field(field => field.Psychologist).DefaultValue(Model.Psychologist);
+        model.Field(field => field.ParoleAgentName).DefaultValue(Model.ParoleAgentName);
+    })))
+    </div>
+    <script type="text/javascript">
+        document.getElementById('divToolbar').style.display = "none";
+        $(function () {
+            var grid = $("#gridAssignment").data("kendoGrid");         
+        });
+        //$(function () {
+        //    var grid = $("#gridAssignment").data("kendoGrid");
+        //    var temp = grid.pager.element[0].innerHTML;
+        //    temp = temp.replace("<span class=\"k-icon k-i-arrow-60-right\">", "<span class=\"k-icon k-i-arrow-60-right\" style=\"margin-top:10px;\">")
+        //    temp = temp.replace("<span class=\"k-icon k-i-arrow-end-right\">", "<span class=\"k-icon k-i-arrow-end-right\" style=\"margin-top:10px;\">");
+        //    temp = temp.replace("<span class=\"k-icon k-i-arrow-60-left\">", "<span class=\"k-icon k-i-arrow-60-left\" style=\"margin-top:10px;\">");
+        //    temp = temp.replace("<span class=\"k-icon k-i-arrow-end-left\">", "<span class=\"k-icon k-i-arrow-end-left\" style=\"margin-top:10px;\">")
+        //    grid.pager.element[0].innerHTML = temp;
+        //});
+        function clearGrid1Fiter() {
+            var gridobj = $("#gridAssignment").data("kendoGrid");
+            gridobj.dataSource.filter({});
+        }
+        function backGrid1Fiter() {
+            var filters = [];
+            var deftUserID = $("#hdDefaultFilterUserID").val();
+            var deftWorkerTypeID = $("#hdDefaulCaseWorkTypeId").val();
+            var obj = $("#gridAssignment").data("kendoGrid").dataSource;
+            obj.filter({});  // clear all
+
+            var filter1 = { field: "CaseStatus", operator: "eq", value: "ACTIVE" };
+            filters.push(filter1);
+            var filetername = "";
+            if (deftUserID.length != undefined && deftUserID.length > 0) {
+                //if (deftWorkerTypeID == 2)
+                //    filetername = "CaseManagerUserId";
+                // else 
+                if (deftWorkerTypeID == 3)
+                    filetername = "PsychiatristUserId";
+                else if (deftWorkerTypeID == 4)
+                    filetername = "PsychologistUserId";
+                else if (deftWorkerTypeID == 5)
+                    filetername = "PsychologistUserId";
+
+                var filter2 = { field: filetername, operator: "eq", value: parseInt(deftUserID) };
+                filters.push(filter2);
+            }
+            obj.filter(filters);
+        }
+        $("#btnExcelExport").on('click', function (e) {
+            $("#gridAssignment").getKendoGrid().saveAsExcel();
+        });
+
+        @*function ExportDataExcel() {
+        var loc = $("#hdComplexId").val();
+        var filter = "";
+        var grid = $("#gridAssignment").data("kendoGrid");
+        var filterMenu = $(grid.thead.find("th:not(.k-hierarchy-cell,.k-group-cell)")[6]).data("kendoFilterMenu");
+        if (filterMenu.form != undefined) {
+            var dropdown = filterMenu.form.find("[data-role='dropdownlist']:eq(1)");
+            if (dropdown != undefined) {
+                filter = dropdown.val();
+            }
+        }
+
+        var url1 = "@Url.Action("ExportViaEPPlus", "Assignment", new { LocationId=0 })";
+        var url = url1.replace("0", loc.toString());
+        window.location.href = url;
+    }*@
+
+        function saveChanges(e) {
+            var grid = $("#gridAssignment").data("kendoGrid");
+            var selectedElements = grid.select();
+            if (selectedElements.length > 0) {
+                if (!confirm("Save the assigned?")) {
+                    e.preventDefault();
+                }
+                var AssignmentViewModelList = [];
+                for (var i = 0 ; i < selectedElements.length; i++) {
+                    var AssignmentViewModel = grid.dataItem(selectedElements[i]);
+                    if ($("#ddlSW").val() != "-1") {
+                        AssignmentViewModel["SocialWorkerUserId"] = $("#ddlSW").val() == "" ? 0 : $("#ddlSW").val();
+                    }
+                    //if ($("#ddlCM").val() != "-1") {
+                    //    AssignmentViewModel["CaseManagerUserId"] = $("#ddlCM").val() == "" ? 0 : $("#ddlCM").val();
+                    //}
+                    if ($("#ddlPCT").val() != "-1") {
+                        AssignmentViewModel["PsychiatristUserId"] = $("#ddlPCT").val() == "" ? 0 : $("#ddlPCT").val();
+                    }
+                    if ($("#ddlPCO").val() != "-1") {
+                        AssignmentViewModel["PsychologistUserId"] = $("#ddlPCO").val() == "" ? 0 : $("#ddlPCO").val();
+                    }
+
+                    AssignmentViewModelList.push(AssignmentViewModel);
+                }
+
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify(AssignmentViewModelList),
+                    url: '@Url.Action("SaveGridData", "Assignment")',
+                    contentType: "application/json",
+                    success: function (result) {
+                        document.getElementById('divToolbar').style.display = "none";
+                        var grid = $("#gridAssignment").data("kendoGrid");
+                        grid.dataSource.filter({});
+                        var filter1 = { field: "CaseStatus", operator: "eq", value: "ACTIVE" };
+                        grid.dataSource.filter(filter1);
+                    }
+                });
+            }
+        }
+
+        function assign_error_handler(e) {
+            if (e.errors) {
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+                var grid = $("#gridAssignment").data("kendoGrid");
+                grid.one("dataBinding", function (e) {
+                    e.preventDefault();   // cancel grid rebind if error occurs
+                });
+            }
+        }
+
+        function MakeMultipleAssignAvailable() {
+            var grid = $("#gridAssignment").data("kendoGrid");
+            if (grid == null)
+                return;
+            var count = grid.select().length;
+            if (count > 0 && !grid.dataItem(grid.select()[0]).CanEdit) {
+                document.getElementById('divToolbar').style.display = "none";
+                return;
+            }
+
+            //$(".k-command-cell").removeAttr("hidden");
+            $(".k-grid-edit").css({ "display": "block", "width": "130px" });
+
+            if (count > 1) {
+                document.getElementById('divToolbar').style.display = "block";
+                $(".k-grid-edit").css({ "display": "none"});
+            }
+            else {
+                document.getElementById('divToolbar').style.display = "none";
+            }
+        }
+
+        function ClearSelection(){
+            $(".k-command-cell").removeAttr("hidden");
+            document.getElementById('divToolbar').style.display = "none";
+        }
+        function BuildNavClientLink(CDCRNums) {
+            var result = "";
+            var action = '@(Url.Action("Index", "Client"))';
+            if (CDCRNums != undefined && CDCRNums != "") {
+                var data = CDCRNums.split(';');
+                for (var i = 0; i < data.length; i++) {
+                    var temp = kendo.format("<a href='{0}?CDCRNum={1}'>" + data[i] + "</a>",
+                            action,
+                            data[i]
+                        );
+                    if (result.length == 0)
+                        result = temp;
+                    else
+                        result += '<br/>' + temp;
+                }
+            }
+            return result;
+        }
+    </script>

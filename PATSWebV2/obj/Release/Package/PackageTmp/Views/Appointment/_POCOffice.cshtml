@@ -1,0 +1,445 @@
+﻿
+@using Kendo.Mvc.UI;
+@model PATSWebV2.ViewModels.AppointmentViewModel
+
+<style>
+    .k-scheduler-toolbar > ul {
+        line-height: 20px;
+    }
+
+        .k-scheduler-toolbar > ul > li {
+            line-height: 20px;
+            margin-left: 1px;
+            float: left;
+        }
+
+    .k-scheduler-toolbar .k-nav-today, .k-scheduler-toolbar .k-nav-prev, .k-scheduler-toolbar.k-nav-next,
+    .k-scheduler-toolbar .k-nav-current,
+    .k-scheduler-toolbar .k-i-arrow-60-left, .k-scheduler-toolbar.k-i-arrow-60-right,
+    .k-scheduler-toolbar.k-button,
+    .k-scheduler-toolbar .k-link {
+        line-height: 20px;
+    }
+
+    .k-scheduler-toolbar .k-icon .k-i-reload {
+        float: right;
+    }
+
+    .k-scheduler-toolbar .k-icon, .k-scheduler-toolbar .k-i-calendar {
+        margin-top: 2px;
+    }
+</style>
+<div class="schedulerscrollbar">
+    <script>
+        function locationChange(e) {
+            if ($("#AllPOCOffice").data("kendoDropDownList").value() == "")
+                $("#AllPOCOffice").data("kendoDropDownList").value($("#hdLocationId").val());
+
+            var scheduler = $("#OfficeTimeLine").data("kendoScheduler");
+            var parameters = getLocationData();
+            scheduler.resources[0].dataSource.read(parameters).then(
+                function (e) {
+                    scheduler.view(scheduler.view().name);
+                    scheduler.refresh();
+                });
+        }
+    </script>
+    <table><tr><td height="5px;"></td></tr>
+        <tr style="padding:0px;height:30px">
+            <td>&nbsp;&nbsp;&nbsp;&nbsp;
+                @Html.Label("Select BHR Office:")&nbsp;&nbsp;
+                @(Html.Kendo().DropDownListFor(m=>m.SelectedLocationId)
+                .Name("AllPOCOffice")
+                .DataValueField("ComplexID")
+                .DataTextField("OfficeName")
+                .HtmlAttributes(new { style = "width:300px;text-align:left;" })
+                .Filter(FilterType.Contains)
+                .Height(290)
+                .Events(e => { e.Change("locationChange");  })
+                .DataSource(source =>
+                {
+                    source.Read(read=>read.Action("GetAllOffices", "Appointment")); }))
+            </td>
+            <td align="left">&nbsp;&nbsp;&nbsp;&nbsp;
+                <button class="k-button" id="btnPdfExport"><span class="k-icon k-i-pdf"></span>Export to PDF</button>
+            </td>
+        </tr>
+        <tr><td height="5px;"></td></tr>
+    </table>
+
+    <script id="template" type="text/x-kendo-template" style="background-color:darkgreen">
+        #var uid = target.parent().attr("data-uid");#
+        #var scheduler = target.closest("[data-role=scheduler]").data("kendoScheduler");#
+        #var model = scheduler.occurrenceByUid(uid);#
+        #if(model) {#
+        @*<strong>CDCR Number:   </strong> #=kendo.format('{0:d}', (model.title == '' || model.title == null) ? 'N/A' : model.title)#
+            <br />*@
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Client:</strong> #=kendo.format('{0:d}',BuildClientNames(model.SelectedClients))#
+        <br />
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type:</strong> #=kendo.format('{0:d}', model.TypeDesc)#
+        <br />
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Status:</strong> #=kendo.format('{0:d}',model.Eventstatus)#
+        <br />
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;POC Office:</strong> #=model.SelectedLocationDesc#
+        <br />
+        #} else {#
+        <strong>No event data is available</strong>
+        #}#
+    </script>
+    <script>
+       function SchDataBound(e) {
+           var view = this.view();
+           var events = this.dataSource.view();
+           var eventElement;
+           var event;
+
+           for (var idx = 0, length = events.length; idx < length; idx++) {
+               event = events[idx];
+               //get event element
+               eventElement = view.element.find("[data-uid=" + event.uid + "]");
+               eventElement.css("background-color", event.CellColor);
+               eventElement.css("border-color", event.CellColor);
+           }
+       }
+       function BeforeSaveAppt1(e) {
+           if (confirm("Are you sure you want to save this Appointment?") == false) {
+               e.preventDefault();
+               return false;
+           }
+       }
+    </script>
+    @(Html.Kendo().Scheduler<PATSWebV2.ViewModels.AppointmentViewModel>()
+            .Name("OfficeTimeLine")
+            .Date(new DateTime(Model.Start.Year, Model.Start.Month, Model.Start.Day))
+            .StartTime(new DateTime(Model.Start.Year, Model.Start.Month, Model.Start.Day, 00, 00, 00))
+            .MajorTick(120)
+            .AllDaySlot(true)
+            .HtmlAttributes(new { @style = "padding:2px;cursor:default;min=width:1200px;height:79vh;" })
+            .Events(e => { e.Navigate("CheckIsHoliday"); e.Edit("onOfficeEdit"); e.DataBound("SchDataBound"); e.Save("BeforeSaveAppt1"); })
+            .Pdf(p => p.FileName("AppointmentOffice.pdf"))
+           .Views(views =>
+           {
+               views.TimelineView(timeView =>
+                 timeView.Selected(true)
+                         .Title("Day")
+                         .EventHeight(20)
+                         .ColumnWidth(20)
+                         .StartTime(new DateTime(Model.Start.Year, Model.Start.Month, Model.Start.Day, 07, 00, 00))
+                         .EndTime(new DateTime(Model.End.Year, Model.End.Month, Model.End.Day, 18, 15, 00))
+                         .MajorTick(15)
+                         .MinorTickCount(2));
+           })
+        .Editable(ed => { ed.TemplateName("_CustEditorTemplate").Window(w => w.Title("BHR Office Appointment").Width(780)).Update(true); })
+        .Group(group => group.Resources("CaseWorkers").Orientation(SchedulerGroupOrientation.Vertical))
+        .Resources(resource =>
+        {
+            resource.Add(m => m.StaffIds)
+           .Title("CaseWorkers")
+           .Name("CaseWorkers")
+           .DataTextField("StaffName")
+           .DataValueField("StaffId")
+           .ValuePrimitive(true)
+           .DataSource(ds => ds
+           .Custom()
+           .Type("aspnetmvc-ajax")
+           .Transport(transport => transport.Read(read => read.Action("GetPOCOfficeStaff", "Appointment").Data("getLocationData").Type(HttpVerbs.Post)))
+           .Schema(schema => schema   //Required in order to work with ToDataSourceResult
+           .Data("Data")
+           .Total("Total")
+           .Errors("Errors")
+           .Model(model =>
+           {
+               model.Id("StaffId");
+               model.Field("StaffId", typeof(int)).From("StaffId");
+               model.Field("StaffName", typeof(string));
+           })));
+            //resource.Add(m => m.TypeID)
+            // .DataValueField("Date")
+            // .DataTextField("Name")
+            // .DataSource(dh => dh.Read("GetHolidays", "Appointment"));
+        })
+        //.Selectable(true)
+        .DataSource(d => d
+            .Model(m =>
+            {
+                m.Id(f => f.AppointmentId);
+                m.Field(f => f.AppointmentId).DefaultValue(0);
+                m.Field(f=>f.CDCRNum).DefaultValue(Model.CDCRNum);
+                m.Field(f=>f.ClientName).DefaultValue(Model.ClientName); ;
+                m.Field(f => f.SelectedClients).DefaultValue(Model.SelectedClients);
+                m.Field(f => f.SelectedStaffs).DefaultValue(Model.SelectedStaffs);
+                m.Field(f => f.Start).DefaultValue(Model.Start);
+                m.Field(f => f.StartTime).DefaultValue(Model.Start.Minute % 15 == 0 ? Model.Start : Model.Start.AddMinutes(15 - Model.Start.Minute % 15));
+                m.Field(f => f.End).DefaultValue(Model.End);
+                m.Field(f => f.EndTime).DefaultValue(Model.Start.Minute % 15 == 0 ? Model.Start.AddMinutes(15) : Model.Start.AddMinutes(15 - Model.Start.Minute % 15).AddMinutes(15));
+                m.Field(field => field.SelectedADAItems).DefaultValue(Model.SelectedADAItems);
+                m.Field(f => f.TypeID).DefaultValue(5);
+                m.Field(f => f.StatusID).DefaultValue(2);
+                m.Field(f => f.SelectedLocationId).DefaultValue(Model.SelectedLocationId);
+                m.Field(f => f.IsAllDay).DefaultValue(false);
+                m.Field(f => f.IsCompleted).DefaultValue(false);
+                m.Field(f => f.Title).DefaultValue("");
+            })
+               .ServerOperation(true)
+               .Read(read => read.Action("AppointmentOfficeRead", "Appointment").Data("getLocationData"))
+               .Create(create=>create.Action("AppointmentOfficeCreate", "Appointment").Data("updateSchData"))
+               .Update(update=>update.Action("AppointmentOfficeUpdate", "Appointment").Data("updateSchFLData"))
+               .Destroy("AppointmentOfficeDestroy", "Appointment")
+               .Events(e => { e.Error("office_error_handler"); e.RequestEnd("OfficeReload");}))
+    )
+</div>
+
+<script>
+    $("#btnPdfExport").on('click', function (e) {
+        $("#OfficeTimeLine").getKendoScheduler().saveAsPDF();
+    });
+    function updateSchData(data) {
+        if ($("#SelectedStaffs").data("kendoMultiSelect").dataSource._data.length > 0) {
+            var staffs = $("#SelectedStaffs").data("kendoMultiSelect").dataSource._data;
+            //remove all older ones
+            if (data.SelectedStaffs != null || data.SelectedStaffs != undefined) {
+                var len = data.SelectedStaffs.length;
+                for (i = 0; i < len; i++) {
+                    data.SelectedStaffs.pop();
+                }
+            }
+            //add current ones
+            for (i = 0; i < staffs.length; i++) {
+                data.SelectedStaffs.push({ StaffId: staffs[i].StaffId, StaffName: staffs[i].StaffName, StaffType: "", StaffTypeId: 0, LocationId: 0 });
+            }
+        }
+        if ($("#SelectedClients").data("kendoMultiSelect").dataSource._data.length > 0) {
+            //get selected episodes
+            var episodes = $("#SelectedClients").data("kendoMultiSelect").dataSource._data;
+            //remove all older ones
+            if (data.SelectedClients != null || data.SelectedClients != undefined) {
+                var len = data.SelectedClients.length;
+                for (i = 0; i < len; i++) {
+                    data.SelectedClients.pop();
+                }
+            }
+            else {
+                data.SelectedClients = [];
+            }
+            //add current ones
+            for (i = 0; i < episodes.length; i++) {
+                data.SelectedClients.push({ EpisodeId: episodes[i].EpisodeID, CDCRNumber: episodes[i].CDCRNumber, ClientName: "", AppointmentId: 0, Agent: "", Unit: "", ReleaseLoc: 0, ClientStatus: episodes[i].ClientStatus });
+            }
+        }
+
+        var startdate = new Date($("#startApptDate").val() + " " + $("#startApptTime").val());
+        data.StartDate = startdate;
+        data.Start = startdate;
+        data.StartTime = startdate;
+
+        var enddate = new Date($("#startApptDate").val() + " " + $("#endApptTime").val());
+        data.EndDate = enddate;
+        data.End = enddate;
+        data.EndTime = enddate;
+
+        data.SelectedADAIds =$("#SelectedADAItems").val() == null ? "" : $("#SelectedADAItems").val().join(",");
+
+        var clients = $("#SelectedClients").val() == null ? "" : $("#SelectedClients").val().join(",");
+        var staffs = $("#SelectedStaffs").val().join(",");
+
+        return { model: JSON.stringify(data), ClientIDs: clients, WorkerIDs: staffs };
+    }
+    function updateSchFLData(data) {
+        if ($("#SelectedStaffs").data("kendoMultiSelect").dataSource._data.length > 0) {
+            var staffs = $("#SelectedStaffs").data("kendoMultiSelect").dataSource._data;
+            //remove all older ones
+            if (data.SelectedStaffs != null || data.SelectedStaffs != undefined) {
+                var len = data.SelectedStaffs.length;
+                for (i = 0; i < len; i++) {
+                    data.SelectedStaffs.pop();
+                }
+            }
+            //add current ones
+            for (i = 0; i < staffs.length; i++) {
+                data.SelectedStaffs.push({ StaffId: staffs[i].StaffId, StaffName: staffs[i].StaffName, StaffType: "", StaffTypeId: 0, LocationId: 0 });
+            }
+        }
+
+        if ($("#SelectedClients").data("kendoMultiSelect").dataSource._data.length > 0) {
+            //get selected episodes
+            var episodes = $("#SelectedClients").data("kendoMultiSelect").dataSource._data;
+            //remove all older ones
+            if (data.SelectedClients != null || data.SelectedClients != undefined) {
+                var len = data.SelectedClients.length;
+                for (i = 0; i < len; i++) {
+                    data.SelectedClients.pop();
+                }
+            }
+            else {
+                data.SelectedClients = [];
+            }
+            //add current ones
+            for (i = 0; i < episodes.length; i++) {
+                data.SelectedClients.push({ EpisodeId: episodes[i].EpisodeID, CDCRNumber: episodes[i].CDCRNumber, ClientName: "", AppointmentId: 0, Agent: "", Unit: "", ReleaseLoc: 0, ClientStatus: episodes[i].ClientStatus, ClientStatus: episodes[i].ClientStatus });
+            }
+        }
+
+        var startdate = new Date($("#startApptDate").val() + " " + $("#startApptTime").val());
+        data.StartDate = startdate;
+        data.Start = startdate;
+        data.StartTime = startdate;
+
+        var enddate = new Date($("#startApptDate").val() + " " + $("#endApptTime").val());
+        data.EndDate = enddate;
+        data.End = enddate;
+        data.EndTime = enddate;
+
+        data.SelectedADAIds = $("#SelectedADAItems").val() == null ? "" : $("#SelectedADAItems").val().join(",");
+
+        var clients = $("#SelectedClients").val() == null ? "" : $("#SelectedClients").val().join(",");
+        var staffs = $("#SelectedStaffs").val().join(",");
+        var locationId = $("#AllPOCOffice").data("kendoDropDownList").value();
+        return { model: JSON.stringify(data), LocationID: locationId, ClientIDs: clients, WorkerIDs: staffs };
+    }
+    function getResourceParameter(e) {
+        var scheduler = $("#OfficeTimeLine").data("kendoScheduler");
+        if (scheduler._selectedView == undefined) {
+            $('#OfficeTimeLine').data().kendoScheduler.view("timeline");
+        }
+        var locationId = $("#AllPOCOffice").data("kendoDropDownList").value();
+        var start = scheduler.view().startDate();
+        var end = scheduler.view().endDate();
+        if (locationId == undefined || locationId == null || locationId == "") {
+            locationId = $("#hdLocationId").val();
+            var dropdownlist = $("#AllPOCOffice").data("kendoDropDownList");
+            dropdownlist.value(locationId);
+            dropdownlist.refresh();
+        }
+        return { LocationId: parseInt(locationId), StartDate: start, EndDate: end };
+    }
+
+    $(function () {
+        $("#OfficeTimeLine").kendoTooltip({
+            filter: ".k-event:not(.k-event-drag-hint) > div",
+            position: "top-left",
+            width: 350,
+            color: "green",
+            content: kendo.template($('#template').html())
+        });
+    });
+
+    function office_error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+            var scheduler = $("#OfficeTimeLine").data("kendoScheduler");
+            scheduler.one("dataBinding", function (e) {
+                //prevent saving if server error is thrown
+                e.preventDefault();
+                return false;
+            })
+        }
+    }
+
+    function onOfficeEdit(e) {
+        if (disableDates(e.event.start)) {
+            e.preventDefault();
+            return;
+        }
+
+         if (e.event.AppointmentId == 0) {
+            $("#startApptTime").val(kendo.toString(e.event.start, 'h:mm tt'));
+            $("#endApptTime").val(kendo.toString(e.event.end, 'h:mm tt'));
+        }
+    }
+
+    //reset date grid and scheduler
+    //timeline event for initial datetime
+    function OfficeDatachanged(e) {//When we open or add an event
+        if (e.action != undefined) {
+            if (e.action == "add") {
+                if (disableDates(e.sender._data[e.sender._data.length - 1].start)) {
+                    e.preventDefault();
+                    return;
+                }
+                if (e.sender._data.length > 0) {
+                    var date = e.sender._data[e.sender._data.length - 1].start;
+                    var endDate = new Date(e.sender._data[e.sender._data.length - 1].start);
+                    endDate = new Date(endDate.setMinutes(endDate.getMinutes() + 15));
+                    var minutes = date.getMinutes();
+                    if (minutes % 15 != 0) {
+                        date = new Date(date.setMinutes(minutes + (15 - minutes % 15)));
+                        endDate = new Date(endDate.setMinutes(minutes + 15 + (15 - minutes % 15)));
+                    }
+                    e.sender._data[e.sender._data.length - 1].StartTime = date;
+                    e.sender._data[e.sender._data.length - 1].EndTime = endDate;
+                    e.sender._data[e.sender._data.length - 1].SelectedStaffs[0].StaffId = e.sender._data[e.sender._data.length - 1].StaffIds;
+                    e.sender._data[e.sender._data.length - 1].SelectedLocationId = $("#AllPOCOffice").val();
+                }
+            }
+        }
+    }
+
+    function onPOCOfficeAdditionalData() {
+        return {
+            text: $("#AllPOCOffice").val()
+        };
+    }
+    //get the current viewmodel data to server
+    function getLocationData() {
+       var locationId = $("#AllPOCOffice").data("kendoDropDownList").value();
+       var scheduler = $("#OfficeTimeLine").data("kendoScheduler");
+       var start = scheduler.views.timeline.startTime;
+       var end = scheduler.views.timeline.endTime;;
+
+       if (scheduler._selectedView != undefined) {
+           start = scheduler.view().startDate();
+           end = scheduler.view().endDate();
+       }
+       if (locationId == "") {
+           locationId = $("#hdLocationId").val();
+            var dropdown = $("#AllPOCOffice").data("kendoDropDownList");
+            $("#AllPOCOffice").data("kendoDropDownList").value(locationId)
+
+       }
+       var result = { LocationId: parseInt(locationId), StartDate: start, EndDate : end };
+
+        return result;
+    }
+    function refreshScheduler(e) {
+       if (e.action == undefined)
+            return false;
+        var scheduler = $("#OfficeTimeLine").data("kendoScheduler");
+        scheduler.setOptions({ date: e.date });
+        scheduler.date(e.date)
+        var parameters = getLocationData();
+        scheduler.resources[0].dataSource.read(parameters).then(
+                function (e) {
+                    scheduler.view(scheduler.view().name);
+                    scheduler.refresh();
+                });
+    }
+    //reload timeline scheduler
+    function OfficeReload(e) {
+        if (e.response ==undefined || e.response.Errors != null) {
+            e.preventDefault();
+            return;
+        }
+        if (e.type == "create" || e.type == "update" || e.type == "destroy") {
+            var scheduler = $("#OfficeTimeLine").data("kendoScheduler");
+            var parameters = getLocationData();
+            scheduler.resources[0].dataSource.read(parameters).then(
+                function (e) {
+                    scheduler.view(scheduler.view().name);
+                    scheduler.refresh();
+                });
+            if (e.response.Data[0].PrintAppointmentID > 0)
+                printPATSPDF(e.response.Data[0].PrintAppointmentID, 0, "Appointment Note", "color-danger");
+        }
+       e.preventDefault();
+    }
+
+</script>
+

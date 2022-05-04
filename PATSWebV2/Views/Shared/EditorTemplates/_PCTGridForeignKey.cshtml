@@ -1,0 +1,12 @@
+﻿@model string
+
+@(Html.Kendo().DropDownListFor(m => m)
+    .AutoBind(false)
+    .OptionLabel("Select Psychiatrist ...")
+    .Filter(FilterType.Contains)
+    .DataTextField("PATSUserName")
+    .DataValueField("PATSUserId")    
+    .BindTo((System.Collections.IEnumerable)ViewData["PCTList"])
+    .Value("-1")
+    .ValuePrimitive(true)
+)

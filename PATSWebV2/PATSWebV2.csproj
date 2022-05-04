@@ -1,0 +1,1080 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C523B763-DE44-411E-A507-4FE82CCCF788}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PATSWebV2</RootNamespace>
+    <AssemblyName>PATSWebV2</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.6.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>..\packages\Portable.BouncyCastle.1.8.6\lib\net40\BouncyCastle.Crypto.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Bin\Dapper.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=1.2.0.246, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpZipLib.1.2.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="itextsharp, Version=5.5.13.1, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\iTextSharp.5.5.13.1\lib\itextsharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Kendo.Mvc, Version=2019.1.220.545, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\KENDOUIMVC\2019.1.220.545\Kendo.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.3\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.3\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.4.1.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.3.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.3.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.0.1\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NPOI, Version=2.5.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPOI.2.5.1\lib\net45\NPOI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NPOI.OOXML, Version=2.5.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPOI.2.5.1\lib\net45\NPOI.OOXML.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NPOI.OpenXml4Net, Version=2.5.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPOI.2.5.1\lib\net45\NPOI.OpenXml4Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NPOI.OpenXmlFormats, Version=2.5.1.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NPOI.2.5.1\lib\net45\NPOI.OpenXmlFormats.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PatsReportLibrary">
+      <HintPath>..\PatsReportLibrary\bin\Debug\PatsReportLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>TelerikLibrary\System.Net.Http.WebRequest.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Http, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.7\lib\net45\System.Web.Http.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.7\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Optimization, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.7\lib\net45\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Telerik.Reporting, Version=13.0.19.222, Culture=neutral, PublicKeyToken=a9d7983dfcc261be, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>TelerikLibrary\Telerik.Reporting.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Reporting.OpenXmlRendering, Version=13.0.19.222, Culture=neutral, PublicKeyToken=a9d7983dfcc261be, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>TelerikLibrary\Telerik.Reporting.OpenXmlRendering.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Reporting.OpenXmlRendering.2.7.2, Version=13.0.19.222, Culture=neutral, PublicKeyToken=a9d7983dfcc261be, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>TelerikLibrary\Telerik.Reporting.OpenXmlRendering.2.7.2.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Reporting.Service, Version=13.0.19.222, Culture=neutral, PublicKeyToken=a9d7983dfcc261be, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>TelerikLibrary\Telerik.Reporting.Service.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Reporting.Services.HttpClient, Version=13.0.19.222, Culture=neutral, PublicKeyToken=a9d7983dfcc261be, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>TelerikLibrary\Telerik.Reporting.Services.HttpClient.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Reporting.Services.ServiceStack, Version=13.0.19.222, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>TelerikLibrary\Telerik.Reporting.Services.ServiceStack.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Reporting.Services.WebApi, Version=13.0.19.222, Culture=neutral, PublicKeyToken=a9d7983dfcc261be, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>TelerikLibrary\Telerik.Reporting.Services.WebApi.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Reporting.WebServiceDataSource, Version=13.0.19.222, Culture=neutral, PublicKeyToken=a9d7983dfcc261be, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>TelerikLibrary\Telerik.Reporting.WebServiceDataSource.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.Reporting.XpsRendering, Version=13.0.19.222, Culture=neutral, PublicKeyToken=a9d7983dfcc261be, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>TelerikLibrary\Telerik.Reporting.XpsRendering.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.ReportViewer.Mvc, Version=13.0.19.222, Culture=neutral, PublicKeyToken=a9d7983dfcc261be, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>TelerikLibrary\Telerik.ReportViewer.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="Telerik.ReportViewer.WebForms, Version=13.0.19.222, Culture=neutral, PublicKeyToken=a9d7983dfcc261be, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>TelerikLibrary\Telerik.ReportViewer.WebForms.dll</HintPath>
+    </Reference>
+    <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\IdentityConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\Startup.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\AppointmentController.cs" />
+    <Compile Include="Controllers\AssignmentController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PATSAccountController.cs" />
+    <Compile Include="Controllers\PATSBassController.cs" />
+    <Compile Include="Controllers\ClientController.cs" />
+    <Compile Include="Controllers\ReportsController.cs" />
+    <Compile Include="DataAccess\PatsConstants.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\HelperModels\HtmlHelpers.cs" />
+    <Compile Include="Models\HelperModels\PrintPATSPDF.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\Appointment\AppointmentViewModel.cs" />
+    <Compile Include="ViewModels\Assignment\AssignmentViewModel.cs" />
+    <Compile Include="ViewModels\Client\AddressEditorViewModel.cs" />
+    <Compile Include="ViewModels\DSM\DsmViewModel.cs" />
+    <Compile Include="ViewModels\Evaluation\EvaluationViewModel.cs" />
+    <Compile Include="ViewModels\LegalDocument\LegalDocumentViewModel.cs" />
+    <Compile Include="ViewModels\Psychiatry\PsychiatryMMAViewModel.cs" />
+    <Compile Include="ViewModels\Reports\ReportsViewmodel.cs" />
+    <Compile Include="ViewModels\SocialWork\ClinicalPMHSViewModel.cs" />
+    <Compile Include="ViewModels\SocialWork\DSM5ViewModel.cs" />
+    <Compile Include="ViewModels\SocialWork\PMHProfileViewModel.cs" />
+    <Compile Include="ViewModels\SocialWork\AssessmentViewModel.cs" />
+    <Compile Include="ViewModels\Client\CaseNoteViewModel.cs" />
+    <Compile Include="ViewModels\Client\ClientAlertViewModel.cs" />
+    <Compile Include="ViewModels\Client\ClientMatchViewModel.cs" />
+    <Compile Include="ViewModels\Client\ClientSummaryViewModel.cs" />
+    <Compile Include="ViewModels\Client\ClientEditViewModel.cs" />
+    <Compile Include="ViewModels\Client\ClientViewModel.cs" />
+    <Compile Include="ViewModels\SocialWork\ClinicalIDTTViewModel.cs" />
+    <Compile Include="ViewModels\SocialWork\IRPViewModel.cs" />
+    <Compile Include="ViewModels\Client\PersonSearchViewModel.cs" />
+    <Compile Include="ViewModels\Client\EditingPaneViewModel.cs" />
+    <Compile Include="ViewModels\SocialWork\MCASRViewModel.cs" />
+    <Compile Include="ViewModels\SocialWork\ReEntryIMHSViewModel.cs" />
+    <Compile Include="ViewModels\SocialWork\SocialWorkViewModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Data\Uploads\Placeholder.txt" />
+    <Content Include="Content\Images\24_close.png" />
+    <Content Include="Content\Images\add.gif" />
+    <Content Include="Content\Images\cancel.gif" />
+    <Content Include="Content\Images\cdcr-masthead-logo.png" />
+    <Content Include="Content\Images\delete-2-icon.png" />
+    <Content Include="Content\Images\Eye-icon.png" />
+    <Content Include="Content\Images\gnome_session_logout.png" />
+    <Content Include="Content\Images\loading.gif" />
+    <Content Include="Content\Images\Loadingimage.png" />
+    <Content Include="Content\Images\loading_pleasewait.gif" />
+    <Content Include="Content\Images\New_32514.png" />
+    <Content Include="Content\Images\print-icon.png" />
+    <Content Include="Content\Images\Printer-icon.png" />
+    <Content Include="Content\Images\start.jpg" />
+    <Content Include="Content\Images\window_close.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\editor.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\imagebrowser.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\indeterminate.gif" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\loading-image.gif" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\loading.gif" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\loading_2x.gif" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\markers.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\markers_2x.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\slider-h.gif" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\slider-v.gif" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\sprite.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\sprite_2x.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\sprite_kpi.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\BlueOpal\sprite_kpi_2x.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\editor.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\imagebrowser.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\indeterminate.gif" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\loading-image.gif" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\loading.gif" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\loading_2x.gif" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\markers.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\markers_2x.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\slider-h.gif" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\slider-v.gif" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\sprite.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\sprite_2x.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\sprite_kpi.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\Bootstrap\sprite_kpi_2x.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\brushed-metal.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\dots1.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\dots2.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\dots3.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\dots4.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\dots5.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\dots6.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\dots7.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\dots8.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\dots9.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\dots10.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\dots11.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\dots12.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\dots13.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\glass.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\glass-lighter.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\highlight.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\hsv-gradient.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\hue.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\leather1.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\leather2.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\noise.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\stripe1.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\stripe2.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\stripe3.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\stripe4.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\stripe5.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\stripe6.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\transparency.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\textures\transtexture.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\LICENSE.txt" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\glyphs\KendoUIGlyphs.svg" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\glyphs\WebComponentsIcons.svg" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\images\back.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\images\kendoui.svg" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\images\wp8_icons.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\images\wp8_inverseicons.png" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.black.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.black.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.blueopal.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.blueopal.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.bootstrap-v4.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.bootstrap.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.bootstrap.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.common-bootstrap.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.common-fiori.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.common-material.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.common-nova.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.common-office365.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.common.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.black.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.blueopal.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.bootstrap.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.default.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.fiori.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.flat.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.highcontrast.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.material.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.materialblack.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.metro.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.metroblack.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.moonlight.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.nova.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.office365.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.silver.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.uniform.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.default-v2.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.default.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.default.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.fiori.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.fiori.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.flat.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.flat.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.highcontrast.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.highcontrast.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.material-v2.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.material.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.material.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.materialblack.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.materialblack.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.metro.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.metro.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.metroblack.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.metroblack.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.all.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.android.dark.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.android.light.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.blackberry.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.common.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.fiori.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.flat.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.ios.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.material.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.meego.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.nova.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.office365.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.wp8.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.moonlight.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.moonlight.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.nova.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.nova.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.office365.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.office365.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.rtl.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.silver.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.silver.mobile.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.uniform.min.css" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.uniform.mobile.min.css" />
+    <Content Include="Content\Styles\PATS\PATSStyle_0.css" />
+    <Content Include="Content\Site.css" />
+    <Content Include="Content\Styles\PATS\SortablePanelForPats.css" />
+    <Content Include="Content\themes\base\accordion.css" />
+    <Content Include="Content\themes\base\all.css" />
+    <Content Include="Content\themes\base\autocomplete.css" />
+    <Content Include="Content\themes\base\base.css" />
+    <Content Include="Content\themes\base\button.css" />
+    <Content Include="Content\themes\base\core.css" />
+    <Content Include="Content\themes\base\datepicker.css" />
+    <Content Include="Content\themes\base\dialog.css" />
+    <Content Include="Content\themes\base\draggable.css" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_444444_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_555555_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_777620_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_777777_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cc0000_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="Content\themes\base\jquery-ui.css" />
+    <Content Include="Content\themes\base\jquery-ui.min.css" />
+    <Content Include="Content\themes\base\menu.css" />
+    <Content Include="Content\themes\base\progressbar.css" />
+    <Content Include="Content\themes\base\resizable.css" />
+    <Content Include="Content\themes\base\selectable.css" />
+    <Content Include="Content\themes\base\selectmenu.css" />
+    <Content Include="Content\themes\base\slider.css" />
+    <Content Include="Content\themes\base\sortable.css" />
+    <Content Include="Content\themes\base\spinner.css" />
+    <Content Include="Content\themes\base\tabs.css" />
+    <Content Include="Content\themes\base\theme.css" />
+    <Content Include="Content\themes\base\tooltip.css" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Global.asax" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="ReportViewer\js\telerikReportViewer-13.0.19.222.js" />
+    <Content Include="ReportViewer\js\telerikReportViewer-13.0.19.222.min.js" />
+    <Content Include="ReportViewer\js\telerikReportViewer.kendo-13.0.19.222.min.js" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.black.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.black.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.blueopal.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.blueopal.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.bootstrap-v4.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.bootstrap.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.bootstrap.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.common-bootstrap.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.common-fiori.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.common-material.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.common-nova.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.common-office365.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.common.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.black.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.blueopal.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.bootstrap.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.default.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.fiori.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.flat.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.highcontrast.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.material.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.materialblack.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.metro.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.metroblack.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.moonlight.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.nova.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.office365.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.silver.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.dataviz.uniform.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.default-v2.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.default.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.default.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.fiori.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.fiori.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.flat.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.flat.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.highcontrast.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.highcontrast.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.material-v2.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.material.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.material.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.materialblack.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.materialblack.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.metro.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.metro.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.metroblack.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.metroblack.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.all.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.android.dark.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.android.light.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.blackberry.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.common.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.fiori.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.flat.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.ios.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.material.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.meego.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.nova.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.office365.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.mobile.wp8.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.moonlight.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.moonlight.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.nova.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.nova.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.office365.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.office365.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.rtl.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.silver.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.silver.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.uniform.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\kendo.uniform.mobile.min.css.map" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\images\kendoui.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\images\kendoui.woff" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\DejaVuSans-Bold.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\DejaVuSans-BoldOblique.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\DejaVuSans-ExtraLight.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\DejaVuSans-Oblique.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\DejaVuSans.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\DejaVuSansMono-Bold.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\DejaVuSansMono-BoldOblique.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\DejaVuSansMono-Oblique.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\DejaVuSansMono.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\DejaVuSerif-Bold.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\DejaVuSerif-BoldItalic.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\DejaVuSerif-Italic.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\DejaVu\DejaVuSerif.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\glyphs\KendoUIGlyphs.eot" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\glyphs\KendoUIGlyphs.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\glyphs\KendoUIGlyphs.woff" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\glyphs\WebComponentsIcons.eot" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\glyphs\WebComponentsIcons.ttf" />
+    <Content Include="Content\Styles\Kendo\2019.1.220\fonts\glyphs\WebComponentsIcons.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+    <None Include="Properties\PublishProfiles\PATSWEBV2.pubxml" />
+    <None Include="Properties\PublishProfiles\PATSWebV2DEV.pubxml" />
+    <None Include="Scripts\jquery-3.3.1.intellisense.js" />
+    <Content Include="Scripts\jquery-3.3.1.js" />
+    <Content Include="Scripts\jquery-3.3.1.min.js" />
+    <Content Include="Scripts\jquery-3.3.1.slim.js" />
+    <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
+    <Content Include="Scripts\jquery-migrate-3.3.0.js" />
+    <Content Include="Scripts\jquery-migrate-3.3.0.min.js" />
+    <Content Include="Scripts\jquery-ui-1.12.1.js" />
+    <Content Include="Scripts\jquery-ui-1.12.1.min.js" />
+    <Content Include="Scripts\kendo.modernizr.custom.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\angular.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\jquery.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\jszip.min.js" />
+    <None Include="Scripts\Kendo\2019.1.220\kendo.all-vsdoc.js" />
+    <None Include="Scripts\Kendo\2019.1.220\kendo.all.min.intellisense.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.all.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.angular.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.aspnetmvc.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.autocomplete.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.binder.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.button.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.buttongroup.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.calendar.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.chat.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.color.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.colorpicker.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.columnmenu.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.columnsorter.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.combobox.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.core.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.data.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.data.odata.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.data.signalr.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.data.xml.min.js" />
+    <None Include="Scripts\Kendo\2019.1.220\kendo.dataviz-vsdoc.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.barcode.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.chart.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.core.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.diagram.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.gauge.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.map.min.js" />
+    <None Include="Scripts\Kendo\2019.1.220\kendo.dataviz.min.intellisense.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.mobile.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.qrcode.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.sparkline.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.stock.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.themes.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.treemap.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dateinput.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.datepicker.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.daterangepicker.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.datetimepicker.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dialog.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dom.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.draganddrop.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.drawing.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dropdownlist.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dropdowntree.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.editable.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.editor.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.excel.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.filebrowser.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.filtercell.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.filtermenu.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.fx.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.gantt.list.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.gantt.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.gantt.timeline.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.grid.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.groupable.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.imagebrowser.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.list.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.listbox.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.listview.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.maskedtextbox.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mediaplayer.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.menu.min.js" />
+    <None Include="Scripts\Kendo\2019.1.220\kendo.mobile-vsdoc.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.actionsheet.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.application.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.button.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.buttongroup.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.collapsible.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.drawer.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.listview.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.loader.min.js" />
+    <None Include="Scripts\Kendo\2019.1.220\kendo.mobile.min.intellisense.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.modalview.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.navbar.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.pane.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.popover.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.scroller.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.scrollview.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.shim.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.splitview.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.switch.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.tabstrip.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.view.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.multicolumncombobox.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.multiselect.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.multiviewcalendar.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.notification.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.numerictextbox.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.ooxml.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.pager.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.panelbar.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.pdf.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.pivot.configurator.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.pivot.fieldmenu.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.pivotgrid.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.popup.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.progressbar.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.reorderable.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.resizable.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.responsivepanel.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.ripple.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.router.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.agendaview.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.dayview.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.monthview.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.recurrence.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.timelineview.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.view.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scrollview.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.selectable.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.slider.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.sortable.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.splitter.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.spreadsheet.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.switch.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.tabstrip.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.timepicker.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.timezones.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.toolbar.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.tooltip.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.touch.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.treelist.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.treeview.draganddrop.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.treeview.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.upload.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.userevents.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.validator.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.view.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.virtuallist.min.js" />
+    <None Include="Scripts\Kendo\2019.1.220\kendo.web-vsdoc.js" />
+    <None Include="Scripts\Kendo\2019.1.220\kendo.web.min.intellisense.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.web.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.window.min.js" />
+    <Content Include="Scripts\Kendo\2019.1.220\pako_deflate.min.js" />
+    <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\PATS\PATSShared.js" />
+    <Content Include="Scripts\PATS\pulltorefresh.min.js" />
+    <Content Include="Scripts\respond.js" />
+    <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\themeSwitcher.js" />
+    <Content Include="Scripts\_references.js" />
+    <Content Include="TelerikLibrary\Newtonsoft.Json.dll" />
+    <Content Include="TelerikLibrary\System.Net.Http.dll" />
+    <Content Include="TelerikLibrary\System.Net.Http.WebRequest.dll" />
+    <Content Include="TelerikLibrary\System.Net.Http.WebRequest.xml" />
+    <Content Include="TelerikLibrary\System.Net.Http.xml" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.dll" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.OpenXmlRendering.2.7.2.dll" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.OpenXmlRendering.2.7.2.pdb" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.OpenXmlRendering.2.7.2.xml" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.OpenXmlRendering.dll" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.OpenXmlRendering.pdb" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.OpenXmlRendering.xml" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.pdb" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.Service.dll" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.Service.pdb" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.Service.xml" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.Services.HttpClient.dll" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.Services.ServiceStack.dll" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.Services.ServiceStack.pdb" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.Services.ServiceStack.xml" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.Services.WebApi.dll" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.Services.WebApi.pdb" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.Services.WebApi.xml" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.WebServiceDataSource.dll" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.WebServiceDataSource.pdb" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.WebServiceDataSource.xml" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.xml" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.XpsRendering.dll" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.XpsRendering.pdb" />
+    <Content Include="TelerikLibrary\Telerik.Reporting.XpsRendering.xml" />
+    <Content Include="TelerikLibrary\Telerik.ReportViewer.Mvc.dll" />
+    <Content Include="TelerikLibrary\Telerik.ReportViewer.Mvc.pdb" />
+    <Content Include="TelerikLibrary\Telerik.ReportViewer.Mvc.xml" />
+    <Content Include="TelerikLibrary\Telerik.ReportViewer.WebForms.dll" />
+    <Content Include="TelerikLibrary\Telerik.ReportViewer.WebForms.pdb" />
+    <Content Include="TelerikLibrary\Telerik.ReportViewer.WebForms.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Boolean.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Currency.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Date.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\DateTime.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Email.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\EmailAddress.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\GridForeignKey.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Integer.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Number.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Password.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\String.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Time.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Url.cshtml" />
+    <Content Include="Views\PATSAccount\Login.cshtml" />
+    <Content Include="Views\Shared\_Header.cshtml" />
+    <Content Include="Views\Shared\_Footer.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Shared\_LayoutClient.cshtml" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Client\Index.cshtml" />
+    <Content Include="Views\Shared\_HeaderForPats.cshtml" />
+    <Content Include="Views\Client\_ClientSummary.cshtml" />
+    <Content Include="Views\Client\_EditingPane.cshtml" />
+    <Content Include="Views\Client\_AppointmentSummary.cshtml" />
+    <Content Include="Views\Client\_ClientAssignmentSummary.cshtml" />
+    <Content Include="Views\Client\_ClientProfileList.cshtml" />
+    <Content Include="Views\Client\_ClinicalSummary.cshtml" />
+    <Content Include="Views\Client\_DSMSummary.cshtml" />
+    <Content Include="Views\Client\_EvaluationSummary.cshtml" />
+    <Content Include="Views\Client\_LegalDocumentSummary.cshtml" />
+    <Content Include="Views\Client\_PrescriptionSummary.cshtml" />
+    <Content Include="Views\Client\_ClientProfileIndex.cshtml" />
+    <Content Include="Views\Client\_ClientProfileEditor.cshtml" />
+    <Content Include="Views\Client\_Address.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\_GridAddressTemplate.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\_GridHCBenefitTemplate.cshtml" />
+    <Content Include="Views\Client\_AlertEditor.cshtml" />
+    <Content Include="Views\Client\_AllNote.cshtml" />
+    <Content Include="Views\Client\_ClientFileUpload.cshtml" />
+    <Content Include="Views\Client\_ClientHealthCareEditor.cshtml" />
+    <Content Include="Views\Client\_SocialWork.cshtml" />
+    <Content Include="Views\Client\_ReEntryIMHS.cshtml" />
+    <Content Include="Views\Client\_IRP.cshtml" />
+    <Content Include="Views\Client\_MCASR.cshtml" />
+    <Content Include="Views\Client\_NeedsAssessment.cshtml" />
+    <Content Include="Views\Client\_ClinicalIDTT.cshtml" />
+    <Content Include="Views\Client\_PMHSProfile.cshtml" />
+    <Content Include="Views\Client\_ClinicalPMHSPC.cshtml" />
+    <Content Include="Views\Client\_ClinicalPMHSR.cshtml" />
+    <Content Include="Views\Client\_ClinicalNote.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\_NewCMNote.cshtml" />
+    <Content Include="Views\Client\_DSM.cshtml" />
+    <Content Include="Views\Client\_DSMDiagnosis.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\_NewDsm.cshtml" />
+    <Content Include="Views\Client\_DSMHis.cshtml" />
+    <Content Include="Views\Client\_ClientMatchProfileList.cshtml" />
+    <Content Include="Views\Client\_Psychiatry.cshtml" />
+    <Content Include="Views\Client\_MMA.cshtml" />
+    <Content Include="Views\Client\_Evaluation.cshtml" />
+    <Content Include="Views\Client\_EvaluationEditor.cshtml" />
+    <Content Include="Views\Client\_EvaluationHis.cshtml" />
+    <Content Include="Views\Client\_LegalDocument.cshtml" />
+    <Content Include="Views\Client\_LegalDocumentCheckList.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\_PCOGridForeignKey.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\_CMGridForeignKey.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\_SWGridForeignKey.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\_PCTGridForeignKey.cshtml" />
+    <Content Include="Views\Assignment\_MultiClientAssignmentEditor.cshtml" />
+    <Content Include="Views\Assignment\AssignmentIndex.cshtml" />
+    <Content Include="Views\Shared\_LayoutNoSearchHeader.cshtml" />
+    <Content Include="Views\Assignment\_ClientAssignment.cshtml" />
+    <Content Include="Views\Assignment\_ClientAssignmentIndex.cshtml" />
+    <Content Include="Views\Assignment\_ClientAssignmentHistory.cshtml" />
+    <Content Include="Views\Appointment\ApptIndex.cshtml" />
+    <Content Include="Views\Appointment\_DailyActivity.cshtml" />
+    <Content Include="Views\Appointment\_POCOffice.cshtml" />
+    <Content Include="Views\Appointment\_Appointmentmanagement.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\_GridAppointmentTemplate.cshtml" />
+    <Content Include="Views\Appointment\_AppointmentClientManagement.cshtml" />
+    <Content Include="Views\Appointment\_ClientAllActivity.cshtml" />
+    <Content Include="Views\Appointment\_ClientDailyActivity.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\_GridClientAppointmentTemplate.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\_CustEditorTemplate.cshtml" />
+    <Content Include="Views\Shared\_LayoutReport.cshtml" />
+    <Content Include="Views\Shared\_HeaderForAllClients.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Country.cshtml" />
+    <Content Include="Scripts\Kendo\2019.1.220\jquery.min.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.all.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.angular.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.aspnetmvc.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.autocomplete.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.binder.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.button.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.buttongroup.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.calendar.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.chat.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.color.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.colorpicker.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.columnmenu.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.columnsorter.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.combobox.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.core.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.data.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.data.odata.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.data.signalr.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.data.xml.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.barcode.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.chart.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.core.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.diagram.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.gauge.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.map.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.mobile.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.qrcode.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.sparkline.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.stock.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.themes.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dataviz.treemap.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dateinput.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.datepicker.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.daterangepicker.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.datetimepicker.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dialog.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dom.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.draganddrop.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.drawing.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dropdownlist.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.dropdowntree.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.editable.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.editor.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.excel.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.filebrowser.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.filtercell.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.filtermenu.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.fx.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.gantt.list.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.gantt.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.gantt.timeline.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.grid.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.groupable.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.imagebrowser.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.list.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.listbox.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.listview.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.maskedtextbox.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mediaplayer.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.menu.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.actionsheet.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.application.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.button.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.buttongroup.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.collapsible.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.drawer.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.listview.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.loader.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.modalview.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.navbar.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.pane.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.popover.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.scroller.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.scrollview.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.shim.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.splitview.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.switch.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.tabstrip.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.mobile.view.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.multicolumncombobox.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.multiselect.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.multiviewcalendar.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.notification.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.numerictextbox.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.ooxml.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.pager.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.panelbar.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.pdf.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.pivot.configurator.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.pivot.fieldmenu.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.pivotgrid.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.popup.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.progressbar.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.reorderable.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.resizable.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.responsivepanel.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.ripple.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.router.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.agendaview.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.dayview.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.monthview.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.recurrence.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.timelineview.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scheduler.view.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.scrollview.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.selectable.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.slider.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.sortable.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.splitter.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.spreadsheet.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.switch.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.tabstrip.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.timepicker.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.timezones.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.toolbar.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.tooltip.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.touch.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.treelist.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.treeview.draganddrop.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.treeview.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.upload.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.userevents.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.validator.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.view.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.virtuallist.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.web.min.js.map" />
+    <Content Include="Scripts\Kendo\2019.1.220\kendo.window.min.js.map" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Client\_ClinicalDSM5.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\Reports\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Scripts\jquery-3.3.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IdentityManagement\IdentityManagement.csproj">
+      <Project>{eabed8cc-9b6f-4beb-8f14-645a9228bd0e}</Project>
+      <Name>IdentityManagement</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TelerikLibrary\Telerik.ReportViewer.WebForms.Resources.resx" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>54710</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:54710/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <UserProperties UseCdnSupport="True" />
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+</Project>

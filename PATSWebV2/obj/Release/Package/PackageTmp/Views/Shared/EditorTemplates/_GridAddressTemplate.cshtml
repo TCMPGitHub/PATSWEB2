@@ -1,0 +1,161 @@
+﻿@using Kendo.Mvc.UI
+@model IdentityManagement.Entities.Address
+
+@*@{
+    //required in order to render validation attributes
+    ViewContext.FormContext = new FormContext();
+}*@
+<style>
+    .k-edit-form-container{
+        background-color:#ADD8E6;
+        width:800px!important;
+        height:320px!important;
+    }
+    .k-edit-form-container .k-edit-buttons{
+        width:780px!important;
+        /*margin-top:-15px;*/
+    }
+    .k-edit-buttons {
+        height:25px!important;
+        margin-top:-15px;
+    }
+</style>
+    <div id="divAddressWin" style="background-color:#ADD8E6;width:780px!important;height:320px!important;margin-top:-15px;"  data-role="page">
+        <table width="100%">
+            <tr>
+                <td>
+                    <fieldset class="fieldset" style="padding:5px; height:100%; box-shadow:none;">
+                        <table id="smalltable" class="table table-condensed" style="background-color:transparent">
+                            <tr>
+                                <td width="10%"></td>
+                                <td width="18%"></td>
+                                <td width="30%"></td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;<scan style="color:red;font-weight:bold">*</scan>@Html.Label("Address Type:")</td>
+                                <td>
+                                    <script>
+                                        function AddressTypeChanged(e) {
+                                            var dropdownlist = $("#AddressLivingSituationID").data("kendoDropDownList");
+                                            if ($("#AddressTypeID").val() == 1)
+                                               dropdownlist.enable(true);
+                                            else
+                                               dropdownlist.enable(false);
+                                        }
+                                    </script>
+                                    @(Html.Kendo().DropDownListFor(m => m.AddressTypeID).HtmlAttributes(new { style = "width:150px" })
+                         .Name("AddressTypeID")
+                        .OptionLabel("Select Note Type ...")
+                        .DataTextField("AddressTypeDesc")
+                        .DataValueField("AddressTypeID")
+                        .Value(Model.AddressTypeID.ToString())
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetAddressTypeList", "Client");
+                            });
+                        }).Events(e => { e.Change("AddressTypeChanged"); e.DataBound("AddressTypeChanged"); }))
+                    </td>
+                    <td>&nbsp;&nbsp;@(Html.Kendo().TextBoxFor(m => m.FacilityName).HtmlAttributes(new { @placeholder = "Name", maxlength = "55", @style = "width:150px", @id = "txtFacilityName" })) </td>
+                </tr>
+                <tr>
+                    <td width="12%">&nbsp;&nbsp;&nbsp;&nbsp;<scan style="color:red; font-weight:bold">*</scan>@Html.Label("Living Situation:")</td>
+                    <td>
+                        @(Html.Kendo().DropDownListFor(m => m.AddressLivingSituationID)
+                                  .Name("AddressLivingSituationID")
+                                  .OptionLabel("Select Living Situation ...")
+                                  .DataTextField("LivingSituationDesc")
+                                  .DataValueField("AddressLivingSituationID")
+                                  .DataSource(source =>
+                                  {
+                                      source.Read(read =>
+                                      {
+                                          read.Action("GetAddressLivingSituationList", "Client");
+                                      });
+                                  }).HtmlAttributes(new { style = "width:180px" }))
+                        
+                    </td>
+                    <td><scan style="color:red;font-weight:bold">*</scan>@(Html.Kendo().TextBoxFor(m => m.StreetAddress).HtmlAttributes(new { @placeholder = "Street Address", maxlength = "55", @style = "margin-left:1px; width:350px", @id = "txtStreetAddress" })) </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        &nbsp;&nbsp;@(Html.Kendo().TextBoxFor(m => m.City).Name("City").HtmlAttributes(new { @placeholder = "City", maxlength = "55", @style = "width:200px" }))
+                        @(Html.Kendo().DropDownListFor(m => m.State)
+      .Name("State")
+      .OptionLabel("Select ...")
+      .DataTextField("State")
+      .DataValueField("State")
+      .HtmlAttributes(new { style = "width:55px" })
+      .DataSource(source =>
+      {
+          source.Read(read =>
+          {
+              read.Action("GetStateList", "Client");
+          });
+      }))
+
+                        @(Html.Kendo().TextBoxFor(m => m.ZIPCode).HtmlAttributes(new { @placeholder = "Zip", maxlength = "10", @id = "txtZip", @style = "width:90px" }))
+                    </td>
+                </tr>
+                <tr>
+                   
+                    <td>&nbsp;&nbsp;&nbsp;&nbsp;<scan style="color:red; font-weight:bold">*</scan><b>Effective:</b></td>
+                    <td> @*<input id="EffectiveDate" style="width:100px" />*@                
+                        @(Html.Kendo().DatePickerFor(m => m.EffectiveDate).Format("MM/dd/yyyy")
+                    .HtmlAttributes(new
+                    {
+                        @id= "EffectiveDate",
+                        @style = "width:140px"
+                    }))
+                    </td>
+                    <td>
+                        @(Html.Kendo().CheckBoxFor(m => m.Inactive).HtmlAttributes(new { @style = "margin-left:5px;" })) &emsp;@Html.Label("Inactive")
+                    </td>
+                </tr>
+                <tr><td colspan="3" class="space"></td></tr>
+                <tr>
+                    <td colspan="3">
+                        <div id="addresscontainer">
+                            @(Html.TextAreaFor(m => m.AddressDetails, new { @class = "textareaforcasemanngement", @placeholder = "Address details/notes...", spellcheck = true, id= "txtAddressDetails", @maxlength = "255" }))
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
+    </td>
+</tr>
+<tr>
+    <td colspan="2">
+        <fieldset class="fieldset" style="padding:10px; height:100%; box-shadow:none;">
+            <table id="smalltable" class="table table-condensed" style="background-color:transparent;">
+                <tr>
+                    <td>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@Html.LabelFor(m => m.PrimaryNumber):
+                        @(Html.Kendo().MaskedTextBoxFor(m => m.PrimaryNumber).Mask("(000) 000 - 0000")
+                                   .HtmlAttributes(new { @id = "txtPrimaryNumber" }))
+                    </td>
+                    @*</tr>
+                        <tr>*@
+                    <td>
+                        @Html.LabelFor(m => m.SecondaryNumber):@*</td>
+                            <td>*@
+                        @(Html.Kendo().MaskedTextBoxFor(m => m.SecondaryNumber).Mask("(000) 000 - 0000").HtmlAttributes(new { @id = "txtSecondaryNumber" }))
+                    </td>
+                    @*</tr>
+                        <tr>*@
+                    <td>
+                        @Html.LabelFor(m => m.FaxNumber):
+                        @(Html.Kendo().MaskedTextBoxFor(m => m.FaxNumber).Mask("(000) 000 - 0000").HtmlAttributes(new { @id = "txtFaxNumber"}))
+                    </td>
+                </tr>
+
+            </table>
+        </fieldset>
+    </td>
+</tr>
+
+</table>
+</div>

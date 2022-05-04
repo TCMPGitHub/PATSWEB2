@@ -1,0 +1,105 @@
+﻿@model PATSWebV2.ViewModels.Evaluation.EvaluationViewModel
+
+<div id="evlHisPane">
+    <script>
+        $('#evlHisPane').on('click', '.textareaforcasemanngement', function (e) {
+            TextarePopup(e, false, "color-default");
+        });
+        $('#evlHisPane').on('keypress', '.textareaforcasemanngement', function (ev) {
+            var keycode = (ev.keyCode ? ev.keyCode : ev.which);
+            if (keycode == '10' && ev.ctrlKey) {
+                $(this).trigger('click');
+            }
+        })
+               function EvaluationDateFilter(element) {
+                   element.kendoDropDownList({
+                       dataSource: {
+                           transport: {
+                               read: "@Url.Action("FilterEvaluationDate", new { EpisodeId= Model.EpisodeId })"
+                           }
+                       },
+                       optionLabel: "--Select Date--"
+                   });
+               }
+               function EvaluationByFilter(element) {
+                       element.kendoDropDownList({
+                           dataSource: {
+                               transport: {
+                                   read: "@Url.Action("FilterEvaluationBy", new { EpisodeId= Model.EpisodeId })"
+                           }
+                       },
+                           optionLabel: "--Select Name--"
+                   });
+
+               }
+               function EvaluationItemFilter(element) {
+                   element.kendoDropDownList({
+                       dataSource: {
+                           transport: {
+                               read: "@Url.Action("FilterEvaluationItem")"
+                       }
+                   },
+                       optionLabel: "--Select Item--"
+               });
+
+               }
+    </script>
+
+    @(Html.Kendo().Grid<IdentityManagement.Entities.EvaluationData>()
+       .Name("gridEvaluationHis")
+       .Columns(columns =>
+       {
+           //columns.Bound(o => o.EpisodeId).Hidden(true);
+           columns.Bound(o => o.ID).Hidden(true);
+           //columns.Bound(o => o.EvaluationItemOrder).Hidden(true);
+           columns.Bound(o => o.EvaluationItemID).Hidden(true);
+           columns.Bound(o => o.EvaluationGUID).Hidden(true);
+           columns.Bound(p => p.EvaluationDate).Title("Evaluation Date").Format("{0:MM/dd/yyyy}").Width(70).Filterable(filterable => filterable.UI("EvaluationDateFilter"));
+           columns.Bound(p => p.EvaluatedName).Width(100).Title("Evaluated By").Filterable(filterable => filterable.UI("EvaluationByFilter"));
+           columns.Bound(p => p.EvaluationItemDesc).Width(100).Title("Evaluation Item").Filterable(filterable => filterable.UI("EvaluationItemFilter")).HtmlAttributes(new { style = "line-height:14px!important;" });
+           columns.Bound(p => p.EvaluationItemNote).Width(300).Title("Evaluation Narrative").ClientTemplate("<textarea class='textareaforcasemanngement' placeholder = 'Evaluation Note...' readonly='readonly' style='background-color: transparent!important;border-style:none;'>#= EvaluationItemNote #</textarea>").HtmlAttributes(new { style = "line-height:14px!important;" });
+           columns.Bound(p => p.EvaluationStatus).Width(100).Title("Status");
+       })
+       .ToolBar(tools => tools.Excel())
+       .Excel(excel => excel
+        .FileName("Evaluation.xlsx")
+        .Filterable(true)
+        .AllPages(true)
+        )
+        .Resizable(rz => rz.Columns(true))
+       .Scrollable(a => a.Height(500))
+       //.Selectable(selectable => selectable
+       //    .Mode(GridSelectionMode.Single))
+       .Navigatable()
+        .HtmlAttributes(new { style = "height:68vh;margin-top:5px;padding:0px;" })
+        .Pageable(pageable => pageable
+             .Refresh(true)
+             .PageSizes(new List<object> { 10, 20, 30, 50 })
+             .ButtonCount(5))
+        .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+            .StartsWith("Starts with")
+            .IsEqualTo("Is equal to")
+            .IsNotEqualTo("Is not equal to")
+            ))
+       )
+       .DataSource(dataSource => dataSource
+           .Ajax()
+           .Batch(true)
+           .PageSize(13)
+           .Read(read => read.Action("EvaluationHisRead", "Client", new { EpisodeId = Model.EpisodeId }))
+           .Model(model =>
+           {
+               model.Id(field => field.ID);
+               model.Field(field => field.EvaluationDate);
+           })
+       )
+    )
+
+    @*<script id="template" type="text/x-kendo-template">
+        <div> @Html.Raw("#=changeNewLine(EvaluationNote)#")</div>
+    </script>*@
+
+</div>

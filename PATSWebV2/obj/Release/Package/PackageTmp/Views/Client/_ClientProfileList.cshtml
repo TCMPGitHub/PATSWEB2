@@ -1,0 +1,42 @@
+﻿@model PATSWebV2.ViewModels.Client.EditingPaneViewModel
+@{
+    string width = "width:10px";
+}
+<style>
+    .k-grid-header th.k-header > .k-link {
+        line-height: 10px !important;
+        min-height: 10px !important;
+        font-weight:bolder;
+    }
+</style>
+<div class="space5"></div>
+@(Html.Kendo().Grid<IdentityManagement.Entities.SummaryCollection>().Name("gridClientSummary")
+    .NoRecords("No date found.")
+    .HtmlAttributes(new { style = "background-color:#c8e1f1;margin-left:5px;width:97%;" })
+    .Resizable(r => r.Columns(true))
+    .PersistSelection(true)
+   .Columns(column =>
+   {
+       column.Bound(m => m.DateType).Width(150).HtmlAttributes(new { style="height:10px!important;" }).Title("Program Type");
+       column.Bound(m => m.DateEnrolled).Title("Date Enrolled");
+       column.Bound(m => m.smydesc).Title("Date Closed");
+   }).BindTo(Model.AllSmy.Where(x => x.ClientSmy == "ClientSmy")))
+
+@{ 
+    var data = Model.AllSmy.Where(x => x.ClientSmy == "ClientASAMDate").FirstOrDefault();
+    var dataASAM = string.Empty;
+    var displayASAM = string.Empty;
+    if (data != null)
+    {
+        dataASAM = data.DateEnrolled;
+
+    }
+    else
+    {
+        displayASAM = "none";
+    }
+}
+<div style="display : @displayASAM"> @Html.Label("ASAM Date: " + @dataASAM, new { style = "font-size:small;margin-left:10px;height:12px;" })</div>
+
+
+        

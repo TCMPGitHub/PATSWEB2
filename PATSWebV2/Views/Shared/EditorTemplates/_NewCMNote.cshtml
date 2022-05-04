@@ -1,0 +1,77 @@
+﻿@using Kendo.Mvc.UI
+@model IdentityManagement.Entities.CaseNoteData
+@{
+    //required in order to render validation attributes
+    ViewContext.FormContext = new FormContext();
+}
+
+<div id="divCMNote" style="background-color:transparent;width:82vw;" data-role="page">
+    @Html.HiddenFor(m => m.CaseNoteId)
+
+    <script>
+        var validator = $("#divCMNote").kendoValidator().data("kendoValidator");
+    </script>
+
+    <table width="100%">
+        <tr>
+            <td width="12%">
+                <scan style="color:red;margin-left:20px;margin-top:5px; float:left;">*</scan>
+                @Html.Label("Note Type:", new { @style = "width: 90px; font-size: 14px; font-weight: bolder;margin-top:5px;float:left;" })
+            </td>
+            <td width="20%">
+
+                @(Html.Kendo().DropDownListFor(m => m.CaseNoteTypeId)
+              .Name("CaseNoteTypeId")
+              .HtmlAttributes(new { style = "width:90%;" })
+              .OptionLabel("Select Note Type ...")
+              .Height(250)
+              .DataTextField("Name")
+              .DataValueField("CaseNoteTypeId")
+              .Filter(FilterType.Contains)
+              .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                      read.Action("GetCaseNoteTypeList", "Client");
+                  });
+              })
+                )
+            </td>
+            <td width="10px"></td>
+            <td width="10%">@Html.Label("Contact Method:", new { @style = "margin-top:5px;margin-left:10px;width:120px;float:left;font-size: 14px; font-weight: bolder;" })</td>
+            <td width="20%">
+                @(Html.Kendo().DropDownListFor(m => m.CaseContactMethodID)
+              .Name("CaseContactMethodID")
+              .HtmlAttributes(new { style = "width:90%;" })
+              .OptionLabel("Select Contact Method ...")
+              .DataTextField("ContactMethod")
+              .DataValueField("CaseContactMethodID")
+              .Filter(FilterType.Contains)
+              .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                      read.Action("GetCaseContactMethodList", "Client");
+                  });
+
+              }))
+            <td align="right">
+                <a class="k-button k-button-icontext k-primary k-grid-update" role="button" href="#"><span class="k-icon k-i-check"></span>Update</a>
+                <a class="k-button k-button-icontext k-grid-cancel" role="button" href="#"><span class="k-icon k-i-cancel"></span>Cancel</a>
+            </td>
+        </tr>
+        <tr class="space5"><td height="5px"></td></tr>
+        <tr>
+            <td>
+                @Html.Label("Note:", new { @style = "margin-left:20px;margin-top:30px;width:70px;font-size: 14px; font-weight: bolder;" })
+            </td>
+            <td colspan="5">
+                &nbsp;&nbsp;@Html.TextAreaFor(m => m.Note, new { @id = "txtComment", placeholder = "Note ...", spellcheck = "true", style = "padding: 0px; border: thin solid silver; width: 100%;maxlength:4000;height:90%; font-size:16px;background-color:white", rows = "20" })
+            </td>
+        </tr>
+    </table>
+</div>
+
+@{
+    ViewContext.FormContext = null;
+}
