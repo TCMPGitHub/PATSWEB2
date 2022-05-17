@@ -12,7 +12,7 @@ using Telerik.Reporting.Services.WebApi;
 
 namespace PATSWebV2.Controllers
 {
-
+    
     public class ReportsController : ReportsControllerBase
     {
         static ReportServiceConfiguration preservedConfiguration;

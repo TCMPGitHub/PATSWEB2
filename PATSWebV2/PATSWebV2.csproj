@@ -1022,7 +1022,7 @@
     <Content Include="Scripts\Kendo\2019.1.220\kendo.web.min.js.map" />
     <Content Include="Scripts\Kendo\2019.1.220\kendo.window.min.js.map" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Client\_ClinicalDSM5.cshtml" />
+    <Content Include="Views\Client\_ClinicalDMS5.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\Reports\" />

@@ -49,6 +49,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="All_Client_Appointment.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="All_Client_Appointment.designer.cs">
+      <DependentUpon>All_Client_Appointment.cs</DependentUpon>
+    </Compile>
     <Compile Include="Client_Episode_Profile.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -108,6 +114,9 @@
     <Folder Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="All_Client_Appointment.resx">
+      <DependentUpon>All_Client_Appointment.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Client_Episode_Profile.resx">
       <DependentUpon>Client_Episode_Profile.cs</DependentUpon>
     </EmbeddedResource>
