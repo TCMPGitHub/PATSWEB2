@@ -128,7 +128,7 @@ else
                case "CLIENT ASSIGNMENT HISTORY":   { tab = "singleAssignmentHistory";  break; }
                case "RE-ENTRY INITIAL": { tab = "ReEntry"; break; }
                case "IRP": { tab = "IRP"; break; }
-               case "DSM-5": { tab = "DSM5"; break; }
+               case "DMS-5": { tab = "DMS5"; break; }
                case "MCAS-R": { tab = "Multnomah"; break; }
                case "NEEDS ASSESSMENT": { tab = "Assessment"; break; }
                case "PROFILE":{ tab = "PMHSProfile"; break;}
@@ -169,7 +169,7 @@ else
                        LoadSelectedTab(url, fndata, "#viewPlaceHolder");
                        return;
                    }
-               case "ReEntry": case "IDTT": case "IRP": case "DSM5": case "Multnomah": case "Assessment": case "PMHSProfile": case "PMHSPC": case "PMHSR": case "clinicalNote": {
+               case "ReEntry": case "IDTT": case "IRP": case "DMS5": case "Multnomah": case "Assessment": case "PMHSProfile": case "PMHSPC": case "PMHSR": case "clinicalNote": {
                    url = '@Url.Action("GetSocialWork", "Client")';
                    fndata = { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val(), ActiveTabIn: tab };
                    LoadSelectedTab(url, fndata, "#viewPlaceHolder");
@@ -243,7 +243,7 @@ else
             child.Add().Text("RE-ENTRY INITIAL").HtmlAttributes(new { @class = "patsdbmenu" });
             child.Add().Text("IDTT").HtmlAttributes(new { @class = "patsdbmenu" });
             child.Add().Text("IRP").HtmlAttributes(new { @class = "patsdbmenu" });
-            child.Add().Text("DSM-5").HtmlAttributes(new { @class = "patsdbmenu" });
+            child.Add().Text("DMS-5").HtmlAttributes(new { @class = "patsdbmenu" });
             child.Add().Text("MCAS-R").HtmlAttributes(new { @class = "patsdbmenu" });
             child.Add().Text("NEEDS ASSESSMENT").HtmlAttributes(new { @class = "patsdbmenu" });
             child.Add().Text("PROFILE").HtmlAttributes(new { @class = "patsdbmenu" });

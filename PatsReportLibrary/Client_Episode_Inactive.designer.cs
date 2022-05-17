@@ -49,9 +49,6 @@ namespace Telerik.Reporting.Pats.Reports
             this.currentTimeTextBox = new Telerik.Reporting.TextBox();
             this.pageInfoTextBox = new Telerik.Reporting.TextBox();
             this.shape1 = new Telerik.Reporting.Shape();
-            this.reportHeader = new Telerik.Reporting.ReportHeaderSection();
-            this.textBox11 = new Telerik.Reporting.TextBox();
-            this.textBox10 = new Telerik.Reporting.TextBox();
             this.reportFooter = new Telerik.Reporting.ReportFooterSection();
             this.detail = new Telerik.Reporting.DetailSection();
             this.cDCRNumDataTextBox = new Telerik.Reporting.TextBox();
@@ -61,6 +58,9 @@ namespace Telerik.Reporting.Pats.Reports
             this.textBox7 = new Telerik.Reporting.TextBox();
             this.textBox5 = new Telerik.Reporting.TextBox();
             this.sqlDataSourceMain = new Telerik.Reporting.SqlDataSource();
+            this.reportHeader = new Telerik.Reporting.ReportHeaderSection();
+            this.textBox11 = new Telerik.Reporting.TextBox();
+            this.textBox10 = new Telerik.Reporting.TextBox();
             pictureBox2 = new Telerik.Reporting.PictureBox();
             pictureBox1 = new Telerik.Reporting.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
@@ -334,34 +334,6 @@ namespace Telerik.Reporting.Pats.Reports
             this.shape1.Stretch = true;
             this.shape1.Style.LineWidth = Telerik.Reporting.Drawing.Unit.Point(2D);
             // 
-            // reportHeader
-            // 
-            this.reportHeader.Height = Telerik.Reporting.Drawing.Unit.Inch(0.208D);
-            this.reportHeader.Items.AddRange(new Telerik.Reporting.ReportItemBase[] {
-            this.textBox11,
-            this.textBox10});
-            this.reportHeader.Name = "reportHeader";
-            this.reportHeader.PageBreak = Telerik.Reporting.PageBreak.Before;
-            // 
-            // textBox11
-            // 
-            this.textBox11.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(3.396D), Telerik.Reporting.Drawing.Unit.Inch(0D));
-            this.textBox11.Name = "textBox11";
-            this.textBox11.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.673D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
-            this.textBox11.Style.Font.Bold = true;
-            this.textBox11.Style.Font.Name = "Tahoma";
-            this.textBox11.Value = "= Count(Fields.CDCRNum)";
-            // 
-            // textBox10
-            // 
-            this.textBox10.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0.042D), Telerik.Reporting.Drawing.Unit.Inch(0D));
-            this.textBox10.Name = "textBox10";
-            this.textBox10.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(3.354D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
-            this.textBox10.Style.Font.Bold = true;
-            this.textBox10.Style.Font.Name = "Tahoma";
-            this.textBox10.TextWrap = true;
-            this.textBox10.Value = "Total Inactive Cases for Selected Staff";
-            // 
             // reportFooter
             // 
             this.reportFooter.Height = Telerik.Reporting.Drawing.Unit.Inch(0.052D);
@@ -454,6 +426,34 @@ namespace Telerik.Reporting.Pats.Reports
             new Telerik.Reporting.SqlDataSourceParameter("@StartDate", System.Data.DbType.DateTime, "= Parameters.ParameterStart_Date.Value")});
             this.sqlDataSourceMain.SelectCommand = "dbo.spRptClientInactive";
             this.sqlDataSourceMain.SelectCommandType = Telerik.Reporting.SqlDataSourceCommandType.StoredProcedure;
+            // 
+            // reportHeader
+            // 
+            this.reportHeader.Height = Telerik.Reporting.Drawing.Unit.Inch(0.208D);
+            this.reportHeader.Items.AddRange(new Telerik.Reporting.ReportItemBase[] {
+            this.textBox11,
+            this.textBox10});
+            this.reportHeader.Name = "reportHeader";
+            this.reportHeader.PageBreak = Telerik.Reporting.PageBreak.Before;
+            // 
+            // textBox11
+            // 
+            this.textBox11.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(3.396D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.textBox11.Name = "textBox11";
+            this.textBox11.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.673D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.textBox11.Style.Font.Bold = true;
+            this.textBox11.Style.Font.Name = "Tahoma";
+            this.textBox11.Value = "= Count(Fields.CDCRNum)";
+            // 
+            // textBox10
+            // 
+            this.textBox10.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0.042D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.textBox10.Name = "textBox10";
+            this.textBox10.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(3.354D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.textBox10.Style.Font.Bold = true;
+            this.textBox10.Style.Font.Name = "Tahoma";
+            this.textBox10.TextWrap = true;
+            this.textBox10.Value = "Total Inactive Cases for Selected Staff";
             // 
             // ClientEpisodeInactive
             // 
@@ -574,7 +574,6 @@ namespace Telerik.Reporting.Pats.Reports
         private PageFooterSection pageFooter;
         private TextBox currentTimeTextBox;
         private TextBox pageInfoTextBox;
-        private ReportHeaderSection reportHeader;
         private ReportFooterSection reportFooter;
         private DetailSection detail;
         private SqlDataSource sqlDataSourceCaseWorker;
@@ -592,13 +591,14 @@ namespace Telerik.Reporting.Pats.Reports
         private TextBox textBox3;
         private TextBox textBox2;
         private TextBox textBox4;
-        private TextBox textBox11;
-        private TextBox textBox10;
         private TextBox cDCRNumDataTextBox;
         private TextBox lastAppointmentPresentDataTextBox;
         private TextBox offenderDataTextBox;
         private TextBox textBox12;
         private TextBox textBox5;
         private Shape shape1;
+        private ReportHeaderSection reportHeader;
+        private TextBox textBox11;
+        private TextBox textBox10;
     }
 }
