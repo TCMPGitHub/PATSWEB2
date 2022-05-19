@@ -3,3 +3,7 @@
 ################################################################################
 
 /IdentityManagement/bin/Debug
+/.vs/PATSWebV2/v14
+/IdentityManagement/obj/Debug
+/PatsReportLibrary/obj/Debug
+/PATSWebV2/obj/Debug
