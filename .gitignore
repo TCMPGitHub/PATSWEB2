@@ -3,19 +3,3 @@
 ################################################################################
 
 /IdentityManagement/bin/Debug
-/IdentityManagement/bin/Release
-/IdentityManagement/obj/Debug
-/IdentityManagement/obj/Release
-/PatsReportLibrary/bin/Debug
-/PatsReportLibrary/bin/Release
-/PatsReportLibrary/obj/Debug
-/PatsReportLibrary/obj/Release
-/PATSWebV2/bin/Debug
-/PATSWebV2/bin/Release
-/PATSWebV2/obj/Debug
-/PATSWebV2/obj/Release
-/PATSWebV2/Properties/PublishProfiles/PATSWebV2DEV.pubxml.user
-/PATSWebV2/Properties/PublishProfiles/PATSWebV2DEV.pubxml
-/PATSWebV2/Properties/PublishProfiles/PATSWEBV2.pubxml.user
-/PATSWebV2/Properties/PublishProfiles/PATSWEBV2.pubxml
-/.vs/PATSWebV2/v14

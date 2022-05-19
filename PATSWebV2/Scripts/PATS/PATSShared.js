@@ -237,7 +237,7 @@ function ReloadClientPage(objname) {
         case "Client Assignment": { tab = "individualAssignment"; break; }
         case "Case Re-entry Initial Mental Health Screening": { tab = "ReEntry"; break; }
         case "Case Management Individualized Re-entry Plan": { tab = "IRP"; break; }
-        case "DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult": { tab = "DSM5"; break; }
+        case "DMS-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult": { tab = "DSM5"; break; }
         case "Multnomah Community Ability Scale": { tab = "Multnomah"; break; }
         case "Case Management Re-entry Needs Assessment": { tab = "Assessment"; break; }
         case "PMHS Profile": { tab = "PMHSProfile"; break; }
@@ -267,7 +267,7 @@ function ReloadClientPage(objname) {
             LoadSelectedTab(url, fndata, "#viewPlaceHolder");
             return;
         }
-        case "ReEntry": case "IDTT": case "IRP": case "Multnomah": case "Assessment": case "PMHSProfile": case "PMHSPC": case "PMHSR": case "clinicalNote": case "DSM5": {
+        case "ReEntry": case "IDTT": case "IRP": case "Multnomah": case "Assessment": case "PMHSProfile": case "PMHSPC": case "PMHSR": case "clinicalNote": case "DMS5": {
             url = '@Url.Action("GetSocialWork", "Client")';
             fndata = { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val(), ActiveTabIn: tab };
             LoadSelectedTab(url, fndata, "#viewPlaceHolder");
@@ -844,9 +844,9 @@ function printPATSPDF(EpisodeID, id, Title, Color) {
                 url = '/Client/PrintIRP?EpisodeId=' + EpisodeID + '&' + 'IRPID=' + id;
                 break;
             }
-            case "DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult":
+            case "DMS-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult":
             {
-                url = '/Client/PrintDSM5?EpisodeId=' + EpisodeID + '&' + 'DSM5ID=' + id;
+                url = '/Client/PrintDMS5?EpisodeId=' + EpisodeID + '&' + 'DMS5ID=' + id;
                 break;
             }
         case "Case Management Re-entry Needs Assessment":
