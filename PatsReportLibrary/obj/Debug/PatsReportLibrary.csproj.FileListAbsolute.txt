@@ -32,4 +32,3 @@ C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\PatsReportLibrary.dll.license
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\PatsReportLibrary.dll
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\PatsReportLibrary.pdb
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\Telerik.Reporting.Pats.Reports.AllClientAppointment.resources
-C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\PatsReportLibrary.csprojResolveAssemblyReference.cache

@@ -41,9 +41,9 @@
          {
             <a href="javascript:printPATSPDF(@Model.EpisodeID, @item.Id, 'Case Managemnent Individualized Re-entry Plan','color-danger')">Print</a>
          }
-         else if (item.DateType == "DMS-5 Entered" && item.Id > 0)
+         else if (item.DateType == "DSM-5 Entered" && item.Id > 0)
          {
-            <a href="javascript:printPATSPDF(@Model.EpisodeID, @item.Id, 'DMS-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult')">Print</a>
+            <a href="javascript:printPATSPDF(@Model.EpisodeID, @item.Id, 'DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult')">Print</a>
          }
          else if (item.DateType == "Needs Assessment" && item.Id > 0)
          {
