@@ -37,7 +37,6 @@
         //    }
         //}
         function swTabChanged(e) {
-            debugger
             WaitDialog(1);
            if (e.item.textContent == "Back to dashboard") {
                 url = '@Url.Action("GetEditingPaneBack", "Client")';
@@ -77,8 +76,8 @@
                  .LoadContentFrom("GetClinicalIDTT", "Client", new { EpisodeId = Model.EpisodeId, IDTTId = 0 });
           tabstrip.Add().Text("IRP")
                   .LoadContentFrom("GetIRP", "Client", new { EpisodeId = Model.EpisodeId, IRPID = 0 });
-          tabstrip.Add().Text("DMS-5")
-                  .LoadContentFrom("GetClinicalDMS5", "Client", new { EpisodeId = Model.EpisodeId, DMS5ID = 0 });
+          tabstrip.Add().Text("DSM-5")
+                  .LoadContentFrom("GetClinicalDSM5", "Client", new { EpisodeId = Model.EpisodeId, DSM5ID = 0 });
           tabstrip.Add().Text("MCAS-R")
                   .LoadContentFrom("GetMCASR", "Client", new { EpisodeId = Model.EpisodeId, MCASRID=0 });
           tabstrip.Add().Text("NEEDS ASSESSMENT")
@@ -98,14 +97,13 @@
     <script type="text/javascript">
         
         $(document).ready(function () {
-            debugger
             var tabidex = 0;
             switch ($("#hdActiveSWTab").val())
             {
                 case "ReEntry": { tabidex = 1; break; }
                 case "IDTT": { tabidex = 2; break; }
                 case "IRP": { tabidex = 3; break; }
-                case "DMS5": { tabidex = 4; break; }
+                case "DSM5": { tabidex = 4; break; }
                 case "Multnomah": { tabidex = 5; break; }
                 case "Assessment": { tabidex = 6; break; }
                 case "PMHSProfile": { tabidex = 7; break; }

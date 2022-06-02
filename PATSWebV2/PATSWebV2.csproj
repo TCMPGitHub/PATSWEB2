@@ -1024,7 +1024,7 @@
     <Content Include="Scripts\Kendo\2019.1.220\kendo.window.min.js.map" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Client\_ClinicalDSM5.cshtml" />
-    <Content Include="Views\Client\_BHRIR.cshtml" />
+    <Content Include="Views\Client\_BHRIRP.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\Reports\" />

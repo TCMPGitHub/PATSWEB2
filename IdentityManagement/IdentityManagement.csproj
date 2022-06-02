@@ -70,6 +70,7 @@
     <Compile Include="Entities\Psychiatry\MMA.cs" />
     <Compile Include="Entities\SocialWork\ClinicalPMHSData.cs" />
     <Compile Include="Entities\SocialWork\DMS5Data.cs" />
+    <Compile Include="Entities\SocialWork\BHRIRPData.cs" />
     <Compile Include="Entities\SocialWork\NeedsAssessmentData.cs" />
     <Compile Include="Entities\SocialWork\IRPData.cs" />
     <Compile Include="Entities\PATSClient\SummaryCollection.cs" />
