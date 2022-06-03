@@ -3,3 +3,10 @@
 ################################################################################
 
 /IdentityManagement/bin/Debug
+/IdentityManagement/bin/Release
+/.vs/PATSWebV2/v15
+/PatsReportLibrary/obj
+/PatsReportLibrary/obj/Debug
+/PATSWebV2/bin
+/PATSWebV2/obj/Debug
+/PATSWebV2/Properties/PublishProfiles

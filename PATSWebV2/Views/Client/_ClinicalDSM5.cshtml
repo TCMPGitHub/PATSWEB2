@@ -57,7 +57,7 @@
                                 </a>
                             </td>
                             <td style="width:80px;">@Model.NoEditAllowed</td>
-                            <td>DMS-5 DATE:</td>
+                            <td>DSM-5 DATE:</td>
                             <td style="font-size:11px">                              
                                 @(Html.Kendo().DropDownListFor(m => m.DSM5ID)
                 .Name("AllDSM5Dates")
@@ -185,7 +185,7 @@
                 e.stopPropagation();
                 return false;
             }
-            if (confirm("Are you sure you want to save this DSM-s Form?") == false) {
+            if (confirm("Are you sure you want to save this DSM-5 Form?") == false) {
                 e.stopPropagation();
                 return false;
             }

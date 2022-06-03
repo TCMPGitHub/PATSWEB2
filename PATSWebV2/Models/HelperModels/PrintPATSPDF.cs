@@ -616,7 +616,7 @@ namespace PATS.Models.HelperModels
             }
             return bytes;
         }
-        public Byte[] GenerateDMS5Stream(string LoginUser, Dictionary<string, string> HeaderData, List<DMS5> DMS5Data)
+        public Byte[] GenerateDSM5Stream(string LoginUser, Dictionary<string, string> HeaderData, List<DSM5> DSM5Data)
         {
             Byte[] bytes = null;
             using (var ms = new MemoryStream())
@@ -626,14 +626,14 @@ namespace PATS.Models.HelperModels
                     //write header from dictionary
                     using (var writer = PdfWriter.GetInstance(doc, ms))
                     {
-                        writer.PageEvent = new HeaderFooter(LoginUser, DMS5Data, 10f, 100f, 100f);
+                        writer.PageEvent = new HeaderFooter(LoginUser, DSM5Data, 10f, 100f, 100f);
 
                         //Open the document for writing
                         doc.Open();
                         
                         PdfContentByte cb;
                         cb = writer.DirectContent;
-                        if (DMS5Data != null)
+                        if (DSM5Data != null)
                         {
                             var docY = doc.PageSize.Height;
                             var currentY = docY - 50;
@@ -641,69 +641,69 @@ namespace PATS.Models.HelperModels
                             doc.PageCount = pagecount;
                             PrintHeaderRowWithCheckBox(cb, doc, HeaderData, (int)currentY, (int)doc.PageSize.Width, (int)doc.PageSize.Height);
                            
-                            PdfPTable pdfDMS52Tab = new PdfPTable(1);
+                            PdfPTable pdfDSM52Tab = new PdfPTable(1);
                             Phrase phrase = new Phrase();
                             phrase.Add(new Chunk("Instructions: ", FontFactory.GetFont(BaseFont.HELVETICA, 6, Font.BOLD)));
                             phrase.Add(new Chunk(@"The questions below ask about things that might have bothered you. For each question, 
-circle the number that best describes how much(or how often) you have been bothered by each problem during the past", FontFactory.GetFont(BaseFont.HELVETICA, 6, Font.NORMAL)));
+check the number that best describes how much(or how often) you have been bothered by each problem during the past", FontFactory.GetFont(BaseFont.HELVETICA, 6, Font.NORMAL)));
                             phrase.Add(new Chunk(" TWO (2) WEEKS", FontFactory.GetFont(BaseFont.HELVETICA, 6, Font.BOLD)));
 
-                            PdfPCell pdfDMS52TabCell1 = new PdfPCell(phrase);
-                            pdfDMS52TabCell1.Border = 0;
-                            pdfDMS52TabCell1.HorizontalAlignment = PdfPCell.ALIGN_LEFT;
-                            pdfDMS52Tab.AddCell(pdfDMS52TabCell1);
+                            PdfPCell pdfDSM52TabCell1 = new PdfPCell(phrase);
+                            pdfDSM52TabCell1.Border = 0;
+                            pdfDSM52TabCell1.HorizontalAlignment = PdfPCell.ALIGN_LEFT;
+                            pdfDSM52Tab.AddCell(pdfDSM52TabCell1);
 
-                            pdfDMS52Tab.TotalWidth = doc.PageSize.Width;
-                            pdfDMS52Tab.WidthPercentage = 100;
-                            pdfDMS52Tab.WriteSelectedRows(0, -1, 30, docY - 70, cb);
+                            pdfDSM52Tab.TotalWidth = doc.PageSize.Width;
+                            pdfDSM52Tab.WidthPercentage = 100;
+                            pdfDSM52Tab.WriteSelectedRows(0, -1, 30, docY - 70, cb);
 
                             currentY = 90;
                             var tabFoneB = FontFactory.GetFont(BaseFont.HELVETICA, 6, Font.BOLD);
                             var tabFone = FontFactory.GetFont(BaseFont.HELVETICA, 6, Font.NORMAL);
-                            PdfPTable pdfDMS53Tab = new PdfPTable(8);
-                            pdfDMS53Tab.TotalWidth = doc.PageSize.Width;
-                            float[] twidths = { (pdfDMS53Tab.TotalWidth / 8) / 4, (pdfDMS53Tab.TotalWidth /8) * 3,
-                                                (pdfDMS53Tab.TotalWidth / 8) / 2  + 10, (pdfDMS53Tab.TotalWidth /8) / 2  + 10,
-                                                (pdfDMS53Tab.TotalWidth / 8) / 2  + 10, (pdfDMS53Tab.TotalWidth /8) / 2  + 10,
-                                                (pdfDMS53Tab.TotalWidth / 8) / 2  + 10, (pdfDMS53Tab.TotalWidth /8) / 2  + 10 };
+                            PdfPTable pdfDSM53Tab = new PdfPTable(8);
+                            pdfDSM53Tab.TotalWidth = doc.PageSize.Width;
+                            float[] twidths = { (pdfDSM53Tab.TotalWidth / 8) / 4, (pdfDSM53Tab.TotalWidth /8) * 3,
+                                                (pdfDSM53Tab.TotalWidth / 8) / 2  + 10, (pdfDSM53Tab.TotalWidth /8) / 2  + 10,
+                                                (pdfDSM53Tab.TotalWidth / 8) / 2  + 10, (pdfDSM53Tab.TotalWidth /8) / 2  + 10,
+                                                (pdfDSM53Tab.TotalWidth / 8) / 2  + 10, (pdfDSM53Tab.TotalWidth /8) / 2  + 10 };
                             //header line
                             PdfPCell cell1 = new PdfPCell(new Phrase(new Chunk(" ", tabFoneB)));                 
-                            pdfDMS53Tab.AddCell(cell1);
+                            pdfDSM53Tab.AddCell(cell1);
 
                             cell1 = new PdfPCell(new Phrase(new Chunk("During the past TWO (2) WEEKS, how much (or how often) have you been bothered by the following problems? ", tabFoneB)));
-                            pdfDMS53Tab.AddCell(cell1);
+                            pdfDSM53Tab.AddCell(cell1);
 
                             cell1 = new PdfPCell(new Phrase(new Chunk("None Not at all ", tabFoneB)));
                             cell1.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
-                            pdfDMS53Tab.AddCell(cell1);
+                            pdfDSM53Tab.AddCell(cell1);
 
                             cell1 = new PdfPCell(new Phrase(new Chunk("Slight Rare, less than a day or two", tabFoneB)));
                             cell1.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
-                            pdfDMS53Tab.AddCell(cell1);
+                            pdfDSM53Tab.AddCell(cell1);
 
                             cell1 = new PdfPCell(new Phrase(new Chunk("Mild Several days", tabFoneB)));
                             cell1.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
-                            pdfDMS53Tab.AddCell(cell1);
+                            pdfDSM53Tab.AddCell(cell1);
 
                             cell1 = new PdfPCell(new Phrase(new Chunk("Moderate More than half the days", tabFoneB)));
                             cell1.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
-                            pdfDMS53Tab.AddCell(cell1);
+                            pdfDSM53Tab.AddCell(cell1);
 
                             cell1 = new PdfPCell(new Phrase(new Chunk("Severe Nearly every day", tabFoneB)));
                             cell1.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
-                            pdfDMS53Tab.AddCell(cell1);
+                            pdfDSM53Tab.AddCell(cell1);
 
                             cell1 = new PdfPCell(new Phrase(new Chunk("Highest Domain Score (clinician)", tabFoneB)));
                             cell1.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
-                            pdfDMS53Tab.AddCell(cell1);                                                    
-                            pdfDMS53Tab.GetRow(0).SetWidths(twidths);
+                            pdfDSM53Tab.AddCell(cell1);                                                    
+                            pdfDSM53Tab.GetRow(0).SetWidths(twidths);
                             //body lines
                             var rowCount = 0;
-                            var list = DMS5Data.Select(s=>s.GroupID).Distinct().ToList();
+                            var list = DSM5Data.Select(s=>s.GroupID).Distinct().ToList();
                             for (int d = 0; d < list.Count(); d++)
                             {
                                 var gid = list[d];                
-                                var items = DMS5Data.Where(w => w.GroupID == gid).ToList();
+                                var items = DSM5Data.Where(w => w.GroupID == gid).ToList();
                                 var icount = items.Count;
                                 var hscore = -1;
                                 for (int h = 0; h < icount; h++)
@@ -721,50 +721,50 @@ circle the number that best describes how much(or how often) you have been bothe
                                         cell2.Rowspan = icount;
                                         cell2.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
                                         cell2.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
-                                        pdfDMS53Tab.AddCell(cell2);
+                                        pdfDSM53Tab.AddCell(cell2);
                                     }
 
-                                    cell2 = new PdfPCell(new Phrase(new Chunk(items[j].DMS5ItemDesc.TrimEnd(), tabFone)));
+                                    cell2 = new PdfPCell(new Phrase(new Chunk(items[j].DSM5ItemDesc.TrimEnd(), tabFone)));
                                     if (rowCount == 22)
                                         cell2.FixedHeight = 45f;
                                     cell2.HorizontalAlignment = PdfPCell.ALIGN_LEFT;
                                     cell2.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
-                                    pdfDMS53Tab.AddCell(cell2);
+                                    pdfDSM53Tab.AddCell(cell2);
                                     cell2 = new PdfPCell(new Phrase(new Chunk(items[j].ItemScore == 0 ? "[0]" : "0", tabFone)));
                                     cell2.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
                                     cell2.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
-                                    pdfDMS53Tab.AddCell(cell2);
+                                    pdfDSM53Tab.AddCell(cell2);
                                     cell2 = new PdfPCell(new Phrase(new Chunk(items[j].ItemScore == 1 ? "[1]" : "1", tabFone)));
                                     cell2.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
                                     cell2.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
-                                    pdfDMS53Tab.AddCell(cell2);
+                                    pdfDSM53Tab.AddCell(cell2);
                                     cell2 = new PdfPCell(new Phrase(new Chunk(items[j].ItemScore == 2 ? "[2]" : "2", tabFone)));
                                     cell2.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
                                     cell2.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
-                                    pdfDMS53Tab.AddCell(cell2);
+                                    pdfDSM53Tab.AddCell(cell2);
                                     cell2 = new PdfPCell(new Phrase(new Chunk(items[j].ItemScore == 3 ? "[3]" : "3", tabFone)));
                                     cell2.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
                                     cell2.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
-                                    pdfDMS53Tab.AddCell(cell2);
+                                    pdfDSM53Tab.AddCell(cell2);
                                     cell2 = new PdfPCell(new Phrase(new Chunk(items[j].ItemScore == 4 ? "[4]" : "4", tabFone)));
                                     cell2.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
                                     cell2.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
-                                    pdfDMS53Tab.AddCell(cell2);
+                                    pdfDSM53Tab.AddCell(cell2);
                                     if (j == 0)
                                     {
                                         cell2 = new PdfPCell(new Phrase(new Chunk(hscore == -1 ? " " : hscore.ToString(), tabFone)));
                                         cell2.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
                                         cell2.VerticalAlignment = PdfPCell.ALIGN_MIDDLE;
                                         cell2.Rowspan = icount;
-                                        pdfDMS53Tab.AddCell(cell2);
+                                        pdfDSM53Tab.AddCell(cell2);
                                     }
-                                    pdfDMS53Tab.GetRow(rowCount + 1).SetWidths(twidths);
+                                    pdfDSM53Tab.GetRow(rowCount + 1).SetWidths(twidths);
                                     rowCount++;
                                 }
                              
                             };
-                            pdfDMS53Tab.SetExtendLastRow(false, false);
-                            pdfDMS53Tab.WriteSelectedRows(0, -1, 30, docY - currentY, cb);
+                            pdfDSM53Tab.SetExtendLastRow(false, false);
+                            pdfDSM53Tab.WriteSelectedRows(0, -1, 30, docY - currentY, cb);
                             
                         }
                         doc.Close();
@@ -2217,7 +2217,7 @@ circle the number that best describes how much(or how often) you have been bothe
             public string AppointmentTitle { get; set; }
             //public MediCalInfor MedBillInfo { get; set; }
             public CaseNoteInfo CaseNoteInfo { get; set; }
-            public List<DMS5> DSM5Data { get; set; }
+            public List<DSM5> DSM5Data { get; set; }
 
             public MMA MMAInfo { get; set; }
             public Dictionary<string, string> ProfileInfo { get; set; }
@@ -2248,7 +2248,7 @@ circle the number that best describes how much(or how often) you have been bothe
                 LoginUser = loginUser;
                 MMAInfo = mmaInfo;
             }
-            public HeaderFooter(string loginUser, List<DMS5> dsm5data, float fontSize = 40f, float xPosition = 200f, float yPosition = 300f, float angle = 45f)
+            public HeaderFooter(string loginUser, List<DSM5> dsm5data, float fontSize = 40f, float xPosition = 200f, float yPosition = 300f, float angle = 45f)
             {
                 this.watermarkText = string.Empty;
                 this.xPosition = xPosition;
@@ -2762,7 +2762,7 @@ circle the number that best describes how much(or how often) you have been bothe
                 //Head 1
                 //=====================================
                 Phrase p1Header = new Phrase();
-                p1Header.Add(new Chunk("DMS-5 Self-Rated Level 1 Cross-Cutting Symptom Measure—Adult", FontFactory.GetFont(BaseFont.HELVETICA, 12, Font.BOLD, BaseColor.BLACK)));
+                p1Header.Add(new Chunk("DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure—Adult", FontFactory.GetFont(BaseFont.HELVETICA, 12, Font.BOLD, BaseColor.BLACK)));
                 PdfPTable pdfTab = new PdfPTable(1);
                 //Row 1
                 PdfPCell pdfTabCell1 = new PdfPCell(p1Header);

@@ -1957,61 +1957,61 @@ ELSE
             return null;
         }
         #endregion PMHS
-        #region DMS5
-        public ActionResult GetClinicalDMS5(int EpisodeID, int DMS5ID)
+        #region DSM5
+        public ActionResult GetClinicalDSM5(int EpisodeID, int DSM5ID)
         {
-            var data = GetDMS5ListData(EpisodeID, DMS5ID);
+            var data = GetDSM5ListData(EpisodeID, DSM5ID);
             data.NoEditAllowed = (data.CanEdit ? MvcHtmlString.Create("") : this.NoEditAllowed);
-            return PartialView("_ClinicalDMS5", data);
+            return PartialView("_ClinicalDSM5", data);
         }
-        private DMS5ViewModel GetDMS5ListData(int EpisodeID, int DMS5ID)
+        private DSM5ViewModel GetDSM5ListData(int EpisodeID, int DSM5ID)
         {
             JavaScriptSerializer jss = new JavaScriptSerializer();
             List<ParameterInfo> parms = new List<ParameterInfo> {
                 { new ParameterInfo {  ParameterName= "EpisodeID", ParameterValue = EpisodeID } },
                 { new ParameterInfo {  ParameterName= "CurrentUserID", ParameterValue = CurrentUser.UserID } },
-                { new ParameterInfo {  ParameterName= "DMS5ID", ParameterValue = DMS5ID }} };
-            var data = SqlHelper.GetRecords<DMS5ViewModel>("spGetEpisodeDMS5", parms).FirstOrDefault();
-            data.EpisodeDMS5 = jss.Deserialize<List<DMS5>>(data.DMS5Json);
+                { new ParameterInfo {  ParameterName= "DSM5ID", ParameterValue = DSM5ID }} };
+            var data = SqlHelper.GetRecords<DSM5ViewModel>("spGetEpisodeDSM5", parms).FirstOrDefault();
+            data.EpisodeDSM5 = jss.Deserialize<List<DSM5>>(data.DSM5Json);
             return data;
         }
-        public JsonResult GetDMS5DateList(int EpisodeID)
+        public JsonResult GetDSM5DateList(int EpisodeID)
         {
             var query = string.Format(@"DECLARE @EpisodeID int = {0}
-                DECLARE @ID int = ISNULL((SELECT DMS5ID FROM EPisodeTrace WHERE EpisodeID = @EpisodeID), 0) 
+                DECLARE @ID int = ISNULL((SELECT DSM5ID FROM EPisodeTrace WHERE EpisodeID = @EpisodeID), 0) 
                 IF @ID = 0 
-                   SELECT 0 AS DMS5ID, (CONVERT(NVARCHAR(15), GetDate(), 110) + '*') AS DMS5Date
+                   SELECT 0 AS DSM5ID, (CONVERT(NVARCHAR(15), GetDate(), 110) + '*') AS DSM5Date
                 ELSE
-                  SELECT DMS5ID, (CONVERT(NVARCHAR(15), DateAction, 110) + (CASE WHEN DMS5ID = @ID THEN '*' ELSE '' END)) as DMS5Date
+                  SELECT DSM5ID, (CONVERT(NVARCHAR(15), DateAction, 110) + (CASE WHEN DSM5ID = @ID THEN '*' ELSE '' END)) as DSM5Date
                     FROM 
-                   (SELECT DMS5ID, DateAction, ActionBy, ROW_NUMBER() OVER(PARTITION BY Cast(DateAction AS Date), ActionBy ORDER BY DMS5ID DESC) AS RowNum
-                      FROM dbo.ClinicalDMS5 Where EpisodeID = @EpisodeID AND ActionStatus <> 10) T WHERE T.RowNum = 1 ", EpisodeID);
-            var dates = SqlHelper.ExecuteCommands<DMS5Dates>(query);
-            return Json(dates.OrderByDescending(d=>d.DMS5ID), JsonRequestBehavior.AllowGet);
+                   (SELECT DSM5ID, DateAction, ActionBy, ROW_NUMBER() OVER(PARTITION BY Cast(DateAction AS Date), ActionBy ORDER BY DSM5ID DESC) AS RowNum
+                      FROM dbo.ClinicalDSM5 Where EpisodeID = @EpisodeID AND ActionStatus <> 10) T WHERE T.RowNum = 1 ", EpisodeID);
+            var dates = SqlHelper.ExecuteCommands<DSM5Dates>(query);
+            return Json(dates.OrderByDescending(d=>d.DSM5ID), JsonRequestBehavior.AllowGet);
         }
-        public ActionResult SaveClinicalDMS5(DMS5ViewModel DMS5)
+        public ActionResult SaveClinicalDSM5(DSM5ViewModel DSM5)
         {
             if (ModelState.IsValid)
             {
                 JavaScriptSerializer jss = new JavaScriptSerializer();
-                string jasonstring = RemoveUnprintableChars(jss.Serialize(DMS5.EpisodeDMS5));
+                string jasonstring = RemoveUnprintableChars(jss.Serialize(DSM5.EpisodeDSM5));
                 
         //var newid = SaveDSM5(casrIrp.IRPSetList, casrIrp.EpisodeID);
-        var query = string.Format(@"DECLARE @status int = (CASE (SELECT ISNULL(DMS5ID, 0) FROM dbo.EpisodeTrace WHERE EpisodeID = {0}) WHEN 0 THEN 1 ELSE 2 END)
-            INSERT INTO dbo.ClinicalDMS5(EpisodeID, DMS5Json, ActionStatus, ActionBy, DateAction) VALUES({0}, '{1}', @status, {2}, GetDate())
-            UPDATE dbo.EpisodeTrace SET DMS5ID = @@IDENTITY WHERE EpisodeID  = {0}",
-                DMS5.EpisodeID, jasonstring, CurrentUser.UserID);
+        var query = string.Format(@"DECLARE @status int = (CASE (SELECT ISNULL(DSM5ID, 0) FROM dbo.EpisodeTrace WHERE EpisodeID = {0}) WHEN 0 THEN 1 ELSE 2 END)
+            INSERT INTO dbo.ClinicalDSM5(EpisodeID, DSM5Json, ActionStatus, ActionBy, DateAction) VALUES({0}, '{1}', @status, {2}, GetDate())
+            UPDATE dbo.EpisodeTrace SET DSM5ID = @@IDENTITY WHERE EpisodeID  = {0}",
+                DSM5.EpisodeID, jasonstring, CurrentUser.UserID);
                 SqlHelper.ExecuteCommand(query);
                 return RedirectToAction("GetSocialWork", new
                 {
-                    EpisodeID = DMS5.EpisodeID,
-                    ActiveTabIn = "DMS5"
+                    EpisodeID = DSM5.EpisodeID,
+                    ActiveTabIn = "DSM5"
                 });
             }
             return null; // ErrorsJson(ModelStateErrors());
         }
         
-        #endregion DMS5
+        #endregion DSM5
         #endregion Social work
         #region DSM
         public ActionResult GetDsm(int EpisodeId, string ActiveTabIn = "")
@@ -3144,8 +3144,8 @@ LEFT OUTER JOIN dbo.tlkpCounty t3 ON t1.ReleaseCountyID = t3.CountyID WHERE Epis
             //Response.AppendHeader("Content-Disposition", "inline; filename=ClientCaseIrp.pdf");
             return File(outputStream.ToArray(), "pdf", "ClientCaseIrp.pdf");
         }
-        //DMS-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult
-        public ActionResult PrintDMS5(int EpisodeId, int DMS5ID)
+        //DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult
+        public ActionResult PrintDSM5(int EpisodeId, int DSM5ID)
         {
             var header = GetReportClientInfo(EpisodeId);
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
@@ -3155,13 +3155,13 @@ LEFT OUTER JOIN dbo.tlkpCounty t3 ON t1.ReleaseCountyID = t3.CountyID WHERE Epis
             dictionary.Add("Date", header.ReleaseDate.HasValue  ? header.ReleaseDate.Value.ToString("MM/dd/yyyy") : "");
             dictionary.Add("PrintDate", DateTime.Now.ToString("MM/dd/yyyy"));
 
-            var DMS5List = GetDMS5ListData(EpisodeId, DMS5ID).EpisodeDMS5;
+            var DSM5List = GetDSM5ListData(EpisodeId, DSM5ID).EpisodeDSM5;
 
             dictionary.Add("LoginUser", CurrentUser.UserLFI());
 
             PrintPATSPDF ppdf1 = new PrintPATSPDF();
-            Byte[] bytes = ppdf1.GenerateDMS5Stream(CurrentUser.UserLFI(), dictionary, DMS5List);
-            return File(bytes, "pdf", "EpisodeDMS5.pdf");
+            Byte[] bytes = ppdf1.GenerateDSM5Stream(CurrentUser.UserLFI(), dictionary, DSM5List);
+            return File(bytes, "pdf", "EpisodeDSM5.pdf");
         }
         
         public ActionResult PrintPMH1(int EpisodeId)
