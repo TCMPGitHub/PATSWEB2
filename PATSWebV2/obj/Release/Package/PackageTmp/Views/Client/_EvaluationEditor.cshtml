@@ -126,6 +126,17 @@
                         var object = this.dataItem(this.select());
                         if (object == undefined || object == null || object.StaffId < 0)
                             return;
+                    
+                        if (object.StaffId.toString() == $("#hdLoginStaffId").val()
+                            && $("#hdSelectedStaffId").val() != $("#hdLoginStaffId").val()) {
+                            $(".evalInitial").prop("disabled", false);
+                            $(".evalInitial").prop("checked");
+                            $(".evalInitial").trigger('click');
+                            $("#hdEvlEditable").val("True");
+                            DisableAllInputFields("#evaluationform :input", $("#hdEvlEditable").val());
+                            EVAButtonDisable(true);
+                        }
+                                               
                         $("#hdSelectedStaffId").val(object.StaffId);
                     }
                 </script>
@@ -186,10 +197,11 @@
      </table>
      <br/>
         <div class="padded aligncenter form-actions" id="presmeddiv" style="height:auto;margin-top:10px;">
-            @if (Model.CanEdit)
-            {
+            @*@if (Model.CanEdit)
+            {*@
                 <button type="submit" class="btn btn-group-lg default-button" id="evaSave">Submit</button>
-            }&nbsp; &nbsp;
+            @*}*@
+            &nbsp; &nbsp;
             <button type="button" class="btn btn-group-lg default-button" id="evaCancel">Cancel</button>&nbsp;&nbsp;
             <button type="button" class="btn btn-group-lg default-button" id="evaReset">Reset</button>
         </div>

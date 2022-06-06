@@ -21,6 +21,7 @@ C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\bin\Debug\PatsReportLibrary.pdb
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\bin\Debug\Telerik.Reporting.dll
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\bin\Debug\Telerik.Reporting.pdb
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\bin\Debug\Telerik.Reporting.xml
+C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\PatsReportLibrary.csprojResolveAssemblyReference.cache
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\Telerik.Reporting.Pats.Reports.Client_Episode_Profile.resources
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\Telerik.Reporting.Pats.Reports.Client_Pending_Release_by_Location.resources
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\Telerik.Reporting.Pats.Reports.ClientEpisodeInactive.resources
@@ -31,4 +32,3 @@ C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\PatsReportLibrary.csproj.Gene
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\PatsReportLibrary.dll.licenses
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\PatsReportLibrary.dll
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\PatsReportLibrary.pdb
-C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Debug\Telerik.Reporting.Pats.Reports.AllClientAppointment.resources

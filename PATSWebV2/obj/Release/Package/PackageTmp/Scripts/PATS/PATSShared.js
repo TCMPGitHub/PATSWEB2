@@ -844,7 +844,12 @@ function printPATSPDF(EpisodeID, id, Title, Color) {
                 url = '/Client/PrintIRP?EpisodeId=' + EpisodeID + '&' + 'IRPID=' + id;
                 break;
             }
-            case "DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult":
+        case "BHR INDIVIDUALIZED REINTEGRATION PLAN (IRP)":
+            {
+                url = '/Client/PrintBHRIRP?EpisodeId=' + EpisodeID + '&' + 'IRPID=' + id;
+                break;
+            }
+        case "DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult":
             {
                 url = '/Client/PrintDSM5?EpisodeId=' + EpisodeID + '&' + 'DSM5ID=' + id;
                 break;

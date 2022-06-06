@@ -25,7 +25,7 @@
             var edit = ($("#IsLastDSM5Set").val() == "True" && $("#hdEditable").val() == "True");
             function PopulatePreviousDSM5Set(e) {
                 if (this.select() == 0) {
-                     DisableAllInputFields("#dsm5form :input", $("#hdEditable").val(), edit);
+                    DisableAllInputFields("#dsm5form :input", $("#hdEditable").val(), edit);
                      return;
                  }
                  var object = this.dataItem(this.select());
@@ -57,7 +57,7 @@
                                 </a>
                             </td>
                             <td style="width:80px;">@Model.NoEditAllowed</td>
-                            <td>DMS-5 DATE:</td>
+                            <td>DSM-5 DATE:</td>
                             <td style="font-size:11px">                              
                                 @(Html.Kendo().DropDownListFor(m => m.DSM5ID)
                 .Name("AllDSM5Dates")
@@ -80,7 +80,7 @@
         </table>
         <div id="c" style="border:1px solid #ccc;margin-bottom:5px;background-color:white;">
               <p style="line-height:16px;color:red;padding:0px 5px 0px 5px;">
-                  <b>INSTRUCTIONS:</b>&nbsp;&nbsp;@Html.Raw("The questions below ask about things that might have bothered you. For each question, circle the number that best describes how much (or how often) you have been bothered by each problem during the past TWO (2) WEEKS.")
+                  <b>INSTRUCTIONS:</b>&nbsp;&nbsp;@Html.Raw("The questions below ask about things that might have bothered you. For each question, check the number that best describes how much (or how often) you have been bothered by each problem during the past TWO (2) WEEKS.")
               </p>
         </div>
         <table id="gird" class="k-grid" style="background-color:white;min-width:1200px;width:99.8%;">
@@ -98,7 +98,7 @@
             {
                 <tr>
                     @Html.HiddenFor(m => m.EpisodeDSM5[i].GroupID, new { @id = "hdGroup" + Model.EpisodeDSM5[i].DSM5ItemID })
-                    @Html.HiddenFor(m => m.EpisodeDSM5[i].DSM5ItemID, new { @id = "hdDSM5DSM5ItemID" + Model.EpisodeDSM5[i].DSM5ItemID })
+                    @Html.HiddenFor(m => m.EpisodeDSM5[i].DSM5ItemID, new { @id = "hdDSM5ItemID" + Model.EpisodeDSM5[i].DSM5ItemID })
                     @Html.HiddenFor(m => m.EpisodeDSM5[i].DSM5ItemDesc, new { @id = "hdDSM5ItemDesc" + Model.EpisodeDSM5[i].DSM5ItemID })
                     @Html.HiddenFor(m => m.EpisodeDSM5[i].ItemScore, new { @id = "hdItemScore" + Model.EpisodeDSM5[i].DSM5ItemID })
                     @{
@@ -112,7 +112,7 @@
                             Model.EpisodeDSM5[i].DSM5ItemID == 14 || Model.EpisodeDSM5[i].DSM5ItemID == 15 || Model.EpisodeDSM5[i].DSM5ItemID == 16 ||
                             Model.EpisodeDSM5[i].DSM5ItemID == 18 || Model.EpisodeDSM5[i].DSM5ItemID == 19 || Model.EpisodeDSM5[i].DSM5ItemID == 19 ||
                             Model.EpisodeDSM5[i].DSM5ItemID == 21) { needColsSpan = true;  }
-                                                 
+
                         switch (Model.EpisodeDSM5[i].GroupID)
                         {
                             case 1: { row = "I."; rows = 2; break; }
@@ -185,7 +185,7 @@
                 e.stopPropagation();
                 return false;
             }
-            if (confirm("Are you sure you want to save this DSM-s Form?") == false) {
+            if (confirm("Are you sure you want to save this DSM-5 Form?") == false) {
                 e.stopPropagation();
                 return false;
             }
