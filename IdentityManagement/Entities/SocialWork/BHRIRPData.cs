@@ -28,8 +28,8 @@ namespace IdentityManagement.Entities
         public string LTGoal { get; set; }
         public string PlanedLTIntervention { get; set; }
         public DateTime? LTGoalMetDate { get; set; }
-        public int? IdentifiedBarriersToInterventionId { get; set; }
-        public int? BarrierFrequency { get; set; }
+        public int? IdentifiedBarriersToInterventionID { get; set; }
+        public int? BarrierFrequencyID { get; set; }
     }
     public class BHRIRPData
     {
@@ -42,7 +42,8 @@ namespace IdentityManagement.Entities
         public int ActionStatus { get; set; }
         public int ActionBy { get; set; }
         public string ActionName { get; set; }
-        public DateTime DateAction { get; set; }
+        //public DateTime DateAction { get; set; }
+        public DateTime? AssessmentDate { get; set; }
         public bool CanEditIRP { get; set; }
         public List<BHRIRP> IRPList { get; set; }
     }
