@@ -100,7 +100,7 @@
                     source.Read(read => read.Action("GetBHRIRPDateList", "Client", new { EpisodeID = Model.IRP.EpisodeID }));
                 }))
                             </td>
-                            <td>@(Html.Kendo().DatePickerFor(m => m.IRP.DateAction).Format("MM/dd/yyyy")
+                            <td>@(Html.Kendo().DatePickerFor(m => m.IRP.AssessmentDate).Format("MM/dd/yyyy")
                                   .HtmlAttributes(new
                                     {
                                         @style = "width:120px",
@@ -118,7 +118,7 @@
             </tr>
         </table><br/>
         &nbsp;&nbsp;<B>**Readiness to change codes:</B>  PC – Pre-contemplation; C- Contemplation; P- Preparation; A- Action; M-Maintenance; R- Regress                   
-        <table id="gird" class="k-grid" style="background-color:white;">
+        <table id="gird" class="k-grid" style="background-color:white;width:100%;">
             <tr style="background-color:silver;font-size:small;text-align:center" class="k-grid-header k-header table-bordered">
                 <th rowspan="2" style="text-align:center;width:200px;">PRESENTING NEED</th>
                 <th colspan="3" style="text-align:center;width:135px;">LEVEL OF NEED</th>
@@ -147,8 +147,8 @@
                     @Html.HiddenFor(m => m.IRP.IRPList[i].NeedName)
                     @Html.HiddenFor(m => m.IRP.IRPList[i].NeedLevel, new { @id = "hdNL" + i.ToString() })
                     @Html.HiddenFor(m => m.IRP.IRPList[i].ReadingForCharge, new { @id = "hdRFC" + i.ToString() })
-                    @Html.HiddenFor(m => m.IRP.IRPList[i].BarrierFrequency, new { @id = "hdBF" + i.ToString() })
-                    @Html.HiddenFor(m => m.IRP.IRPList[i].IdentifiedBarriersToInterventionId, new { @id = "hdIBTI" + i.ToString() })
+                    @Html.HiddenFor(m => m.IRP.IRPList[i].BarrierFrequencyID, new { @id = "hdBF" + i.ToString() })
+                    @Html.HiddenFor(m => m.IRP.IRPList[i].IdentifiedBarriersToInterventionID, new { @id = "hdIBTI" + i.ToString() })
                     <td valign="top" style="line-height:14px;">
                            <div style="font-size:12px;line-height:14px;">
                             @Html.Raw(string.Format("<b>{0}.   {1}</b>", Model.IRP.IRPList[i].NeedId, Model.IRP.IRPList[i].NeedName))
@@ -183,7 +183,7 @@
                    }))
                     </td>
                     <td style="line-height:14PX;">
-                        @(Html.Kendo().DropDownListFor(m => m.IRP.IRPList[i].IdentifiedBarriersToInterventionId)
+                        @(Html.Kendo().DropDownListFor(m => m.IRP.IRPList[i].IdentifiedBarriersToInterventionID)
                 .Name("IdentifiedBarriersToInterventionId")
                 .OptionLabel("Select BarriersToIntervention...")
                 .DataTextField("IBTIValue")
@@ -195,7 +195,7 @@
                 .BindTo(Model.IBTIList))
                     </td>
                     <td>
-                        @(Html.Kendo().DropDownListFor(m => m.IRP.IRPList[i].BarrierFrequency)
+                        @(Html.Kendo().DropDownListFor(m => m.IRP.IRPList[i].BarrierFrequencyID)
                 .Name("BarrierFrequency")
                 .OptionLabel("Select Barrier Frequency...")
                 .DataTextField("BarrFreqValue")

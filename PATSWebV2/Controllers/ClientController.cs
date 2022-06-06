@@ -3223,8 +3223,8 @@ LEFT OUTER JOIN dbo.tlkpCounty t3 ON t1.ReleaseCountyID = t3.CountyID WHERE Epis
             var irp3 = (List<BarrierFrequency>)result[2];
             
             var q = from l1 in irp1
-                    join l2 in irp2 on l1.IdentifiedBarriersToInterventionId equals l2.IBTIID into l2g
-                    join l3 in irp3 on l1.BarrierFrequency equals l3.BarrFreqID into l3g
+                    join l2 in irp2 on l1.IdentifiedBarriersToInterventionID equals l2.IBTIID into l2g
+                    join l3 in irp3 on l1.BarrierFrequencyID equals l3.BarrFreqID into l3g
                     from l2 in l2g.DefaultIfEmpty()
                     from l3 in l3g.DefaultIfEmpty()
                     select new BHRIRPPDFData
@@ -3239,11 +3239,11 @@ LEFT OUTER JOIN dbo.tlkpCounty t3 ON t1.ReleaseCountyID = t3.CountyID WHERE Epis
                         LTGoal = string.IsNullOrEmpty(l1.LTGoal) ? "" : l1.LTGoal,
                         PlanedLTIntervention = string.IsNullOrEmpty(l1.PlanedLTIntervention) ? "" : l1.PlanedLTIntervention,
                         LTGoalMetDate = l1.LTGoalMetDate.HasValue ? l1.LTGoalMetDate.Value.Date.ToString() : "",
-                        IBTIDesc = l1.IdentifiedBarriersToInterventionId.HasValue ? l2.IBTIValue : "",
-                        BarrFreq = l1.BarrierFrequency.HasValue ? l3.BarrFreqValue : ""
+                        IBTIDesc = l1.IdentifiedBarriersToInterventionID.HasValue ? l2.IBTIValue : "",
+                        BarrFreq = l1.BarrierFrequencyID.HasValue ? l3.BarrFreqValue : ""
                     };
 
-            dictionary.Add("ASSESSMENTDATE", irpData.DateAction.Date.ToString());
+            dictionary.Add("ASSESSMENTDATE", irpData.AssessmentDate.HasValue ? irpData.AssessmentDate.Value.Date.ToString() : "");
             dictionary.Add("CurrentPhaseStatus", irpData.CurrentPhaseStatus.HasValue ? irpData.CurrentPhaseStatus.Value.ToString() : "");
             dictionary.Add("AdditionalRemarks", string.IsNullOrEmpty(irpData.AdditionalRemarks) ? "" : irpData.AdditionalRemarks);
             dictionary.Add("LoginUser", CurrentUser.UserLFI());
