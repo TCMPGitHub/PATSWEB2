@@ -1169,22 +1169,75 @@ ELSE
         #region IRP
         public ActionResult GetIRP(int EpisodeId, int IRPID)
         {
-            return PartialView("_IRP", new IRPViewModel
+            var results = GetBHRIRPListData(EpisodeId, IRPID);
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            BHRIRPData irp = (BHRIRPData)results[0];
+            irp.IRPList = serializer.Deserialize<List<BHRIRP>>(irp.BHRIRPJson);
+
+            return PartialView("_BHRIRP", new BHRIRPViewModel
             {
-                EpisodeID = EpisodeId,
-                IRPSetList = GetIRPListData(EpisodeId, IRPID),
-                ActionUserName = CurrentUser.UserLFI(),
-                CanEdit = this.CanEditClient,
-                NoEditAllowed = (this.CanEditClient ? MvcHtmlString.Create("") : this.NoEditAllowed)
+                BarrFreqList = (List<BarrierFrequency>)results[2],
+                IBTIList = (List<IdentifiedBarriersToIntervention>)results[1],
+                IRP = irp,
+                NoEditAllowed = (irp.CanEditIRP ? MvcHtmlString.Create("") : this.NoEditAllowed)
             });
         }
-        private List<IRPSet> GetIRPListData(int EpisodeID, int IRPID)
+        private List<object> GetBHRIRPListData(int EpisodeID, int IRPID)
         {
             List<IRPSet> list = new List<IRPSet>();
             List<ParameterInfo> parms = new List<ParameterInfo> {
                 { new ParameterInfo {  ParameterName= "EpisodeID", ParameterValue = EpisodeID } },
-                { new ParameterInfo {  ParameterName= "IRPID", ParameterValue = IRPID }} };
-            return SqlHelper.GetRecords<IRPSet>("spGetEpisodeIRP", parms);
+                { new ParameterInfo {  ParameterName= "BHRIRPID", ParameterValue = IRPID } },
+                { new ParameterInfo {  ParameterName= "CurrentUserID", ParameterValue = CurrentUser.UserID }} };
+            List<string> objlist = new List<string>();
+            objlist.Add("BHRIRP");
+            objlist.Add("IdentifiedBarriersToIntervention");
+            objlist.Add("BarrierFrequency");
+            var results = SqlHelper.GetMultiRecordsets<object>("spGetEpisodeBHRIRP", parms, objlist);
+
+            return results;
+        }
+        public JsonResult GetBHRIRPDateList(int EpisodeID)
+        {
+            var query = string.Format("DECLARE @EpisodeID int = {0} " +
+                "DECLARE @ID int = (SELECT ISNULl(BHRIRPID, 0) FROM EpisodeTrace WHERE EpisodeID = @EpisodeID) " +
+                "IF @ID = 0 " +
+                "SELECT 0 AS IRPID, (CONVERT(NVARCHAR(15), GetDate(), 110) + '*') AS IRPDate " +
+                "ELSE " +
+                  " SELECT IRPID, (CONVERT(NVARCHAR(15), DateAction, 110) + " +
+                  " (CASE WHEN IRPID = @ID THEN '*' ELSE '' END)) as IRPDate " +
+                  " From dbo.CaseBHRIRP Where EpisodeID = @EpisodeID AND ActionStatus <> 10 ORDER BY DateAction DESC", EpisodeID);
+            var dates = SqlHelper.ExecuteCommands<IRPDates>(query);
+            return Json(dates, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult SaveBHRIRP(BHRIRPViewModel casrIrp)
+        {
+            if (ModelState.IsValid)
+            {
+                var newid = SaveBIRP(casrIrp.IRP, casrIrp.IRP.EpisodeID);
+                return RedirectToAction("GetSocialWork", new
+                {
+                    EpisodeID = casrIrp.IRP.EpisodeID,
+                    ActiveTabIn = "IRP"
+                });
+            }
+            return null; // ErrorsJson(ModelStateErrors());
+        }
+        private int SaveBIRP(BHRIRPData IRPs, int EpisodeID)
+        {
+            if (IRPs == null || IRPs.IRPList.Count() == 0)
+                return 0;
+
+            //var currentDateTime = DateTime.Now;
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            var irp = serializer.Serialize(IRPs.IRPList);
+            var isnew = IRPs.IRPId == 0 ? 1 : 2;
+            var query = string.Format(@"DECLARE @ID int = 0 INSERT INTO [dbo].[CaseBHRIRP]([EpisodeID],[CurrentPhaseStatus],[BHRIRPJson],[AdditionalRemarks]
+           ,[ActionStatus],[ActionBy],[DateAction]) VALUES({0},{1},{2},{3},{4},{5},GetDate()) SET @ID=@@IDENTITY
+           UPDATE dbo.EpisodeTrace SET BHRIRPID=@ID WHERE EpisodeID={0} SELECT @ID",
+           IRPs.EpisodeID, IRPs.CurrentPhaseStatus.HasValue ? IRPs.CurrentPhaseStatus.ToString() : "null", "'" + RemoveUnprintableChars(irp) + "'",
+           string.IsNullOrEmpty(IRPs.AdditionalRemarks) ? "null" : "'" + RemoveUnprintableChars(IRPs.AdditionalRemarks) + "'", isnew, CurrentUser.UserID);
+            return SqlHelper.ExecuteCommands<int>(query).SingleOrDefault();
         }
         public JsonResult GetIRPDateList(int EpisodeID)
         {
@@ -1199,6 +1252,27 @@ ELSE
             var dates = SqlHelper.ExecuteCommands<IRPDates>(query);
             return Json(dates, JsonRequestBehavior.AllowGet);
         }
+        private List<IRPSet> GetIRPListData(int EpisodeID, int IRPID)
+        {
+            List<IRPSet> list = new List<IRPSet>();
+            List<ParameterInfo> parms = new List<ParameterInfo> {
+                { new ParameterInfo {  ParameterName= "EpisodeID", ParameterValue = EpisodeID } },
+                { new ParameterInfo {  ParameterName= "IRPID", ParameterValue = IRPID }} };
+            return SqlHelper.GetRecords<IRPSet>("spGetEpisodeIRP", parms);
+        }
+        //public JsonResult GetIRPDateList(int EpisodeID)
+        //{
+        //    var query = string.Format("DECLARE @EpisodeID int = {0} " +
+        //        "DECLARE @ID int = (SELECT ISNULl(IRPID, 0) FROM EpisodeTrace WHERE EpisodeID = @EpisodeID) " +
+        //        "IF @ID = 0 " +
+        //        "SELECT 0 AS IRPID, (CONVERT(NVARCHAR(15), GetDate(), 110) + '*') AS IRPDate " +
+        //        "ELSE " +
+        //          " SELECT id as IRPID, (CONVERT(NVARCHAR(15), DateAction, 110) + " +
+        //          " (CASE WHEN id = @ID THEN '*' ELSE '' END)) as IRPDate " +
+        //          " From dbo.CaseIRP Where EpisodeID = @EpisodeID AND NeedId = 1 AND ActionStatus <> 10 ORDER BY DateAction DESC", EpisodeID);
+        //    var dates = SqlHelper.ExecuteCommands<IRPDates>(query);
+        //    return Json(dates, JsonRequestBehavior.AllowGet);
+        //}
         public ActionResult SaveClinicalIRP(IRPViewModel casrIrp)
         {
             if (ModelState.IsValid)
@@ -3143,6 +3217,53 @@ LEFT OUTER JOIN dbo.tlkpCounty t3 ON t1.ReleaseCountyID = t3.CountyID WHERE Epis
             }
             //Response.AppendHeader("Content-Disposition", "inline; filename=ClientCaseIrp.pdf");
             return File(outputStream.ToArray(), "pdf", "ClientCaseIrp.pdf");
+        }
+        public ActionResult PrintBHRIRP(int EpisodeId, int IRPID)
+        {
+            var header = GetReportClientInfo(EpisodeId);
+            Dictionary<string, string> dictionary = new Dictionary<string, string>();
+            dictionary.Add("PAROLEENAME", header.PAROLEENAME);
+            dictionary.Add("CDCR#", header.CDCRNum);
+            dictionary.Add("AgentName", header.ParoleAgent);
+            dictionary.Add("Date", header.ReleaseDate.HasValue ? header.ReleaseDate.Value.ToString("MM/dd/yyyy") : "");
+            dictionary.Add("PrintDate", DateTime.Now.ToString("MM/dd/yyyy"));
+
+            var result = GetBHRIRPListData(EpisodeId, IRPID);
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            BHRIRPData irpData = (BHRIRPData)result[0];
+            var irp1 = serializer.Deserialize<List<BHRIRP>>(irpData.BHRIRPJson);
+            var irp2 = (List<IdentifiedBarriersToIntervention>)result[1];
+            var irp3 = (List<BarrierFrequency>)result[2];
+
+            var q = from l1 in irp1
+                    join l2 in irp2 on l1.IdentifiedBarriersToInterventionID equals l2.IBTIID into l2g
+                    join l3 in irp3 on l1.BarrierFrequencyID equals l3.BarrFreqID into l3g
+                    from l2 in l2g.DefaultIfEmpty()
+                    from l3 in l3g.DefaultIfEmpty()
+                    select new BHRIRPPDFData
+                    {
+                        NeedId = l1.NeedId.ToString(),
+                        NeedName = l1.NeedName,
+                        NeedLevel = l1.NeedLevel.HasValue ? l1.NeedLevel.Value.ToString() : "",
+                        STGoal = string.IsNullOrEmpty(l1.STGoal) ? "" : l1.STGoal,
+                        PlanedSTIntervention = string.IsNullOrEmpty(l1.PlanedSTIntervention) ? "" : l1.PlanedSTIntervention,
+                        STGoalMetDate = l1.STGoalMetDate.HasValue ? l1.STGoalMetDate.Value.Date.ToString() : "",
+                        ReadingForCharge = l1.ReadingForCharge.HasValue ? l1.ReadingForCharge.Value.ToString() : "",
+                        LTGoal = string.IsNullOrEmpty(l1.LTGoal) ? "" : l1.LTGoal,
+                        PlanedLTIntervention = string.IsNullOrEmpty(l1.PlanedLTIntervention) ? "" : l1.PlanedLTIntervention,
+                        LTGoalMetDate = l1.LTGoalMetDate.HasValue ? l1.LTGoalMetDate.Value.Date.ToString() : "",
+                        IBTIDesc = l1.IdentifiedBarriersToInterventionID.HasValue ? l2.IBTIValue : "",
+                        BarrFreq = l1.BarrierFrequencyID.HasValue ? l3.BarrFreqValue : ""
+                    };
+
+            dictionary.Add("ASSESSMENTDATE", irpData.AssessmentDate.HasValue ? irpData.AssessmentDate.Value.Date.ToString() : "");
+            dictionary.Add("CurrentPhaseStatus", irpData.CurrentPhaseStatus.HasValue ? irpData.CurrentPhaseStatus.Value.ToString() : "");
+            dictionary.Add("AdditionalRemarks", string.IsNullOrEmpty(irpData.AdditionalRemarks) ? "" : irpData.AdditionalRemarks);
+            dictionary.Add("LoginUser", CurrentUser.UserLFI());
+
+            PrintPATSPDF ppdf1 = new PrintPATSPDF();
+            Byte[] bytes = ppdf1.GenerateBHRIRPStream(CurrentUser.UserLFI(), dictionary, q.ToList());
+            return File(bytes, "pdf", "ClientCaseBHRIrp.pdf");
         }
         //DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult
         public ActionResult PrintDSM5(int EpisodeId, int DSM5ID)

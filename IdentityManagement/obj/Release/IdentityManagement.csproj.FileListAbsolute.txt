@@ -13,6 +13,5 @@ C:\TCMPGitHub\PATSWEB2\IdentityManagement\bin\Release\Dapper.dll
 C:\TCMPGitHub\PATSWEB2\IdentityManagement\bin\Release\Microsoft.AspNet.Identity.Core.dll
 C:\TCMPGitHub\PATSWEB2\IdentityManagement\bin\Release\Dapper.xml
 C:\TCMPGitHub\PATSWEB2\IdentityManagement\bin\Release\Microsoft.AspNet.Identity.Core.xml
-C:\TCMPGitHub\PATSWEB2\IdentityManagement\obj\Release\IdentityManagement.csprojResolveAssemblyReference.cache
 C:\TCMPGitHub\PATSWEB2\IdentityManagement\obj\Release\IdentityManagement.dll
 C:\TCMPGitHub\PATSWEB2\IdentityManagement\obj\Release\IdentityManagement.pdb

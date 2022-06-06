@@ -32,4 +32,3 @@ C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Release\PatsReportLibrary.csproj.Ge
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Release\PatsReportLibrary.dll.licenses
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Release\PatsReportLibrary.dll
 C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Release\PatsReportLibrary.pdb
-C:\TCMPGitHub\PATSWEB2\PatsReportLibrary\obj\Release\PatsReportLibrary.csprojResolveAssemblyReference.cache

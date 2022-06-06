@@ -273,6 +273,24 @@ namespace IdentityManagement.Data
                                         recordList.Add(set.FirstOrDefault());
                                         break;
                                     }
+                                case "BHRIRP":
+                                    {
+                                        var set = multipleResults.Read<BHRIRPData>();
+                                        recordList.Add(set.FirstOrDefault());
+                                        break;
+                                    }
+                                case "IdentifiedBarriersToIntervention":
+                                    {
+                                        var set = multipleResults.Read<IdentifiedBarriersToIntervention>();
+                                        recordList.Add(set.ToList());
+                                        break;
+                                    }
+                                case "BarrierFrequency":
+                                    {
+                                        var set = multipleResults.Read<BarrierFrequency>();
+                                        recordList.Add(set.ToList());
+                                        break;
+                                    }
                             }
                         }
                     }
