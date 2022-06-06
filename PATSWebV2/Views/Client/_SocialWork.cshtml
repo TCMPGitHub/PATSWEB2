@@ -37,7 +37,7 @@
         //    }
         //}
         function swTabChanged(e) {
-           WaitDialog(1);
+            WaitDialog(1);
            if (e.item.textContent == "Back to dashboard") {
                 url = '@Url.Action("GetEditingPaneBack", "Client")';
                 fndata = { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val() };

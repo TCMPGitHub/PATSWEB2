@@ -616,6 +616,165 @@ namespace PATS.Models.HelperModels
             }
             return bytes;
         }
+        public Byte[] GenerateBHRIRPStream(string LoginUser, Dictionary<string, string> HeaderData, List<BHRIRPPDFData> IRPData)
+        {
+            Byte[] bytes = null;
+            var tabFoneB = FontFactory.GetFont(BaseFont.HELVETICA, 6, Font.BOLD);
+            var tabFone = FontFactory.GetFont(BaseFont.HELVETICA, 6, Font.NORMAL);
+            Font zapfdingbats = new Font(Font.FontFamily.ZAPFDINGBATS);
+            //phrase.Add(new Chunk("\u0033", zapfdingbats));
+            using (var ms = new MemoryStream())
+            {
+                using (var doc = new Document(PageSize.A4.Rotate(), 10, 10, 10, 10))
+                {
+                    using (var writer = PdfWriter.GetInstance(doc, ms))
+                    {
+                        var ar = HeaderData["AdditionalRemarks"] == null ? "" : HeaderData["AdditionalRemarks"];
+                        int totalPage = string.IsNullOrEmpty(ar) ? 1 : 2; //\u2713
+                        var chk = "[X]"; var space = new String(' ', 2);
+                        var cps = HeaderData["CurrentPhaseStatus"] == null ? "" : HeaderData["CurrentPhaseStatus"];
+                        var unchk = "[" + space + "]";
+                        writer.PageEvent = new HeaderFooter(LoginUser, IRPData, 10f, 100f, 100f) {
+                            TotalPages = totalPage,
+                          ProfileInfo = HeaderData
+                        };
+                        //Paragraph p = new Paragraph("\u2713", tabFone);
+                        //Open the document for writing
+                        doc.Open();
+
+                        PdfContentByte cb;
+                        cb = writer.DirectContent;
+                        int currentY = 110;
+                        if (IRPData != null && IRPData.Count() > 0)
+                        {
+                            var docY = doc.PageSize.Height;                          
+                            float[] bwidths = { };
+                            //doc.PageCount = 1;
+
+                            PdfPTable pdfClientIRPTab = CreateNewIRPPage(cb, doc, ref bwidths);
+                            var row = pdfClientIRPTab.Rows.Count;
+                            var bNewPage = false;
+                            for (int i = 0; i < IRPData.Count(); i++)
+                            {
+                                row = pdfClientIRPTab.Rows.Count;
+                                var col1 = string.Format("{0}. {1}", IRPData[i].NeedId, IRPData[i].NeedName);
+                                var col2 = !string.IsNullOrEmpty(IRPData[i].NeedLevel) && IRPData[i].NeedLevel == "1" ? chk : unchk;
+                                var col3 = !string.IsNullOrEmpty(IRPData[i].NeedLevel) && IRPData[i].NeedLevel == "2" ? chk : unchk;
+                                var col4 = !string.IsNullOrEmpty(IRPData[i].NeedLevel) && IRPData[i].NeedLevel == "3" ? chk : unchk;
+                                var col7 = string.IsNullOrEmpty(IRPData[i].STGoalMetDate) || Convert.ToDateTime(IRPData[i].STGoalMetDate) == DateTime.MinValue ? "" : Convert.ToDateTime(IRPData[i].STGoalMetDate).Date.ToString("MM/dd/yyyy");
+                                var col11 = string.IsNullOrEmpty(IRPData[i].LTGoalMetDate) || Convert.ToDateTime(IRPData[i].LTGoalMetDate) == DateTime.MinValue ? "" : Convert.ToDateTime(IRPData[i].LTGoalMetDate).Date.ToString("MM/dd/yyyy");
+                                var col8 = string.Format(
+                                "  " + (IRPData[i].ReadingForCharge == "1" ? chk : unchk) + " PC" +
+                                "  " + (IRPData[i].ReadingForCharge == "2" ? chk : unchk) + " C" + space +
+                                "  " + (IRPData[i].ReadingForCharge == "3" ? chk : unchk) + " P \r\n" + "\r\n" +
+                                "  " + (IRPData[i].ReadingForCharge == "4" ? chk : unchk) + " A" + space +
+                                "  " + (IRPData[i].ReadingForCharge == "5" ? chk : unchk) + " M" + space +
+                                "  " + (IRPData[i].ReadingForCharge == "5" ? chk : unchk) + " R" + space);
+                                pdfClientIRPTab.AddCell(new PdfPCell(new Phrase(col1, tabFone)) { HorizontalAlignment = Element.ALIGN_LEFT });
+                                pdfClientIRPTab.AddCell(new PdfPCell(new Phrase(col2, tabFoneB)) { HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
+                                pdfClientIRPTab.AddCell(new PdfPCell(new Phrase(col3, tabFoneB)) { HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
+                                pdfClientIRPTab.AddCell(new PdfPCell(new Phrase(col4, tabFoneB)) { HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
+                                pdfClientIRPTab.AddCell(new PdfPCell(new Phrase(IRPData[i].STGoal, tabFone)));
+                                pdfClientIRPTab.AddCell(new PdfPCell(new Phrase(IRPData[i].PlanedSTIntervention, tabFone)));
+                                pdfClientIRPTab.AddCell(new PdfPCell(new Phrase(col7, tabFone)) { HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
+                                pdfClientIRPTab.AddCell(new PdfPCell(new Phrase(col8, tabFoneB)));
+                                pdfClientIRPTab.AddCell(new PdfPCell(new Phrase(IRPData[i].LTGoal, tabFone)));
+                                pdfClientIRPTab.AddCell(new PdfPCell(new Phrase(IRPData[i].PlanedLTIntervention, tabFone)));
+                                pdfClientIRPTab.AddCell(new PdfPCell(new Phrase(col11, tabFone)) { HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
+                                pdfClientIRPTab.AddCell(new PdfPCell(new Phrase(IRPData[i].IBTIDesc, tabFone)));
+                                pdfClientIRPTab.AddCell(new PdfPCell(new Phrase(IRPData[i].BarrFreq, tabFone)));
+                                pdfClientIRPTab.GetRow(row).SetWidths(bwidths);
+                                if ((currentY + (int)pdfClientIRPTab.TotalHeight) > doc.PageSize.Height - 70)
+                                {
+                                    pdfClientIRPTab.WriteSelectedRows(0, -1, 30, doc.PageSize.Height - currentY, cb);
+                                    doc.NewPage();
+                                    pdfClientIRPTab = CreateNewIRPPage(cb, doc, ref bwidths);                                   
+                                    row = pdfClientIRPTab.Rows.Count;
+                                    currentY = 110;
+                                    bNewPage = true;
+                                    continue;
+                                }
+                            }
+                            pdfClientIRPTab.WriteSelectedRows(0, -1, 30, doc.PageSize.Height - currentY, cb);
+                            currentY += (int)pdfClientIRPTab.TotalHeight;
+
+                            PdfPTable pdfDescTab = new PdfPTable(1);
+                            var chunk1 = new Chunk("**Readiness to change codes: ", tabFoneB);
+                            var chunk2 = new Chunk("PC – Pre-contemplation; C- Contemplation; P- Preparation; A- Action; M-Maintenance; R- Regress", tabFone);
+                            var phrase = new Phrase() { chunk1, chunk2 };
+                            pdfDescTab.AddCell(new PdfPCell(phrase) { HorizontalAlignment = PdfPCell.ALIGN_LEFT, Border = 0 });
+
+                            pdfDescTab.TotalWidth = doc.PageSize.Width;
+                            pdfDescTab.WriteSelectedRows(0, -1, 30, doc.PageSize.Height - currentY, writer.DirectContent);
+                            currentY += (int)pdfDescTab.TotalHeight + 20;
+                            if (!string.IsNullOrEmpty(ar))
+                            {
+                                if (!bNewPage)
+                                {
+                                    doc.NewPage();
+                                    currentY = 110;
+                                }
+                                PdfPTable pdfAdditionalTab = new PdfPTable(1);
+                                pdfAdditionalTab.TotalWidth = (float)(doc.PageSize.Width * 0.935);
+                                float[] width = { pdfAdditionalTab.TotalWidth };
+                                pdfAdditionalTab.AddCell(new PdfPCell(new Phrase("Additional Rmarks:", tabFoneB)) { HorizontalAlignment = PdfPCell.ALIGN_LEFT, Border = 0 });
+                                pdfAdditionalTab.GetRow(0).SetWidths(width);
+                                pdfAdditionalTab.AddCell(new PdfPCell(new Phrase(ar, tabFone)) { HorizontalAlignment = PdfPCell.ALIGN_LEFT, Border = Rectangle.BOX, MinimumHeight=100 });
+                                pdfAdditionalTab.GetRow(1).SetWidths(width);
+                                pdfAdditionalTab.WriteSelectedRows(0, -1, 30, (doc.PageSize.Height - currentY ), writer.DirectContent);
+                            }
+                        }
+                        doc.Close();
+                    }
+                }
+                bytes = ms.ToArray();
+                ms.Close();
+            }          
+            return bytes;
+        }
+        public static PdfPTable CreateNewIRPPage(PdfContentByte cb, Document doc, ref float[] tabw)
+        {
+            var tabFoneB = FontFactory.GetFont(BaseFont.HELVETICA, 6, Font.BOLD);
+            var tabFone = FontFactory.GetFont(BaseFont.HELVETICA, 6, Font.NORMAL);
+            var pdfClientIRPTab = new PdfPTable(13);
+            pdfClientIRPTab.TotalWidth = doc.PageSize.Width;
+
+            tabw = new float[] { (pdfClientIRPTab.TotalWidth / 8),
+                     (pdfClientIRPTab.TotalWidth / 35),
+                     (pdfClientIRPTab.TotalWidth / 35),
+                     (pdfClientIRPTab.TotalWidth / 35),
+                     (pdfClientIRPTab.TotalWidth / 10),
+                     (pdfClientIRPTab.TotalWidth / 10),
+                     (pdfClientIRPTab.TotalWidth / 20),
+                     (pdfClientIRPTab.TotalWidth / 13),
+                     (pdfClientIRPTab.TotalWidth / 10),
+                     (pdfClientIRPTab.TotalWidth / 10),
+                     (pdfClientIRPTab.TotalWidth / 20),
+                     (pdfClientIRPTab.TotalWidth / 10),
+                     (pdfClientIRPTab.TotalWidth / 22)
+                    };
+            
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("PRESENTING NEEDS", tabFoneB)) { Rowspan = 2, HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("LEVEL OF NEED", tabFoneB)) { Colspan = 3, HorizontalAlignment = Element.ALIGN_CENTER });
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("Identified High/Urgent Needs Require ST Plan", tabFoneB)) { Colspan = 3, HorizontalAlignment = Element.ALIGN_CENTER });
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("READINESS FOR CHANGE**", tabFoneB)) { Rowspan = 2, HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("Identified High/Urgent Needs Require LT Plan", tabFoneB)) { Colspan = 3, HorizontalAlignment = Element.ALIGN_CENTER });
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("Identified Barriers to Intervention", tabFoneB)) { Rowspan = 2, HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("Barrier Frequency", tabFoneB)) { Rowspan = 2, HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_CENTER });
+            pdfClientIRPTab.GetRow(0).SetWidths(tabw);
+            //row 2     
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("None", tabFoneB)));
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("Non-Urgent", tabFoneB)));
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("High / Urgent", tabFoneB)));
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("Short Term (ST) Goal", tabFoneB)));
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("Planned ST Intervention", tabFoneB)));
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("Date ST Goal Met", tabFoneB)));
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("Short Term (LT) Goal", tabFoneB)));
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("Planned LT Intervention", tabFoneB)));
+            pdfClientIRPTab.AddCell(new PdfPCell(new Phrase("Date LT Goal Met", tabFoneB)));
+            pdfClientIRPTab.GetRow(1).SetWidths(tabw);
+            return pdfClientIRPTab;
+        }
         public Byte[] GenerateDSM5Stream(string LoginUser, Dictionary<string, string> HeaderData, List<DSM5> DSM5Data)
         {
             Byte[] bytes = null;
@@ -2143,7 +2302,7 @@ check the number that best describes how much(or how often) you have been bother
             else pdfCell.FixedHeight = Border * 15;
 
             pdfCell.HorizontalAlignment = Element.ALIGN_LEFT;
-            if (font.Color.ToString() == "Color value[FF004080]")
+            if (font.Color !=null && font.Color.ToString() == "Color value[FF004080]")
             {
                 if (ColSpan > 0)
                     pdfCell.BackgroundColor = BaseColor.LIGHT_GRAY;
@@ -2218,7 +2377,7 @@ check the number that best describes how much(or how often) you have been bother
             //public MediCalInfor MedBillInfo { get; set; }
             public CaseNoteInfo CaseNoteInfo { get; set; }
             public List<DSM5> DSM5Data { get; set; }
-
+            public List<BHRIRPPDFData> BHRIRPPDFData { get; set; }
             public MMA MMAInfo { get; set; }
             public Dictionary<string, string> ProfileInfo { get; set; }
             #endregion
@@ -2256,6 +2415,15 @@ check the number that best describes how much(or how often) you have been bother
                 this.angle = angle;
                 LoginUser = loginUser;
                 DSM5Data = dsm5data;
+            }
+            public HeaderFooter(string loginUser, List<BHRIRPPDFData> irpdata, float fontSize = 40f, float xPosition = 200f, float yPosition = 300f, float angle = 45f)
+            {
+                this.watermarkText = string.Empty;
+                this.xPosition = xPosition;
+                this.yPosition = yPosition;
+                this.angle = angle;
+                LoginUser = loginUser;
+                BHRIRPPDFData = irpdata;
             }
             //public HeaderFooter(string loginUser, string psychiatristName, MediCalInfor medInfor, string watermarkText, float fontSize = 40f, float xPosition = 200f, float yPosition = 300f, float angle = 45f)
             //{
@@ -2334,6 +2502,10 @@ check the number that best describes how much(or how often) you have been bother
                 else if (DSM5Data != null)
                 {
                     DSM5HeadFooter(writer, document);
+                }
+                else if (BHRIRPPDFData != null)
+                {
+                    BHRIRPHeadFooter(writer, document, ProfileInfo);
                 }
                 else
                 {
@@ -2799,6 +2971,89 @@ check the number that best describes how much(or how often) you have been bother
                 cb.ShowText("This material can be reproduced without permission by researchers and by clinicians for use with their patients.");
                 cb.EndText();
             }
+            public void BHRIRPHeadFooter(PdfWriter writer, Document document, Dictionary<string, string> HeaderData)
+            {
+                var tabFoneB = FontFactory.GetFont(BaseFont.HELVETICA, 6, Font.BOLD);
+            
+                //Create PdfTable object
+                PdfPTable pdfHead1Tab = new PdfPTable(1);
+                //Row 1
+                PdfPCell pdfHeadCell1 = new PdfPCell(new Phrase("BHR INDIVIDUALIZED REINTEGRATION PLAN (IRP)", PatsFont.PatsHeadBold));
+                pdfHeadCell1.HorizontalAlignment = Element.ALIGN_LEFT;
+                //Row 2
+                //PdfPCell pdfHeadCell2 = new PdfPCell(new Phrase("Parole Automation Tracking System", PatsFont.PatsSmall));
+                //pdfHeadCell2.HorizontalAlignment = Element.ALIGN_LEFT;
+
+                pdfHeadCell1.Border = 0;
+                //pdfHeadCell2.Border = 0;
+                pdfHead1Tab.AddCell(pdfHeadCell1);
+                //pdfHead1Tab.AddCell(pdfHeadCell2);
+
+                pdfHead1Tab.TotalWidth = document.PageSize.Width;
+                pdfHead1Tab.WidthPercentage = 90;
+                pdfHead1Tab.WriteSelectedRows(0, -1, 30, document.PageSize.Height - 30, writer.DirectContent);
+
+                //Create PdfTable object for head 2
+                var pdfHead2Tab = new PdfPTable(3);
+                //cell 1
+                PdfPCell pdfHead2TabCell1 = new PdfPCell(new Phrase(""));
+                //cell 2
+                PdfPCell pdfHead2TabCell2 = new PdfPCell(new Phrase("Printed: " + PrintTime.ToShortDateString() + string.Format(" {0:t}", DateTime.Now), PatsFont.PatsSmall));
+                pdfHead2TabCell2.HorizontalAlignment = Element.ALIGN_LEFT;
+                //cell 3
+                PdfPCell pdfHead2TabCell3 = new PdfPCell(new Phrase(string.Format("{0} {1}", "By", LoginUser), PatsFont.PatsSmall));
+                pdfHead2TabCell3.HorizontalAlignment = Element.ALIGN_MIDDLE;
+
+                pdfHead2TabCell1.Border = 0;
+                pdfHead2TabCell2.Border = 0;
+                pdfHead2TabCell3.Border = 0;
+                pdfHead2Tab.AddCell(pdfHead2TabCell1);
+                pdfHead2Tab.AddCell(pdfHead2TabCell2);
+                pdfHead2Tab.AddCell(pdfHead2TabCell3);
+
+                pdfHead2Tab.TotalWidth = document.PageSize.Width;
+                pdfHead2Tab.WidthPercentage = 90;
+                pdfHead2Tab.WriteSelectedRows(0, -1, 30, document.PageSize.Height - 55, writer.DirectContent);
+                //============================================
+                PdfPTable pdfClientInfoTab = new PdfPTable(5);
+                pdfClientInfoTab.TotalWidth = document.PageSize.Width;
+                string[] list = new string[5] { "CDCR#", "PAROLEE NAME", "AGENT OF RECORD", "ASSESSMENT DATE", "CURRENT PHASE STATUS: " };
+                for (int i = 0; i < 5; i++)
+                {
+                    PrintRow(pdfClientInfoTab, list[i], tabFoneB, 1, 1, 0);
+                }
+                float[] widths = { pdfClientInfoTab.TotalWidth / 12,pdfClientInfoTab.TotalWidth / 6,
+                                    pdfClientInfoTab.TotalWidth / 6, pdfClientInfoTab.TotalWidth /6, (pdfClientInfoTab.TotalWidth / 3) + 13 };
+                pdfClientInfoTab.GetRow(0).SetWidths(widths);
+                var chk = "[X]"; var space = new String(' ', 2);
+                var cps = HeaderData["CurrentPhaseStatus"] == null ? "" : HeaderData["CurrentPhaseStatus"];
+                var unchk = "[" + space + "]";
+                var assdate = (DateTime?)Convert.ToDateTime(HeaderData["ASSESSMENTDATE"]);
+                var cpstr = string.Format(
+                    "  " + (cps == "1" ? chk : unchk) + " Prioritization" +
+                    "  " + (cps == "2" ? chk : unchk) + " Stabilization" +
+                    "  " + (cps == "3" ? chk : unchk) + " Activation" +
+                    "  " + (cps == "4" ? chk : unchk) + " Sustainability" +
+                    "  " + (cps == "5" ? chk : unchk) + " Maintenance");
+                string[] list1 = new string[5] { HeaderData["CDCR#"], HeaderData["PAROLEENAME"],(HeaderData["AgentName"] == null ? "" : HeaderData["AgentName"]),
+                                                            ((assdate == (DateTime?)null || assdate == DateTime.MinValue) ? "" : assdate.Value.Date.ToString()), cpstr };
+
+                for (int i = 0; i < 5; i++)
+                {
+                    PrintRow(pdfClientInfoTab, list1[i], tabFoneB, 1, 1, 1);
+                }
+                pdfClientInfoTab.GetRow(1).SetWidths(widths);
+                pdfClientInfoTab.WriteSelectedRows(0, -1, 30, document.PageSize.Height - 70, cb);
+
+                string text = "Page " + writer.CurrentPageNumber + " of ";
+                cb.BeginText();
+                cb.SetFontAndSize(PatsFont.PatsFontBold, 8);
+                cb.SetTextMatrix(document.PageSize.Width / 2 - 20, document.PageSize.GetBottom(30));
+                cb.ShowText(text);
+                cb.EndText();
+
+                cb.AddTemplate(template, (document.PageSize.Width / 2) + text.Length + 6, document.PageSize.GetBottom(30));
+            }
             public void EvaluationHeadFooter(PdfWriter writer, Document document)
             {
                 //Head 1
@@ -2973,7 +3228,7 @@ check the number that best describes how much(or how often) you have been bother
 
                 cb.AddTemplate(template, (document.PageSize.Width / 2) + text.Length + 5, document.PageSize.GetBottom(30));
 
-                cb.AddTemplate(template, (document.PageSize.Width / 2) + text.Length + 5, document.PageSize.GetBottom(30));
+                //cb.AddTemplate(template, (document.PageSize.Width / 2) + text.Length + 5, document.PageSize.GetBottom(30));
 
                 cb.BeginText();
                 cb.SetFontAndSize(PatsFont.PatsFontBold, 8);
