@@ -1182,6 +1182,7 @@ ELSE
                 NoEditAllowed = (irp.CanEditIRP ? MvcHtmlString.Create("") : this.NoEditAllowed)
             });
         }
+
         private List<object> GetBHRIRPListData(int EpisodeID, int IRPID)
         {
             List<IRPSet> list = new List<IRPSet>();
@@ -1239,6 +1240,14 @@ ELSE
            string.IsNullOrEmpty(IRPs.AdditionalRemarks) ? "null" : "'" + RemoveUnprintableChars(IRPs.AdditionalRemarks) + "'", isnew, CurrentUser.UserID);
             return SqlHelper.ExecuteCommands<int>(query).SingleOrDefault();
         }
+        private List<IRPSet> GetIRPListData(int EpisodeID, int IRPID)
+        {
+            List<IRPSet> list = new List<IRPSet>();
+            List<ParameterInfo> parms = new List<ParameterInfo> {
+                { new ParameterInfo {  ParameterName= "EpisodeID", ParameterValue = EpisodeID } },
+                { new ParameterInfo {  ParameterName= "IRPID", ParameterValue = IRPID }} };
+            return SqlHelper.GetRecords<IRPSet>("spGetEpisodeIRP", parms);
+        }
         public JsonResult GetIRPDateList(int EpisodeID)
         {
             var query = string.Format("DECLARE @EpisodeID int = {0} " +
@@ -1252,27 +1261,6 @@ ELSE
             var dates = SqlHelper.ExecuteCommands<IRPDates>(query);
             return Json(dates, JsonRequestBehavior.AllowGet);
         }
-        private List<IRPSet> GetIRPListData(int EpisodeID, int IRPID)
-        {
-            List<IRPSet> list = new List<IRPSet>();
-            List<ParameterInfo> parms = new List<ParameterInfo> {
-                { new ParameterInfo {  ParameterName= "EpisodeID", ParameterValue = EpisodeID } },
-                { new ParameterInfo {  ParameterName= "IRPID", ParameterValue = IRPID }} };
-            return SqlHelper.GetRecords<IRPSet>("spGetEpisodeIRP", parms);
-        }
-        //public JsonResult GetIRPDateList(int EpisodeID)
-        //{
-        //    var query = string.Format("DECLARE @EpisodeID int = {0} " +
-        //        "DECLARE @ID int = (SELECT ISNULl(IRPID, 0) FROM EpisodeTrace WHERE EpisodeID = @EpisodeID) " +
-        //        "IF @ID = 0 " +
-        //        "SELECT 0 AS IRPID, (CONVERT(NVARCHAR(15), GetDate(), 110) + '*') AS IRPDate " +
-        //        "ELSE " +
-        //          " SELECT id as IRPID, (CONVERT(NVARCHAR(15), DateAction, 110) + " +
-        //          " (CASE WHEN id = @ID THEN '*' ELSE '' END)) as IRPDate " +
-        //          " From dbo.CaseIRP Where EpisodeID = @EpisodeID AND NeedId = 1 AND ActionStatus <> 10 ORDER BY DateAction DESC", EpisodeID);
-        //    var dates = SqlHelper.ExecuteCommands<IRPDates>(query);
-        //    return Json(dates, JsonRequestBehavior.AllowGet);
-        //}
         public ActionResult SaveClinicalIRP(IRPViewModel casrIrp)
         {
             if (ModelState.IsValid)

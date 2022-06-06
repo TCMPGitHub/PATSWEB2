@@ -2424,6 +2424,15 @@ check the number that best describes how much(or how often) you have been bother
                 LoginUser = loginUser;
                 DSM5Data = dsm5data;
             }
+            public HeaderFooter(string loginUser, List<BHRIRPPDFData> irpdata, float fontSize = 40f, float xPosition = 200f, float yPosition = 300f, float angle = 45f)
+            {
+                this.watermarkText = string.Empty;
+                this.xPosition = xPosition;
+                this.yPosition = yPosition;
+                this.angle = angle;
+                LoginUser = loginUser;
+                BHRIRPPDFData = irpdata;
+            }
             //public HeaderFooter(string loginUser, string psychiatristName, MediCalInfor medInfor, string watermarkText, float fontSize = 40f, float xPosition = 200f, float yPosition = 300f, float angle = 45f)
             //{
             //    this.watermarkText = watermarkText;
@@ -2505,6 +2514,10 @@ check the number that best describes how much(or how often) you have been bother
                 else if (DSM5Data != null)
                 {
                     DSM5HeadFooter(writer, document);
+                }
+                else if (BHRIRPPDFData != null)
+                {
+                    BHRIRPHeadFooter(writer, document, ProfileInfo);
                 }
                 else
                 {
