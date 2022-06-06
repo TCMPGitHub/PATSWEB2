@@ -88,7 +88,7 @@ namespace PATSWebV2.Controllers
         }
         public bool CanEditPsychi
         {
-            get { return (CurrentUser.IsPOCAdmin || CurrentUser.IsPOCPsychiatrist); }
+            get { return (CurrentUser.IsPOCAdmin || CurrentUser.IsPOCPsychiatrist ); }
         }
         public bool CanEditDSM
         {
@@ -109,13 +109,13 @@ namespace PATSWebV2.Controllers
             return View();
         }
         public JsonResult GetAllSearchResults(string text)
-        {
+        {  
             if (string.IsNullOrEmpty(text))
             {
                 return Json("", JsonRequestBehavior.AllowGet);
             }
             List<ParameterInfo> parameters = new List<ParameterInfo> { new ParameterInfo() { ParameterName = "SearchString", ParameterValue = text } };
-
+           
             var result = SqlHelper.GetRecords<SelectListItem>("spGetEpisodeDropDownList", parameters).ToList();
             return Json(result, JsonRequestBehavior.AllowGet);
         }
@@ -126,12 +126,12 @@ namespace PATSWebV2.Controllers
             {
                 return Json("", JsonRequestBehavior.AllowGet);
             }
-            List<ParameterInfo> parameters = new List<ParameterInfo> { new ParameterInfo() { ParameterName = "EpisodeID", ParameterValue = EpisodeID } };
-
+           List<ParameterInfo> parameters = new List<ParameterInfo> { new ParameterInfo() { ParameterName = "EpisodeID", ParameterValue = EpisodeID } };
+            
             var results = SqlHelper.GetRecords<SelectListItem>("spGetOffenderEpisodes", parameters).ToList();
             return Json(results, JsonRequestBehavior.AllowGet);
         }
-
+        
         [OutputCache(NoStore = true, Duration = 0, VaryByParam = "*")]
         public ActionResult GetEditingPane(int? selectedSearchResult)
         {
@@ -145,7 +145,7 @@ namespace PATSWebV2.Controllers
 
                     //var episode = new Episode();
                     //episode.Offender = new Offender();
-                    // int EpisodeID, int PID, string CDCRNum, bool NewEpisode
+                   // int EpisodeID, int PID, string CDCRNum, bool NewEpisode
                     return RedirectToAction("GetClientProfile", "Client", new { EpisodeID = -1, PID = 0, CDCRNum = string.Empty, NewEpisode = true });
                 }
                 else
@@ -165,19 +165,19 @@ namespace PATSWebV2.Controllers
             List<string> objList = new List<string> { "PPSummary", "CaseAssignSmy" };
             List<ParameterInfo> parameters = new List<ParameterInfo> { new ParameterInfo() { ParameterName = "EpisodeID", ParameterValue = selectedSearchResult.Value } };
             var results = SqlHelper.GetMultiRecordsets<dynamic>("spGetEpisodeSummary", parameters, objList);
-
+            
             ////var results = PATSClientController.GetClientSummary(selectedSearchResult.Value);
             return PartialView("_ClientSummary", new ClientSummaryViewModel
             {
                 ClientSummary = (PPSummary)results[0],
-                Staffs = results[1] == null ? (new List<CaseAssignSmy> { new CaseAssignSmy { DateEnrolled = "", Psychiatrist = "", Psychologist = "", SocialWorker = "", Id = 0 } }) : ((List<CaseAssignSmy>)results[1]).ToList(),
+                Staffs = results[1] == null ? (new List<CaseAssignSmy> { new CaseAssignSmy { DateEnrolled ="", Psychiatrist = "", Psychologist= "", SocialWorker = "", Id =0 } }) : ((List<CaseAssignSmy>)results[1]).ToList(),
                 CanUploadFile = CurrentUser.IsPOCAdmin || CurrentUser.IsPOCPsychologist,
                 CanAddMed = CurrentUser.IsPOCPsychiatrist
             });
 
         }
         private EditingPaneViewModel GetAllSummary(int EpisodeID)
-        {
+        {      
             List<string> objList = new List<string> { "SummaryCollection", "CaseAssignSmy", "AppointmentSummary", "ParoleLocationID" };
             List<ParameterInfo> parameters = new List<ParameterInfo>{
                 new ParameterInfo { ParameterName = "EpisodeID",ParameterValue = EpisodeID }};
@@ -207,7 +207,7 @@ namespace PATSWebV2.Controllers
         public ActionResult GetClientProfileIndex(int EpisodeID, string ActiveTabIn, bool NewClient, bool FromCMRequested)
         {
             ModelState.Clear();
-
+           
             return PartialView("_ClientProfileIndex", new ClientViewModel { EpisodeID = EpisodeID, ActiveTab = ActiveTabIn, NewEpisode = NewClient, CanDoASAM = CurrentUser.IsPOCAdmin || CurrentUser.IsPOCPsychologist, FromCM = FromCMRequested, EditingEnabled = true, CanEditAddress = true, CanEditHCB = true });
         }
         public ActionResult GetClientProfile(int EpisodeID, int PID, string CDCRNum, bool NewEpisode)
@@ -250,13 +250,13 @@ namespace PATSWebV2.Controllers
         }
         public ActionResult MatchesRead([DataSourceRequest] DataSourceRequest request, string PID, string CDCRNum)
         {
-            var parms = new List<ParameterInfo> {
+           var parms = new List<ParameterInfo> {
                 new ParameterInfo { ParameterName="EpisodeID", ParameterValue=0 },
                 new ParameterInfo { ParameterName="PID", ParameterValue=PID},
                 new ParameterInfo { ParameterName="CDCRNum", ParameterValue=CDCRNum },
                 new ParameterInfo { ParameterName="Matches", ParameterValue=true } };
             var results = SqlHelper.GetRecords<MatchClient>("spGetEpisodeProfile", parms);
-
+            
             return Json(results.Where(x => x.EpisodeId > 0).ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 
@@ -324,7 +324,7 @@ END", EpisodeID, IntakeDate, CaseBankedDate, CaseClosureDate, CaseClosureReasonC
                 var InclusionCriteriaMet = "null";
                 if (submission.Profile.InclusionCriteriaMetYes)
                     InclusionCriteriaMet = "1";
-                else if (submission.Profile.InclusionCriteriaMetNo)
+                else if(submission.Profile.InclusionCriteriaMetNo)
                     InclusionCriteriaMet = "0";
 
                 var IsConvictedStalking = "null";
@@ -402,20 +402,20 @@ ELSE
       END    
       SELECT @EpisodeID",
    submission.Profile.PID, "'" + submission.Profile.CDCRNumber + "'",
-   submission.Profile.SelectedLocationId.HasValue ? submission.Profile.SelectedLocationId.Value.ToString() : "null",
-   "'" + RemoveUnprintableChars(submission.Profile.FirstName) + "'",
-   "'" + RemoveUnprintableChars(submission.Profile.LastName) + "'",
+   submission.Profile.SelectedLocationId.HasValue ?  submission.Profile.SelectedLocationId.Value.ToString() : "null", 
+   "'" + RemoveUnprintableChars(submission.Profile.FirstName) + "'", 
+   "'" + RemoveUnprintableChars(submission.Profile.LastName) + "'", 
    submission.Profile.GenderID, (submission.Profile.PC290 == false ? 0 : 1),
    (submission.Profile.PC457 == false ? 0 : 1), (submission.Profile.USVet == false ? 0 : 1),
    (submission.Profile.DOB == (DateTime?)null ? "null" : "'" + submission.Profile.DOB + "'"),
    (string.IsNullOrEmpty(submission.Profile.SSN) ? @"'999-99-9999'" : "'" + submission.Profile.SSN + "'"),
-   (string.IsNullOrEmpty(submission.Profile.MidName) ? "null" : "'" + RemoveUnprintableChars(submission.Profile.MidName) + "'"),
-   (submission.Profile.Lifer == false ? 0 : 1),
+   (string.IsNullOrEmpty(submission.Profile.MidName)? "null" : "'" + RemoveUnprintableChars(submission.Profile.MidName) + "'"),
+   (submission.Profile.Lifer == false ? 0 : 1), 
    ((submission.Profile.ComplexId == (int?)null || submission.Profile.ComplexId == 0) ? 0 : submission.Profile.ComplexId),
    (submission.Profile.ReleaseDate == (DateTime?)null ? "null" : "'" + submission.Profile.ReleaseDate + "'"),
    (string.IsNullOrEmpty(submission.Profile.ParoleAgent) ? "null" : "'" + RemoveUnprintableChars(submission.Profile.ParoleAgent) + "'"),
    (submission.Profile.CaseClosureDate.HasValue ? "'" + submission.Profile.CaseClosureDate.Value.ToShortDateString() + "'" : "null"),
-   (string.IsNullOrEmpty(submission.Profile.Alias) ? "null" : "'" + RemoveUnprintableChars(submission.Profile.Alias) + "'"),
+   (string.IsNullOrEmpty(submission.Profile.Alias) ? "null" : "'" + RemoveUnprintableChars(submission.Profile.Alias) + "'"),   
    ((string.IsNullOrEmpty(submission.Profile.CaseClosureReasonID) || submission.Profile.CaseClosureReasonID == "-1") ? "null" : "'" + submission.Profile.CaseClosureReasonID + "'"),
    (string.IsNullOrEmpty(submission.Profile.CaseReferral) ? "null" : "'" + submission.Profile.CaseReferral + "'"),
    (submission.Profile.InTakeDate.HasValue ? "'" + submission.Profile.InTakeDate.Value.ToShortDateString() + "'" : "null"),
@@ -438,7 +438,7 @@ ELSE
    (submission.Profile.EthnicityId.HasValue ? submission.Profile.EthnicityId.Value.ToString() : "null"),
    (!string.IsNullOrEmpty(submission.Profile.POB) ? "'" + RemoveUnprintableChars(submission.Profile.POB) + "'" : "null"),
    InclusionCriteriaMet, CurrentUser.UserID);
-
+               
                 int epdId = SqlHelper.ExecuteCommands<int>(query).FirstOrDefault();
                 if (epdId < 0)
                 {
@@ -448,7 +448,7 @@ ELSE
                     return null;
                 }
 
-
+               
                 return RedirectToAction("GetClientProfileIndex", new
                 {
                     EpisodeId = epdId,
@@ -534,16 +534,16 @@ ELSE
                                                      AddressTypeID,State,EffectiveDate,FacilityName,FaxNumber,Inactive,
                                                      StreetAddress,PrimaryNumber,SecondaryNumber,City,ZIPCode,LivingSituationID)
                   VALUES ('ClientProf',{0},{1},GetDate(),{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15})
-                 IF {4} = 1 UPDATE dbo.EpisodeTrace SET AddressID=@@IDENTITY WHERE EpisodeID  ={2} ",
+                 IF {4} = 1 UPDATE dbo.EpisodeTrace SET AddressID=@@IDENTITY WHERE EpisodeID  ={2} ", 
                  CurrentUser.UserID, actionstatus, address.EpisodeID,
-                 (string.IsNullOrEmpty(address.AddressDetails) ? "null" : "'" + RemoveUnprintableChars(address.AddressDetails) + "'"),
-                 address.AddressTypeID, ("'" + address.State + "'"), ("'" + address.EffectiveDate + "'"),
-                 (string.IsNullOrEmpty(address.FacilityName) ? "null" : "'" + RemoveUnprintableChars(address.FacilityName) + "'"),
+                 (string.IsNullOrEmpty(address.AddressDetails) ? "null" :"'" + RemoveUnprintableChars(address.AddressDetails) + "'"), 
+                 address.AddressTypeID,("'" + address.State + "'"),("'" + address.EffectiveDate + "'"),
+                 (string.IsNullOrEmpty(address.FacilityName)? "null" : "'" + RemoveUnprintableChars(address.FacilityName) + "'"),
                  (string.IsNullOrEmpty(address.FaxNumber) ? "null" : "'" + address.FaxNumber + "'"), (address.Inactive == true ? 1 : 0),
                  (string.IsNullOrEmpty(address.StreetAddress) ? "null" : "'" + RemoveUnprintableChars(address.StreetAddress) + "'"),
                  (string.IsNullOrEmpty(address.PrimaryNumber) ? "null" : "'" + address.PrimaryNumber + "'"),
                  (string.IsNullOrEmpty(address.SecondaryNumber) ? "null" : "'" + address.SecondaryNumber + "'"),
-                 (string.IsNullOrEmpty(address.City) ? "null" : "'" + address.City + "'"),
+                 (string.IsNullOrEmpty(address.City) ? "null" : "'" + address.City + "'"), 
                  (string.IsNullOrEmpty(address.ZIPCode) ? "null" : "'" + address.ZIPCode + "'"),
                  (!address.AddressLivingSituationID.HasValue || address.AddressLivingSituationID == -1) ? "null" : address.AddressLivingSituationID.ToString());
             return SqlHelper.ExecuteCommand(commText);
@@ -558,7 +558,7 @@ ELSE
                          Update EpisodeTrace Set AddressID = ISNULL(@ID, null) WHERE EpisodeID = {0}",
                         EpisodeID, addrId);
                 }
-
+                    
                 return SqlHelper.ExecuteCommand(commText);
             }
             return 0;
@@ -566,12 +566,12 @@ ELSE
         private List<Address> GetLatestAddress(int EpisodeID, int AddressTypeID)
         {
             List<Address> addressList = new List<Address>();
-            List<ParameterInfo> parameters = new List<ParameterInfo> {
+            List<ParameterInfo> parameters = new List<ParameterInfo> { 
                { new ParameterInfo { ParameterName = "EpisodeID",ParameterValue = EpisodeID } },
                { new ParameterInfo { ParameterName = "AddressTypeID",ParameterValue = AddressTypeID } }
             };
             addressList = SqlHelper.GetRecords<Address>("spGetEpisodeAddress", parameters).ToList();
-
+              
             return addressList;
         }
         public JsonResult GetAddressTypeList()
@@ -604,9 +604,9 @@ ELSE
             var resultlist = SqlHelper.GetRecords<ClientNote>("spGetEpisodeAlert", parms);
             return PartialView("_AlertEditor", new ClientAlertViewModel
             {
-                Alert = resultlist.FirstOrDefault(),
-                ActiveTab = "",
-                EditingEnabled = true
+                  Alert = resultlist.FirstOrDefault(),
+                  ActiveTab = "",
+                  EditingEnabled = true
             });
         }
         public ActionResult SaveClientAlert(ClientAlertViewModel submission)
@@ -615,8 +615,8 @@ ELSE
             {
                 var commText = string.Format(@"INSERT INTO dbo.ClientNote(EpisodeID, NoteType, NoteField, NoteOrComments, EntryDate, EntryID, ActionStatus) 
                    VALUES({0},{1},{2},{3},GetDate(),{4},{5})  UPDATE dbo.EpisodeTrace SET ClientNoteID=@@IDENTITY WHERE EpisodeID ={0}",
-                 submission.Alert.EpisodeID, submission.Alert.NoteType,
-                 (string.IsNullOrEmpty(submission.Alert.NoteField) ? "null" : "'" + submission.Alert.NoteField + "'"),
+                 submission.Alert.EpisodeID,submission.Alert.NoteType,
+                 (string.IsNullOrEmpty(submission.Alert.NoteField) ? "null" : "'" + submission.Alert.NoteField + "'" ),  
                  (string.IsNullOrEmpty(submission.Alert.NoteOrComments) ? "null" : "'" + RemoveUnprintableChars(submission.Alert.NoteOrComments) + "'"),
                  CurrentUser.UserID, (submission.Alert.ActionStatus == 0 ? 1 : 2));
                 var success = SqlHelper.ExecuteCommand(commText);
@@ -659,7 +659,7 @@ ELSE
             }
 
             return Json(new[] { hcbenefit }.ToDataSourceResult(request, ModelState), JsonRequestBehavior.AllowGet);
-        }
+        }       
         public ActionResult HCBenefitCreate([DataSourceRequest] DataSourceRequest request, HealthBenefit hcbenefit)
         {
             if (hcbenefit != null && ModelState.IsValid)
@@ -686,7 +686,7 @@ ELSE
             var commText = string.Format(@"INSERT INTO dbo.ClientHealthCareBenefit(EpisodeID, BenefitTypeID, AppliedOrRefusedOnDate,
                            PhoneInterviewDate, OutcomeID, OutcomeDate, BICNum,AppliedOrRefused, IssuedOnDate, ArchivedOnDate, NoteOrComment, 
                            ActionStatus, ActionBy, DateAction) VALUES({0}, {1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}, GetDate())",
-                  hcbenefit.EpisodeId, (hcbenefit.BenefitTypeID.HasValue ? hcbenefit.BenefitTypeID.ToString() : "null"),
+                  hcbenefit.EpisodeId,(hcbenefit.BenefitTypeID.HasValue ? hcbenefit.BenefitTypeID.ToString() : "null"),
                   (hcbenefit.AppliedOrRefusedOnDate.HasValue ? ("'" + hcbenefit.AppliedOrRefusedOnDate + "'") : "null"),
                   (hcbenefit.PhoneInterviewDate.HasValue ? ("'" + hcbenefit.PhoneInterviewDate + "'") : "null"),
                   (hcbenefit.OutcomeID.HasValue ? hcbenefit.OutcomeID.ToString() : "null"),
@@ -696,18 +696,18 @@ ELSE
                   (hcbenefit.IssuedOnDate.HasValue ? ("'" + hcbenefit.IssuedOnDate + "'") : "null"),
                   (hcbenefit.ArchivedOnDate.HasValue ? ("'" + hcbenefit.ArchivedOnDate + "'") : "null"),
                   (string.IsNullOrEmpty(hcbenefit.NoteorComment) ? "null" : "'" + RemoveUnprintableChars(hcbenefit.NoteorComment) + "'"),
-                  (hcbenefit.ID > 1 ? 2 : 1), CurrentUser.UserID);
-
+                  (hcbenefit.ID > 1 ? 2 : 1),CurrentUser.UserID);
+                  
             var success = SqlHelper.ExecuteCommand(commText);
         }
         private List<HealthBenefit> GetLatestHCBenefit(int EpisodeID, int BenefitTypeID)
         {
-            List<ParameterInfo> parameters = new List<ParameterInfo> {
+            List<ParameterInfo> parameters = new List<ParameterInfo> { 
                 { new ParameterInfo() { ParameterName = "EpisodeID", ParameterValue = EpisodeID } },
                 { new ParameterInfo() { ParameterName = "BenefitTypeID", ParameterValue = BenefitTypeID } } };
 
             var result = SqlHelper.GetRecords<HealthBenefit>("spGetEpisodeHealthBenefit", parameters).ToList();
-
+           
             return result.OrderBy(o => o.BenefitTypeID).ThenByDescending(t => t.ID).ToList();
         }
         public JsonResult GetBenefitTypeList()
@@ -739,11 +739,11 @@ ELSE
                     edit = this.CanEditClient;
                 }
             }
-
+            
             return PartialView(viewName, new CaseNoteViewModel
             {
                 EpisodeId = EpisodeId,
-                CanEdit = edit,
+                CanEdit= edit,
                 NoEditAllowed = (edit ? MvcHtmlString.Create("") : this.NoEditAllowed),
                 ActionModel = ActionModel,
             });
@@ -818,17 +818,17 @@ ELSE
                          INSERT INTO dbo.CaseNoteTrace(CaseNoteId, NoteID) VALUES(@newID, @newID) 
                       END
                    ELSE 
-                      UPDATE dbo.CaseNoteTrace SET NoteID = @newID WHERE CaseNoteId={0} ",
-                      Note.CaseNoteId, EpisodeId, Note.CaseNoteTypeId, Note.CaseContactMethodID,
+                      UPDATE dbo.CaseNoteTrace SET NoteID = @newID WHERE CaseNoteId={0} ", 
+                      Note.CaseNoteId, EpisodeId, Note.CaseNoteTypeId,Note.CaseContactMethodID,
                       "'" + RemoveUnprintableChars(Note.Note) + "'", Status, CurrentUser.UserID, "'" + ActionModel + "'");
                 var success = SqlHelper.ExecuteCommand(commText);
             }
         }
-
-
+                            
+        
         public ActionResult HierarchyBinding_Note([DataSourceRequest] DataSourceRequest request, int CaseNoteId)
         {
-            List<CaseNoteHistory> casenotes = GetCaseNoteListData<CaseNoteHistory>(0, CaseNoteId);
+            List<CaseNoteHistory> casenotes = GetCaseNoteListData<CaseNoteHistory>(0,CaseNoteId);
             return Json(casenotes.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
         private List<T> GetCaseNoteListData<T>(int EpisodeID, int CaseNoteId)
@@ -837,8 +837,8 @@ ELSE
             List<ParameterInfo> parameters = new List<ParameterInfo> {
                 { new ParameterInfo() { ParameterName = "EpisodeID", ParameterValue = EpisodeID } },
                 { new ParameterInfo() { ParameterName = "CaseNoteID", ParameterValue = CaseNoteId } } };
-
-            return SqlHelper.GetRecords<T>("spGetEpisodeCaseNote", parameters).ToList();
+           
+           return SqlHelper.GetRecords<T>("spGetEpisodeCaseNote", parameters).ToList();
         }
         #endregion Case Note
         #region File Upload
@@ -851,17 +851,17 @@ ELSE
             });
 
             return PartialView("_ClientFileUpload", new ClientEditViewModel() {
-                EpisodeId = EpisodeID, PageSize = list, EditingEnabled = this.CanEditClient
+                EpisodeId = EpisodeID, PageSize = list, EditingEnabled= this.CanEditClient
             });
         }
         public ActionResult FilesRead([DataSourceRequest] DataSourceRequest request, int EpisodeId)
         {
             List<UploadedFiles> uploadFiles = new List<UploadedFiles>();
             var query = string.Format("SELECT t1.ID, t1.FileName, (t1.FileSize/1024) AS FileSize, t1.DateAction AS UploadDate," +
-                   " (t2.LastName + ', ' + t2.FirstName + ' ' + ISNULl(MiddleName,''))UploadBy FROM dbo.ClientUploadFile t1" +
+                   " (t2.LastName + ', ' + t2.FirstName + ' ' + ISNULl(MiddleName,''))UploadBy FROM dbo.ClientUploadFile t1" + 
                    " INNER JOIN dbo.[User] t2 ON t1.ActionBy = t2.UserID WHERE EpisodeID = {0}", EpisodeId);
             uploadFiles = SqlHelper.ExecuteCommands<UploadedFiles>(query);
-
+          
             return Json(uploadFiles.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 
@@ -934,9 +934,9 @@ ELSE
             bool hasIDTT = false;
             var query = string.Format("SELECT COUNT(*) FROM dbo.ClinicalIDTT WHERE EpisodeID  = {0} AND ActionStatus <> 10", EpisodeID);
             var tt = SqlHelper.ExecuteCommands<int>(query).FirstOrDefault();
-            if (tt > 0)
+            if(tt > 0)
                 hasIDTT = true;
-
+            
             return PartialView("_SocialWork", new SocialWorkViewModel
             {
                 ActiveTabIn = ActiveTabIn,
@@ -947,15 +947,16 @@ ELSE
                 ModelAction = "Clinic"
             });
         }
+
         #region Case Reentry
         public ActionResult GetReEntryIMHS(int EpisodeId, int CaseReEntryIMHSID)
         {
             var reentry = GetReEntryIMHSData(EpisodeId, CaseReEntryIMHSID);
             return PartialView("_ReEntryIMHS", new ReEntryIMHSViewModel(reentry) {
-                CanEdit = this.CanEditClient,
-                NoEditAllowed = (this.CanEditClient ? MvcHtmlString.Create("") : this.NoEditAllowed),
-                EpisodeID = EpisodeId,
-                IsAdmin = CurrentUser.IsPOCAdmin
+                   CanEdit = this.CanEditClient,
+                   NoEditAllowed = (this.CanEditClient ? MvcHtmlString.Create("") : this.NoEditAllowed),
+                   EpisodeID = EpisodeId,
+                   IsAdmin = CurrentUser.IsPOCAdmin
             });
         }
         private ReEntryIMHSData GetReEntryIMHSData(int EpisodeID, int caseReEntryIMHSID)
@@ -965,7 +966,7 @@ ELSE
                 { new ParameterInfo {  ParameterName= "CaseReEntryIMHSID", ParameterValue = caseReEntryIMHSID }} };
             ReEntryIMHSData reentry = new ReEntryIMHSData();
             reentry = SqlHelper.GetRecord<ReEntryIMHSData>("[dbo].[spGetEpisodeReEntryIMHS]", parms);
-
+            
             return reentry;
         }
         public JsonResult GetRIMHSDateList(int EpisodeID)
@@ -980,7 +981,7 @@ ELSE
                    " From CaseReEntryIMHS Where EpisodeID = @EpisodeID ORDER BY DateAction DESC", EpisodeID);
             var dates = SqlHelper.ExecuteCommands<CaseReEntryDates>(query);
             return Json(dates, JsonRequestBehavior.AllowGet);
-
+            
         }
         [HttpPost]
         public ActionResult SaveReEntryIMHS(ReEntryIMHSViewModel caseReEntryIMHSView)
@@ -992,7 +993,7 @@ ELSE
                 int? levelcare = (int?)null;
 
                 var status = caseReEntryIMHSView.CaseReEntryIMHSSet.CaseReEntryID > 0 ? 2 : 1;
-
+                
                 if (caseReEntryIMHSView.CaseReEntryIMHSSet.NewLevelCareCCCMS == true)
                     levelcare = (int)LEVELCARE.CCCMS;
                 if (caseReEntryIMHSView.CaseReEntryIMHSSet.NewLevelCareEOP == true)
@@ -1141,18 +1142,18 @@ ELSE
            (!string.IsNullOrEmpty(caseReEntryIMHSView.CaseReEntryIMHSSet.RoutineNextAppointmentNote) ? "'" + RemoveUnprintableChars(caseReEntryIMHSView.CaseReEntryIMHSSet.RoutineNextAppointmentNote) + "'" : "null"),
            (mhcc != (bool?)null ? (mhcc == true ? "1" : "0") : "null"), (levelcare != (int?)null ? levelcare.ToString() : "null"),
            (!string.IsNullOrEmpty(caseReEntryIMHSView.CaseReEntryIMHSSet.ScreeningNote) ? "'" + RemoveUnprintableChars(caseReEntryIMHSView.CaseReEntryIMHSSet.ScreeningNote) + "'" : "null"),
-           status, CurrentUser.UserID,
+           status, CurrentUser.UserID, 
            (UrgentCurrentlyPreScribedMed != (bool?)null ? (UrgentCurrentlyPreScribedMed == true ? "1" : "0") : "null"),
            (UrgentHasMed != (bool?)null ? (UrgentHasMed == true ? "1" : "0") : "null"),
            (UrgentBridgeMedRequested != (bool?)null ? (UrgentBridgeMedRequested == true ? "1" : "0") : "null"),
            (InterMediateCurrentlyPreScribedMed != (bool?)null ? (InterMediateCurrentlyPreScribedMed == true ? "1" : "0") : "null"),
            (InterMediateHasMed != (bool?)null ? (InterMediateHasMed == true ? "1" : "0") : "null"),
            (imbmr != (bool?)null ? (imbmr == true ? "1" : "0") : "null"),
-           (RoutineCurrentlyPreScribedMed != (bool?)null ? (RoutineCurrentlyPreScribedMed == true ? "1" : "0") : "null"),
+           (RoutineCurrentlyPreScribedMed != (bool?)null ? (RoutineCurrentlyPreScribedMed == true ? "1" : "0") : "null"),          
            (RoutineHasMed != (bool?)null ? (RoutineHasMed == true ? "1" : "0") : "null"),
-           (RoutineBridgeMedRequested != (bool?)null ? (RoutineBridgeMedRequested == true ? "1" : "0") : "null"),
+           (RoutineBridgeMedRequested != (bool?)null ? (RoutineBridgeMedRequested == true ? "1" : "0") : "null"),           
            (HistoryMHTreatment != (bool?)null ? (HistoryMHTreatment == true ? "1" : "0") : "null"),
-           (UnApptNecessary != (bool?)null ? (UnApptNecessary == true ? "1" : "0") : "null"),
+           (UnApptNecessary != (bool?)null ? (UnApptNecessary == true ? "1" : "0") : "null"), 
            (mhstatus == (int?)null ? "null" : mhstatus.ToString()), (desccare == (int?)null ? "null" : desccare.ToString()));
 
                 var result = SqlHelper.ExecuteCommand(query);
@@ -1168,76 +1169,22 @@ ELSE
         #region IRP
         public ActionResult GetIRP(int EpisodeId, int IRPID)
         {
-           var results = GetBHRIRPListData(EpisodeId, IRPID);
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-            BHRIRPData irp = (BHRIRPData)results[0];
-            irp.IRPList = serializer.Deserialize<List<BHRIRP>>(irp.BHRIRPJson);
-
-            return PartialView("_BHRIRP", new BHRIRPViewModel
+            return PartialView("_IRP", new IRPViewModel
             {
-                BarrFreqList = (List<BarrierFrequency>)results[2],
-                IBTIList = (List<IdentifiedBarriersToIntervention>)results[1],
-                IRP = irp,
-                NoEditAllowed = (irp.CanEditIRP ? MvcHtmlString.Create("") : this.NoEditAllowed)
+                EpisodeID = EpisodeId,
+                IRPSetList = GetIRPListData(EpisodeId, IRPID),
+                ActionUserName = CurrentUser.UserLFI(),
+                CanEdit = this.CanEditClient,
+                NoEditAllowed = (this.CanEditClient ? MvcHtmlString.Create("") : this.NoEditAllowed)
             });
         }
-
-        private List<object> GetBHRIRPListData(int EpisodeID, int IRPID)
+        private List<IRPSet> GetIRPListData(int EpisodeID, int IRPID)
         {
             List<IRPSet> list = new List<IRPSet>();
             List<ParameterInfo> parms = new List<ParameterInfo> {
                 { new ParameterInfo {  ParameterName= "EpisodeID", ParameterValue = EpisodeID } },
-                { new ParameterInfo {  ParameterName= "BHRIRPID", ParameterValue = IRPID } },
-                { new ParameterInfo {  ParameterName= "CurrentUserID", ParameterValue = CurrentUser.UserID }} };
-            List<string> objlist = new List<string>();
-            objlist.Add("BHRIRP");
-            objlist.Add("IdentifiedBarriersToIntervention");
-            objlist.Add("BarrierFrequency");
-            var results = SqlHelper.GetMultiRecordsets<object>("spGetEpisodeBHRIRP", parms, objlist);
-
-            return results;
-        }
-        public JsonResult GetBHRIRPDateList(int EpisodeID)
-        {
-            var query = string.Format("DECLARE @EpisodeID int = {0} " +
-                "DECLARE @ID int = (SELECT ISNULl(BHRIRPID, 0) FROM EpisodeTrace WHERE EpisodeID = @EpisodeID) " +
-                "IF @ID = 0 " +
-                "SELECT 0 AS IRPID, (CONVERT(NVARCHAR(15), GetDate(), 110) + '*') AS IRPDate " +
-                "ELSE " +
-                  " SELECT IRPID, (CONVERT(NVARCHAR(15), DateAction, 110) + " +
-                  " (CASE WHEN IRPID = @ID THEN '*' ELSE '' END)) as IRPDate " +
-                  " From dbo.CaseBHRIRP Where EpisodeID = @EpisodeID AND ActionStatus <> 10 ORDER BY DateAction DESC", EpisodeID);
-            var dates = SqlHelper.ExecuteCommands<IRPDates>(query);
-            return Json(dates, JsonRequestBehavior.AllowGet);
-        }
-        public ActionResult SaveBHRIRP(BHRIRPViewModel casrIrp)
-        {
-            if (ModelState.IsValid)
-            {
-                var newid = SaveBIRP(casrIrp.IRP, casrIrp.IRP.EpisodeID);
-                return RedirectToAction("GetSocialWork", new
-                {
-                    EpisodeID = casrIrp.IRP.EpisodeID,
-                    ActiveTabIn = "IRP"
-                });
-            }
-            return null; // ErrorsJson(ModelStateErrors());
-        }
-        private int SaveBIRP(BHRIRPData IRPs, int EpisodeID)
-        {
-            if (IRPs == null || IRPs.IRPList.Count() == 0)
-                return 0;
-
-            //var currentDateTime = DateTime.Now;
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-            var irp = serializer.Serialize(IRPs.IRPList);
-            var isnew = IRPs.IRPId == 0 ? 1 : 2;
-            var query = string.Format(@"DECLARE @ID int = 0 INSERT INTO [dbo].[CaseBHRIRP]([EpisodeID],[CurrentPhaseStatus],[BHRIRPJson],[AdditionalRemarks]
-           ,[ActionStatus],[ActionBy],[DateAction]) VALUES({0},{1},{2},{3},{4},{5},GetDate()) SET @ID=@@IDENTITY
-           UPDATE dbo.EpisodeTrace SET BHRIRPID=@ID WHERE EpisodeID={0} SELECT @ID",
-           IRPs.EpisodeID, IRPs.CurrentPhaseStatus.HasValue ? IRPs.CurrentPhaseStatus.ToString() : "null", "'" + RemoveUnprintableChars(irp) + "'",
-           string.IsNullOrEmpty(IRPs.AdditionalRemarks) ? "null" : "'" + RemoveUnprintableChars(IRPs.AdditionalRemarks) + "'", isnew, CurrentUser.UserID);
-            return SqlHelper.ExecuteCommands<int>(query).SingleOrDefault();
+                { new ParameterInfo {  ParameterName= "IRPID", ParameterValue = IRPID }} };
+            return SqlHelper.GetRecords<IRPSet>("spGetEpisodeIRP", parms);
         }
         public JsonResult GetIRPDateList(int EpisodeID)
         {
@@ -1251,14 +1198,6 @@ ELSE
                   " From dbo.CaseIRP Where EpisodeID = @EpisodeID AND NeedId = 1 AND ActionStatus <> 10 ORDER BY DateAction DESC", EpisodeID);
             var dates = SqlHelper.ExecuteCommands<IRPDates>(query);
             return Json(dates, JsonRequestBehavior.AllowGet);
-        }
-        private List<IRPSet> GetIRPListData(int EpisodeID, int IRPID)
-        {
-            List<IRPSet> list = new List<IRPSet>();
-            List<ParameterInfo> parms = new List<ParameterInfo> {
-                { new ParameterInfo {  ParameterName= "EpisodeID", ParameterValue = EpisodeID } },
-                { new ParameterInfo {  ParameterName= "IRPID", ParameterValue = IRPID }} };
-            return SqlHelper.GetRecords<IRPSet>("spGetEpisodeIRP", parms);
         }
         public ActionResult SaveClinicalIRP(IRPViewModel casrIrp)
         {
@@ -1310,7 +1249,7 @@ ELSE
                     queryIRP = queryIRP + " SET @ID=@@IDENTITY ";
                 }
                 query = query + queryIRP;
-
+                
             }
             query = query + " UPDATE dbo.EpisodeTrace SET IRPID=@ID WHERE EpisodeID=@EpisodeID SELECT @ID ";
             return SqlHelper.ExecuteCommands<int>(query).SingleOrDefault();
@@ -1342,7 +1281,7 @@ ELSE
                     item.PossibleAnswer.Add(new Anwser { Answer = "Do not know", AnwserId = 0, QuestionAnwserId = 0 });
                 }
             }
-
+          
             return new MCASRViewModel
             {
                 EpisodeID = EpisodeID,
@@ -1362,8 +1301,8 @@ ELSE
                   " SELECT id as MCASRID, (CONVERT(NVARCHAR(15), DateAction, 110) + " +
                   " (CASE WHEN id = @ID THEN '*' ELSE '' END)) as CaseMCASRDate " +
                   " From dbo.CaseMCASR Where EpisodeID = @EpisodeID AND ActionStatus <> 10 ORDER BY DateAction DESC", EpisodeID);
-            var dates = SqlHelper.ExecuteCommands<MCASRDates>(query);
-            return Json(dates, JsonRequestBehavior.AllowGet);
+             var dates = SqlHelper.ExecuteCommands<MCASRDates>(query);
+             return Json(dates, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -1401,10 +1340,10 @@ ELSE
                         view.Scalequestions[15].SelectedAnwser == null ? 0 : Convert.ToInt32(view.Scalequestions[15].SelectedAnwser),
                         view.Scalequestions[16].SelectedAnwser == null ? 0 : Convert.ToInt32(view.Scalequestions[16].SelectedAnwser),
                         CurrentUser.UserID);
-
+                        
                 var newID = SqlHelper.ExecuteCommand(query);
                 //UpdateEpisodeTrace(view.EpisodeID, "MCASRID", newID);
-
+               
                 return RedirectToAction("GetSocialWork", new
                 {
                     EpisodeID = view.EpisodeID,
@@ -1476,7 +1415,7 @@ ELSE
                 {
                     newIrpID = SaveIRP(currtIrpset, Assessment.EpisodeID);
                 }
-
+             
                 //save needs assessment
                 var ipn = (bool?)null;
                 if (Assessment.NeedsAssessmentSet.InterpreterNeededYes.HasValue && Assessment.NeedsAssessmentSet.InterpreterNeededYes == true)
@@ -1517,7 +1456,7 @@ ELSE
                 var query = querytitle + queryvalue + " UPDATE dbo.EpisodeTrace SET NeedsAssessmentID=@@IDENTITY WHERE EpisodeID=@EpisodeID ";
                 //save case assessment
                 int newID = SqlHelper.ExecuteCommand(query);        
-
+              
                 return RedirectToAction("GetSocialWork", new
                 {
                     EpisodeId = Assessment.EpisodeID,
@@ -1665,7 +1604,7 @@ ELSE
                     }
                 }
                 var success = SqlHelper.ExecuteCommand(query);
-
+                
                 return RedirectToAction("GetSocialWork", new
                 {
                     EpisodeId = clinicalIDTT.ClinicalIDTTSet.EpisodeId,
@@ -1741,7 +1680,7 @@ ELSE
                 else if (profileData.ReleaseTypeNone)
                     CaseReferralSourceCode = null;
 
-
+              
 
                 string ddp = string.Empty;
                 if (profileData.NCF)
@@ -1805,7 +1744,7 @@ ELSE
                       (!string.IsNullOrEmpty(profileData.SOCIALSECURITYNUMBER) ? "'" + profileData.SOCIALSECURITYNUMBER + "'" : "null"),
                       (profileData.RECENTRELEASEDATE != (DateTime?)null ? "'" + profileData.RECENTRELEASEDATE.ToString() + "'" : "null"),
                       (profileData.FacilityID == 0 ? "null" : profileData.FacilityID.ToString()));
-
+                                             
                 var succes = SqlHelper.ExecuteCommand(query);
 
                 return RedirectToAction("GetSocialWork", new
@@ -1833,7 +1772,7 @@ ELSE
                 new ParameterInfo { ParameterName = "PMHSID", ParameterValue= 0 }
             };
             var result = SqlHelper.GetRecords<ClinicalPMHSData>("spGetEpisodeClinicalPMHS", Parms).FirstOrDefault();
-
+           
             result.IsRenew = false;
             result.ClinicianName = CurrentUser.UserLFI();
 
@@ -1869,7 +1808,7 @@ ELSE
                     cmhd = (int)MH_L_STATUS.CCCMS;
                 else if (viewModel.ClinicalPMHSSet.ForEOP)
                     cmhd = (int)MH_L_STATUS.EOP;
-
+                
 
                 //get prescribed value
                 bool? prescribing = (bool?)null;
@@ -1920,7 +1859,7 @@ ELSE
                     CurrentUser.UserID, status,
                     (!string.IsNullOrEmpty(viewModel.ClinicalPMHSSet.ClinicianName) ? "'" + viewModel.ClinicalPMHSSet.ClinicianName + "'" : "null"), 
                     (cmhd ==(int?)null ? "null" : cmhd.ToString() ));
-              
+     
                 var success = SqlHelper.ExecuteCommand(query);
 
                 return RedirectToAction("GetSocialWork", new
@@ -1940,7 +1879,7 @@ ELSE
                 new ParameterInfo { ParameterName = "PMHSID", ParameterValue= 0 }
             };
             var result = SqlHelper.GetRecords<ClinicalPMHSData>("spGetEpisodeClinicalPMHS", Parms).FirstOrDefault();
-
+           
             bool editable = result.Id == 0 ? false : true;
             var message = result.Id == 0 ? "Must complete CDCR 128-PMH1 form to continue." : "";
             result.IsRenew = false;
@@ -2004,8 +1943,8 @@ ELSE
                         UPDATE EpisodeTrace SET PMHSID = @@IDENTITY WHERE EpisodeID  = {0}",
                       viewModel.EpisodeID, (dischargeType == (int?)null ? "null" : dischargeType.ToString()), (string.IsNullOrEmpty(dischargeDate) ? "null" : "'" + dischargeDate + "'"),
                       (string.IsNullOrEmpty(viewModel.ClinicalPMHSSet.ClinicianName) ? CurrentUser.UserLFI() : viewModel.ClinicalPMHSSet.ClinicianName), CurrentUser.UserID,
-                      (string.IsNullOrEmpty(viewModel.ClinicalPMHSSet.PMHSDischargeNote) ? "'" + null + "'" : "'" + RemoveUnprintableChars(viewModel.ClinicalPMHSSet.PMHSDischargeNote) + "'"));
-
+                      (string.IsNullOrEmpty(viewModel.ClinicalPMHSSet.PMHSDischargeNote) ? "'" + null + "'": "'" + RemoveUnprintableChars(viewModel.ClinicalPMHSSet.PMHSDischargeNote) + "'"));
+             
                 var success = SqlHelper.ExecuteCommand(query);
 
                 return RedirectToAction("GetSocialWork", new
@@ -2048,7 +1987,7 @@ ELSE
                    (SELECT DSM5ID, DateAction, ActionBy, ROW_NUMBER() OVER(PARTITION BY Cast(DateAction AS Date), ActionBy ORDER BY DSM5ID DESC) AS RowNum
                       FROM dbo.ClinicalDSM5 Where EpisodeID = @EpisodeID AND ActionStatus <> 10) T WHERE T.RowNum = 1 ", EpisodeID);
             var dates = SqlHelper.ExecuteCommands<DSM5Dates>(query);
-            return Json(dates.OrderByDescending(d => d.DSM5ID), JsonRequestBehavior.AllowGet);
+            return Json(dates.OrderByDescending(d=>d.DSM5ID), JsonRequestBehavior.AllowGet);
         }
         public ActionResult SaveClinicalDSM5(DSM5ViewModel DSM5)
         {
@@ -2056,12 +1995,12 @@ ELSE
             {
                 JavaScriptSerializer jss = new JavaScriptSerializer();
                 string jasonstring = RemoveUnprintableChars(jss.Serialize(DSM5.EpisodeDSM5));
-
-                //var newid = SaveDSM5(casrIrp.IRPSetList, casrIrp.EpisodeID);
-                var query = string.Format(@"DECLARE @status int = (CASE (SELECT ISNULL(DSM5ID, 0) FROM dbo.EpisodeTrace WHERE EpisodeID = {0}) WHEN 0 THEN 1 ELSE 2 END)
+                
+        //var newid = SaveDSM5(casrIrp.IRPSetList, casrIrp.EpisodeID);
+        var query = string.Format(@"DECLARE @status int = (CASE (SELECT ISNULL(DSM5ID, 0) FROM dbo.EpisodeTrace WHERE EpisodeID = {0}) WHEN 0 THEN 1 ELSE 2 END)
             INSERT INTO dbo.ClinicalDSM5(EpisodeID, DSM5Json, ActionStatus, ActionBy, DateAction) VALUES({0}, '{1}', @status, {2}, GetDate())
             UPDATE dbo.EpisodeTrace SET DSM5ID = @@IDENTITY WHERE EpisodeID  = {0}",
-                        DSM5.EpisodeID, jasonstring, CurrentUser.UserID);
+                DSM5.EpisodeID, jasonstring, CurrentUser.UserID);
                 SqlHelper.ExecuteCommand(query);
                 return RedirectToAction("GetSocialWork", new
                 {
@@ -2071,7 +2010,7 @@ ELSE
             }
             return null; // ErrorsJson(ModelStateErrors());
         }
-
+        
         #endregion DSM5
         #endregion Social work
         #region DSM
@@ -2085,7 +2024,7 @@ ELSE
         }
         public ActionResult GetDsmDiagnosis(int EpisodeId, int DsmId)
         {
-            var query = string.Format(@"DECLARE @EpisodeID int ={0}
+           var query = string.Format(@"DECLARE @EpisodeID int ={0}
 DECLARE @EvaluationID int =(SELECT ISNULl(EvaluationID,0) FROM dbo.EpisodeTrace WHERE EpisodeID = @EpisodeID) 
 IF @EvaluationID = 0
    SELECT '' AS EvaluationNote
@@ -2098,7 +2037,7 @@ BEGIN
     SELECT EvaluationNote FROM dbo.EpisodeEvaluation WHERE EvaluationItemId = 12 AND DateAction =@DateAction
 END", EpisodeId);
             var result = SqlHelper.ExecuteCommands<string>(query).Single();
-
+            
             return PartialView("_DSMDiagnosis", new DsmViewModel
             {
                 CanEdit = this.CanEditDSM,
@@ -2125,8 +2064,8 @@ END", EpisodeId);
         public JsonResult GetDSMSearchList(string text)
         {
             var query = @"SELECT t1.ICDCode + '_' + (CASE WHEN t1.DSMDesc like '%No corresponding DSM-5%' THEN t1.ICDDesc ELSE t1.DSMDesc END) AS Dsm, t1.MasterDXId FROM  dbo.tlkpICD_DX_Codes t1 LEFT OUTER JOIN dbo.tlkpDsmQAMap t2 ON t1.MasterDXId = t2.MasterDXId";
-            var result = SqlHelper.ExecuteCommands<ICDCodeList>(query).Distinct().OrderBy(o => o.Dsm);
-
+            var result = SqlHelper.ExecuteCommands<ICDCodeList>(query).Distinct().OrderBy(o=>o.Dsm);
+           
             return Json(result, JsonRequestBehavior.AllowGet);
         }
         public JsonResult GetDSMTypeSearchList(int? MasterDXId)
@@ -2164,8 +2103,8 @@ END", EpisodeId);
         {
             List<DsmData> dsms = new List<DsmData>();
             var dsm = GetDiagnosisList(EpisodeId, DsmId);
-            if (dsm.FirstOrDefault() != null)
-                dsms = dsm;
+            if (dsm.FirstOrDefault() != null )
+               dsms = dsm;
             return Json(dsms.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
@@ -2225,7 +2164,7 @@ END", EpisodeId);
                 EpisodeId = EpisodeId,
             });
         }
-
+       
         public ActionResult DSMDiagnosisDestroy([DataSourceRequest] DataSourceRequest request, [Bind(Prefix = "models")]IEnumerable<DsmData> dsms, int EpisodeID)
         {
             if (ModelState.IsValid && dsms != null)
@@ -2266,18 +2205,18 @@ END", EpisodeId);
         }
         private List<DsmData> GetDiagnosisList(int EpisodeId, int DsmId)
         {
-            var Parms = new List<ParameterInfo> {
+           var Parms = new List<ParameterInfo> {
                  new ParameterInfo { ParameterName= "EpisodeID", ParameterValue= EpisodeId },
                  new ParameterInfo { ParameterName= "DSMID", ParameterValue= DsmId } };
-            return SqlHelper.GetRecords<DsmData>("spGetEpisodeDSM", Parms);
-
+            return SqlHelper.GetRecords<DsmData>("spGetEpisodeDSM", Parms);      
+            
         }
         #endregion DSM
         #region Psychiatry
         public ActionResult GetPsychiatry(int EpisodeId, string ActiveTabIn = "")
         {
             bool canedit = (CurrentUser.IsPOCAdmin || CurrentUser.IsPOCPsychiatrist);
-            return PartialView("_Psychiatry", new PsychiatryMMAViewModel
+             return PartialView("_Psychiatry", new PsychiatryMMAViewModel
             {
                 EpisodeId = EpisodeId,
                 CanEdit = this.CanEditPsychi,
@@ -2341,7 +2280,7 @@ END", EpisodeId);
 
                 var GunshotWounds = "null";
                 if (vmodel.PsyAsmt.GUNSHOTWOUNDSYES)
-                    GunshotWounds = "1";
+                     GunshotWounds = "1";
                 else if (vmodel.PsyAsmt.GUNSHOTWOUNDSDENIED)
                     GunshotWounds = "0";
 
@@ -2727,7 +2666,7 @@ END", EpisodeId);
                 else if (vmodel.PsyAsmt.SEXPREFERENCEMALE)
                     SexPreferenceGender = "2";
 
-                var query = string.Format(@"INSERT INTO [dbo].[PsychiatryASMT]([EpisodeId],[Weight]
+    var query = string.Format(@"INSERT INTO [dbo].[PsychiatryASMT]([EpisodeId],[Weight]
            ,[ChiefComplaint],[DiscontinuedMedications],[MedicationChanges]
            ,[MedicationSideEffects],[PrevPsyAdmission],[PrevSuicideAttempts]
            ,[YearOutpatientPsyCare],[PrevDrugDependence],[CurrDrugDependence]
@@ -2775,93 +2714,93 @@ END", EpisodeId);
             {120},{121},{122},{123},{124},{125},{126},{127},{128},{129},{130},{131},{132},{133},{134},{135},{136},{137},{138},{139},
             {140},GetDate(),GetDate()) 
          UPDATE dbo.EpisodeTrace SET ASMTID =@@IDENTITY WHERE EpisodeID={0}",
-                    vmodel.EpisodeId, (string.IsNullOrEmpty(vmodel.PsyAsmt.WEIGHT) ? "null" : vmodel.PsyAsmt.WEIGHT),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.CHIEFCOMPLAINT) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CHIEFCOMPLAINT) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.DISCONTINUEDMEDICATIONS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.DISCONTINUEDMEDICATIONS) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.MEDICATIONCHANGES) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.MEDICATIONCHANGES) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.MEDICATIONSIDEEFFECTS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.MEDICATIONSIDEEFFECTS) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.PREVPSYCHIATRICADMISSIONS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.PREVPSYCHIATRICADMISSIONS) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.PREVSUICIDEATTEMPTS) ? "null" : vmodel.PsyAsmt.PREVSUICIDEATTEMPTS),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.OUTPATIENTPSYCHIATRICCAREYEARS) ? "null" : vmodel.PsyAsmt.OUTPATIENTPSYCHIATRICCAREYEARS),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.PREVDRUGDEPENDENCE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.PREVDRUGDEPENDENCE) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.CURRENTDRUGDEPENDENCE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CURRENTDRUGDEPENDENCE) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.YEARSOFDRUGUSE) ? "null" : vmodel.PsyAsmt.YEARSOFDRUGUSE),
-                    (vmodel.PsyAsmt.DATEOFLASTDRUGUSE == (DateTime?)null ? "null" : "'" + vmodel.PsyAsmt.DATEOFLASTDRUGUSE.Value.ToShortDateString() + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.MEDICATIONALLERGIES) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.MEDICATIONALLERGIES) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.HOSPITALIZATIONS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HOSPITALIZATIONS) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.SURGERIES) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.SURGERIES) + "'"), HeadTraumaHistory,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.HISTORYHEADTRAUMANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISTORYHEADTRAUMANOTE) + "'"),
-                    StrokeHistory, (string.IsNullOrEmpty(vmodel.PsyAsmt.HISTORYSTROKENOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISTORYSTROKENOTE) + "'"),
-                    LossConsciousnessHistory,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.HISTORYLOSSCONSCIOUSNESSNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISTORYLOSSCONSCIOUSNESSNOTE) + "'"),
-                    SpinalCordInjuries,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.SPINALCORDINJURIESNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.SPINALCORDINJURIESNOTE) + "'"),
-                    SkeletalFracturesOrBrakes,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.SKELETALFRACTURESBRAKESNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.SKELETALFRACTURESBRAKESNOTE) + "'"),
-                    MVA, (string.IsNullOrEmpty(vmodel.PsyAsmt.MVANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.MVANOTE) + "'"), GunshotWounds,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.GUNSHOTWOUNDSNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.GUNSHOTWOUNDSNOTE) + "'"), SeizuresHistory,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.HISTORYOFSEIZURESNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISTORYOFSEIZURESNOTE) + "'"),
-                    MigraineHAHistory,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.HISTORYMIGRAINEHANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISTORYMIGRAINEHANOTE) + "'"), HeartDisease,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.HEARTDISEASENOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HEARTDISEASENOTE) + "'"), Asthma,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.ASTHMANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.ASTHMANOTE) + "'"), COPD,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.COPDNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.COPDNOTE) + "'"), Diabetes,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.DIABETESNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.DIABETESNOTE) + "'"), Hyperlipidemia,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.HYPERLIPIDEMIANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HYPERLIPIDEMIANOTE) + "'"), Hypertension,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.HYPERTENSIONNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HYPERTENSIONNOTE) + "'"), Hepatitis,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.HEPATITISNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HEPATITISNOTE) + "'"), VDOrHIV,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.VDHIVNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.VDHIVNOTE) + "'"), Anemia,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.ANEMIANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.ANEMIANOTE) + "'"), ThyroidAbnormalities,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.THYROIDABNORMALITIESNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.THYROIDABNORMALITIESNOTE) + "'"),
-                    Glaucoma, (string.IsNullOrEmpty(vmodel.PsyAsmt.GLAUCOMANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.GLAUCOMANOTE) + "'"), AbnormalLabResults,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.ABNORMALLABRESULTSNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.ABNORMALLABRESULTSNOTE) + "'"), AbnormalEKG,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.ABNORMALEKGNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.ABNORMALEKGNOTE) + "'"), CurrPregnancy,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.CURRENTPREGNANCYNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CURRENTPREGNANCYNOTE) + "'"), PriapismHistory,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.HISTORYPRIAPISMNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISTORYPRIAPISMNOTE) + "'"), OtherChronicMediIll,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.OTHERCHRONICMEDICALILLNESSNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.OTHERCHRONICMEDICALILLNESSNOTE) + "'"), (vmodel.PsyAsmt.NUMBERPREGNANCIES == 0 ? "null" : vmodel.PsyAsmt.NUMBERPREGNANCIES.ToString()),
-                    (vmodel.PsyAsmt.NUMBERDELIVERIES == 0 ? "null" : vmodel.PsyAsmt.NUMBERDELIVERIES.ToString()),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.CURRENTHOUSING) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CURRENTHOUSING) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.SUPPORTIVERELATIONSHIPS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.SUPPORTIVERELATIONSHIPS) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.CURRENTEMPLOYMENT) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CURRENTEMPLOYMENT) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.LASTEMPLOYED) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.LASTEMPLOYED) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.HIGHESTGRADECOMPLETED) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HIGHESTGRADECOMPLETED) + "'"), IdentifyLearnDisablity,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.IDENTIFIEDLEARNINGDISABILITYNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.IDENTIFIEDLEARNINGDISABILITYNOTE) + "'"),
-                    IntellectualImpairment, (string.IsNullOrEmpty(vmodel.PsyAsmt.INTELLECTUALIMPAIRMENT) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.INTELLECTUALIMPAIRMENT) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.HISOTRYINCARCERATION) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISOTRYINCARCERATION) + "'"), Appearance,
-                    PsychomotorActivity, AbnormalInvoluntaryMovement,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.DISTRACTIBILITY) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.DISTRACTIBILITY) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.IMPULSIVITY) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.IMPULSIVITY) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.CONCENTRATION) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CONCENTRATION) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.MEMORYREGISTRATION) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.MEMORYREGISTRATION) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.ANXIETYLEVEL) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.ANXIETYLEVEL) + "'"), ChildhoodMemo,
-                    AdultMemPrevTraumatic, RptIntentPsyReactTrauMemo, RptAvoidSAWTrauMemo, RptFlashTrauMemo, RptRecurrDistressNMTrau,
-                    ObsessionsCompulsions, AppearsRespInternStimulus, Anhedonia, SLArticulation, SLRate, SLRhythm,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.MOOD) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.MOOD) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.EUPHORIA) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.EUPHORIA) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.DEMEANOR) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.DEMEANOR) + "'"), Sleep,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.PERIODSTIMETOOENERGIZEDTOSLEEP) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.PERIODSTIMETOOENERGIZEDTOSLEEP) + "'"), (string.IsNullOrEmpty(vmodel.PsyAsmt.APPETITE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.APPETITE) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.ENERGYLEVEL) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.ENERGYLEVEL) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.LIBIDO) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.LIBIDO) + "'"), Irritability, RangeAffect,
-                    AppropriateContentSpeech, MoodCongruent, HomicidalIdeationPlanOrUntent, SuicidalIdeation, SuicidalPlan, SuicidalIntent,
-                    VisualHallucinations, AuditoryHallucinations, Insight, "null", ThoughtProcesses, RacingThoughts,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.DELUSIONS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.DELUSIONS) + "'"), GuardSuspicious, HyperVigilant,
-                    Preoccupation, (string.IsNullOrEmpty(vmodel.PsyAsmt.JUDGEMENT) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.JUDGEMENT) + "'"), ExaggPsySymptoms,
-                    "'" + medSym + "'", "'" + func + "'", "'" + recmd + "'", "'" + labs + "'",
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.LABSREQUESTEDOTHERNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.LABSREQUESTEDOTHERNOTE) + "'"), RTC,
-                    (vmodel.PsyAsmt.RTCAMOUNTWEEKS > 0 ? vmodel.PsyAsmt.RTCAMOUNTWEEKS.ToString() : "null"), "'" + discussed + "'",
-                    CurrentUser.UserID.ToString(), (vmodel.PsyAsmt.MMAID > 0 ? "2" : "1"), SexPreferenceGender,
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.SEXPREFERENCENOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.SEXPREFERENCENOTE) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.CURRENTMEDICATIONS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CURRENTMEDICATIONS) + "'"),
-                    (string.IsNullOrEmpty(vmodel.PsyAsmt.PREVIOUSPSYCHIATRICMEDICATIONS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.PREVIOUSPSYCHIATRICMEDICATIONS) + "'"), CurrentUser.UserID.ToString());
+        vmodel.EpisodeId, (string.IsNullOrEmpty(vmodel.PsyAsmt.WEIGHT) ? "null" : vmodel.PsyAsmt.WEIGHT), 
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.CHIEFCOMPLAINT) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CHIEFCOMPLAINT) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.DISCONTINUEDMEDICATIONS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.DISCONTINUEDMEDICATIONS) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.MEDICATIONCHANGES) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.MEDICATIONCHANGES) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.MEDICATIONSIDEEFFECTS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.MEDICATIONSIDEEFFECTS) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.PREVPSYCHIATRICADMISSIONS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.PREVPSYCHIATRICADMISSIONS) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.PREVSUICIDEATTEMPTS) ? "null" : vmodel.PsyAsmt.PREVSUICIDEATTEMPTS),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.OUTPATIENTPSYCHIATRICCAREYEARS) ? "null" : vmodel.PsyAsmt.OUTPATIENTPSYCHIATRICCAREYEARS),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.PREVDRUGDEPENDENCE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.PREVDRUGDEPENDENCE) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.CURRENTDRUGDEPENDENCE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CURRENTDRUGDEPENDENCE) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.YEARSOFDRUGUSE) ? "null" : vmodel.PsyAsmt.YEARSOFDRUGUSE),
+        (vmodel.PsyAsmt.DATEOFLASTDRUGUSE ==(DateTime?)null ? "null" : "'" + vmodel.PsyAsmt.DATEOFLASTDRUGUSE.Value.ToShortDateString() + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.MEDICATIONALLERGIES) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.MEDICATIONALLERGIES) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.HOSPITALIZATIONS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HOSPITALIZATIONS) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.SURGERIES) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.SURGERIES) + "'"), HeadTraumaHistory,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.HISTORYHEADTRAUMANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISTORYHEADTRAUMANOTE) + "'"),
+        StrokeHistory, (string.IsNullOrEmpty(vmodel.PsyAsmt.HISTORYSTROKENOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISTORYSTROKENOTE) + "'"),
+        LossConsciousnessHistory, 
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.HISTORYLOSSCONSCIOUSNESSNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISTORYLOSSCONSCIOUSNESSNOTE) + "'"),
+        SpinalCordInjuries, 
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.SPINALCORDINJURIESNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.SPINALCORDINJURIESNOTE) + "'"),
+        SkeletalFracturesOrBrakes,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.SKELETALFRACTURESBRAKESNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.SKELETALFRACTURESBRAKESNOTE) + "'"),
+        MVA, (string.IsNullOrEmpty(vmodel.PsyAsmt.MVANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.MVANOTE) + "'"), GunshotWounds,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.GUNSHOTWOUNDSNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.GUNSHOTWOUNDSNOTE) + "'"), SeizuresHistory,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.HISTORYOFSEIZURESNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISTORYOFSEIZURESNOTE) + "'"), 
+        MigraineHAHistory,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.HISTORYMIGRAINEHANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISTORYMIGRAINEHANOTE) + "'"), HeartDisease,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.HEARTDISEASENOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HEARTDISEASENOTE) + "'"), Asthma,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.ASTHMANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.ASTHMANOTE) + "'"), COPD,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.COPDNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.COPDNOTE) + "'"), Diabetes,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.DIABETESNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.DIABETESNOTE) + "'"), Hyperlipidemia,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.HYPERLIPIDEMIANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HYPERLIPIDEMIANOTE) + "'"), Hypertension,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.HYPERTENSIONNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HYPERTENSIONNOTE) + "'"), Hepatitis,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.HEPATITISNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HEPATITISNOTE) + "'"), VDOrHIV,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.VDHIVNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.VDHIVNOTE) + "'"), Anemia,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.ANEMIANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.ANEMIANOTE) + "'"), ThyroidAbnormalities,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.THYROIDABNORMALITIESNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.THYROIDABNORMALITIESNOTE) + "'"),
+        Glaucoma,(string.IsNullOrEmpty(vmodel.PsyAsmt.GLAUCOMANOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.GLAUCOMANOTE) + "'"), AbnormalLabResults,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.ABNORMALLABRESULTSNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.ABNORMALLABRESULTSNOTE) + "'"), AbnormalEKG,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.ABNORMALEKGNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.ABNORMALEKGNOTE) + "'"), CurrPregnancy,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.CURRENTPREGNANCYNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CURRENTPREGNANCYNOTE) + "'"), PriapismHistory,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.HISTORYPRIAPISMNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISTORYPRIAPISMNOTE) + "'"), OtherChronicMediIll,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.OTHERCHRONICMEDICALILLNESSNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.OTHERCHRONICMEDICALILLNESSNOTE) + "'"),(vmodel.PsyAsmt.NUMBERPREGNANCIES == 0 ? "null" : vmodel.PsyAsmt.NUMBERPREGNANCIES.ToString()),
+        (vmodel.PsyAsmt.NUMBERDELIVERIES == 0 ? "null" : vmodel.PsyAsmt.NUMBERDELIVERIES.ToString()),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.CURRENTHOUSING) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CURRENTHOUSING) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.SUPPORTIVERELATIONSHIPS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.SUPPORTIVERELATIONSHIPS) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.CURRENTEMPLOYMENT) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CURRENTEMPLOYMENT) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.LASTEMPLOYED) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.LASTEMPLOYED) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.HIGHESTGRADECOMPLETED) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HIGHESTGRADECOMPLETED) + "'"), IdentifyLearnDisablity,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.IDENTIFIEDLEARNINGDISABILITYNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.IDENTIFIEDLEARNINGDISABILITYNOTE) + "'"),
+        IntellectualImpairment,(string.IsNullOrEmpty(vmodel.PsyAsmt.INTELLECTUALIMPAIRMENT) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.INTELLECTUALIMPAIRMENT) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.HISOTRYINCARCERATION) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.HISOTRYINCARCERATION) + "'"), Appearance,
+        PsychomotorActivity, AbnormalInvoluntaryMovement,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.DISTRACTIBILITY) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.DISTRACTIBILITY) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.IMPULSIVITY) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.IMPULSIVITY) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.CONCENTRATION) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CONCENTRATION) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.MEMORYREGISTRATION) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.MEMORYREGISTRATION) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.ANXIETYLEVEL) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.ANXIETYLEVEL) + "'"), ChildhoodMemo, 
+        AdultMemPrevTraumatic, RptIntentPsyReactTrauMemo, RptAvoidSAWTrauMemo, RptFlashTrauMemo, RptRecurrDistressNMTrau,
+        ObsessionsCompulsions, AppearsRespInternStimulus, Anhedonia, SLArticulation, SLRate, SLRhythm,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.MOOD) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.MOOD) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.EUPHORIA) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.EUPHORIA) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.DEMEANOR) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.DEMEANOR) + "'"), Sleep,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.PERIODSTIMETOOENERGIZEDTOSLEEP) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.PERIODSTIMETOOENERGIZEDTOSLEEP) + "'"),(string.IsNullOrEmpty(vmodel.PsyAsmt.APPETITE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.APPETITE) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.ENERGYLEVEL) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.ENERGYLEVEL) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.LIBIDO) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.LIBIDO) + "'"), Irritability, RangeAffect,
+        AppropriateContentSpeech, MoodCongruent, HomicidalIdeationPlanOrUntent, SuicidalIdeation, SuicidalPlan, SuicidalIntent,
+        VisualHallucinations, AuditoryHallucinations, Insight,"null", ThoughtProcesses, RacingThoughts,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.DELUSIONS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.DELUSIONS) + "'"), GuardSuspicious, HyperVigilant,
+        Preoccupation, (string.IsNullOrEmpty(vmodel.PsyAsmt.JUDGEMENT) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.JUDGEMENT) + "'"), ExaggPsySymptoms,
+        "'" + medSym + "'", "'" + func + "'", "'" + recmd + "'", "'" + labs + "'",
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.LABSREQUESTEDOTHERNOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.LABSREQUESTEDOTHERNOTE) + "'"), RTC,
+        (vmodel.PsyAsmt.RTCAMOUNTWEEKS > 0 ? vmodel.PsyAsmt.RTCAMOUNTWEEKS.ToString() : "null"),"'" + discussed + "'",
+        CurrentUser.UserID.ToString(), (vmodel.PsyAsmt.MMAID > 0 ? "2" : "1"), SexPreferenceGender,
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.SEXPREFERENCENOTE) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.SEXPREFERENCENOTE) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.CURRENTMEDICATIONS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.CURRENTMEDICATIONS) + "'"),
+        (string.IsNullOrEmpty(vmodel.PsyAsmt.PREVIOUSPSYCHIATRICMEDICATIONS) ? "null" : "'" + RemoveUnprintableChars(vmodel.PsyAsmt.PREVIOUSPSYCHIATRICMEDICATIONS) + "'"), CurrentUser.UserID.ToString());
                 SaveQueryToFile(query);
                 var result = SqlHelper.ExecuteCommand(query);
-
-                return RedirectToAction("GetPsychiatry", new
+                
+               return RedirectToAction("GetPsychiatry", new
                 { EpisodeId = vmodel.EpisodeId, ActiveTab = "mma" });
             }
             return null;
         }
-        private void SaveQueryToFile(string query)
+        private void SaveQueryToFile(string  query)
         {
             string logDir = WebConfigurationManager.AppSettings["ErrorLogDir"].ToString();
             if (string.IsNullOrEmpty(logDir))
@@ -2915,7 +2854,7 @@ END", EpisodeId);
                 EpisodeId = EpisodeId,
                 CanEdit = this.CanEditClient,
                 SelectedStaffId = CurrentUser.UserID.ToString(),
-                ActiveTabIn = ActiveTabIn,
+                ActiveTabIn = ActiveTabIn,   
             });
         }
         public ActionResult GetEvaluationHis(int EpisodeId)
@@ -2931,10 +2870,10 @@ END", EpisodeId);
             return Json(evlHis.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
         public ActionResult GetEvaluationItems(int EpisodeId, int EvaluationID)
-        {
+        {       
             var dataSet = GetEvaluationItemList(EpisodeId, EvaluationID);
             var firstEvl = dataSet.FirstOrDefault();
-            string selectedPsychiatrist = firstEvl.EvaluatedBy > 0 ? firstEvl.EvaluatedBy.ToString() : CurrentUser.UserID.ToString();
+            string selectedPsychiatrist = firstEvl.EvaluatedBy > 0 ?  firstEvl.EvaluatedBy.ToString() : CurrentUser.UserID.ToString();
             DateTime selectedEvaluationdate = firstEvl.EvaluationDate == null ? DateTime.Now : firstEvl.EvaluationDate;
             return PartialView("_EvaluationEditor", new EvaluationViewModel
             {
@@ -2958,7 +2897,7 @@ END", EpisodeId);
                 new ParameterInfo { ParameterName= "EpisodeID" , ParameterValue = EpisodeID },
                 new ParameterInfo { ParameterName= "EvaluationID" , ParameterValue = EvaluationID } };
             var results = SqlHelper.GetRecords<EvaluationData>("spGetEpisodeEvaluation", parms);
-
+            
             return results;
         }
         public JsonResult GetEvlDateList(int EpisodeId)
@@ -2978,22 +2917,22 @@ END", EpisodeId);
         }
         public ActionResult SaveEvaluation(EvaluationViewModel evaluation)
         {
-
-            if (ModelState.IsValid)
+           
+           if (ModelState.IsValid)
             {
                 var inital = evaluation.Evaluations[0].IsInitial ? 1 : 0;
                 var guid = (inital == 0 ? evaluation.Evaluations[0].EvaluationGUID : Guid.NewGuid().ToString());
                 var userid = evaluation.SelectedStaffId;
                 var query = string.Format(@" DECLARE @EpisodeID int = {0} DECLARE @evlID int = 0  DECLARE @evlDate DateTime = GetDate() DECLARE @status int = 1 
                                              DECLARE @initial bit = {1} IF (SELECT ISNULL(EvaluationID, 0) FROM EpisodeTrace WHERE EpisodeID = @EpisodeID) > 0 
-                                               BEGIN IF @initial = 1  SET @status = 3 ELSE SET @status = 2 END ", evaluation.EpisodeId, inital);
+                                               BEGIN IF @initial = 1  SET @status = 3 ELSE SET @status = 2 END ",evaluation.EpisodeId, inital);
 
                 foreach (var item in evaluation.Evaluations)
                 {
                     var query1 = string.Format(@" INSERT INTO [dbo].[EpisodeEvaluation]([EpisodeEvaluationGUID],[EpisodeID],[EvaluationItemId],[EvaluationNote],
                                                [EvaluatedBy],[ActionStatus],[ActionBy],[DateAction]) VALUES ({4},@EpisodeID, {0},{1},{2},@status,{3}, @evlDate) ",
                      item.EvaluationItemID, string.IsNullOrEmpty(item.EvaluationItemNote) ? "null" : "'" + RemoveUnprintableChars(item.EvaluationItemNote) + "'",
-                     (string.IsNullOrEmpty(userid) ? CurrentUser.UserID.ToString() : userid), CurrentUser.UserID, "'" + guid + "'");
+                     (string.IsNullOrEmpty(userid) ?  CurrentUser.UserID.ToString() : userid), CurrentUser.UserID, "'" + guid + "'");
                     query = query + query1;
                     if (item.EvaluationItemID == 1)
                     {
@@ -3035,17 +2974,17 @@ END", EpisodeId);
             return Json(docs.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 
-        private List<LegalDocumentData> GetLegalDocumentList(int EpisodeId, int DocId)
+        private List<LegalDocumentData>GetLegalDocumentList(int EpisodeId, int DocId)
         {
             var Parms = new List<ParameterInfo> {
                 new ParameterInfo { ParameterName="EpisodeID", ParameterValue=EpisodeId },
                 new ParameterInfo { ParameterName="DocID", ParameterValue=DocId }
-            };
+            };          
             return SqlHelper.GetRecords<LegalDocumentData>("spGetEpisodeLegalDoc", Parms);
-        }
+        }            
         public LegalDocumentData GetSelectedData(int EpisodeID, int DocId)
         {
-            return GetLegalDocumentList(EpisodeID, DocId).FirstOrDefault();
+             return GetLegalDocumentList(EpisodeID, DocId).FirstOrDefault();
         }
         public ActionResult GetLegalDocumentCheckList(int EpisodeId, int DocId)
         {
@@ -3055,8 +2994,8 @@ END", EpisodeId);
                 docData = legalDocumentDataSet.Where(x => x.Id == DocId).FirstOrDefault();
             }
             else
-                docData = legalDocumentDataSet.Where(x => x.IsLastOne == true).FirstOrDefault();
-
+                docData = legalDocumentDataSet.Where(x=>x.IsLastOne == true).FirstOrDefault();
+           
             return PartialView("_LegalDocumentCheckList", new LegalDocumentViewModel { CanEdit = this.CanEditClient, EpisodeId = EpisodeId, legDoc = docData });
         }
         public void DeleteLegalDocument(int EpisodeId, int DocId)
@@ -3072,7 +3011,7 @@ END", EpisodeId);
                        END", EpisodeId, DocId);
                 var result = SqlHelper.ExecuteCommand(query);
             }
-            return;
+             return;
         }
         public ActionResult SaveLegalDocument(LegalDocumentViewModel lgDocument)
         {
@@ -3080,9 +3019,9 @@ END", EpisodeId);
             {
                 var query = string.Format(@" DECLARE @EpisodeID int = {0} DECLARE @status int = 1 IF (SELECT ISNULl(LegalDocID, 0) FROM dbo.EpisodeTrace Where EpisodeID ={0}) > 0 SET @status = 2 INSERT INTO dbo.LegalDocument ([EpisodeId],[ReleaseInformationsNote],[ReleaseTo],[ReleaseFrom],[OtherDdesc]
            ,[DateReleaseInfoExpiration],[DateNoticePrivacyPractice],[DateInformedConcentForTreatment],[DateOther]
-           ,[ActionBy],[ActionStatus],[DateAction]) VALUES({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},@status,GetDate()) Update dbo.EpisodeTrace SET LegalDocID = @@IDENTITY WHERE EpisodeID = @EpisodeID ", lgDocument.EpisodeId,
+           ,[ActionBy],[ActionStatus],[DateAction]) VALUES({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},@status,GetDate()) Update dbo.EpisodeTrace SET LegalDocID = @@IDENTITY WHERE EpisodeID = @EpisodeID ", lgDocument.EpisodeId, 
            (string.IsNullOrEmpty(lgDocument.legDoc.ReleaseInformationsNote) ? "null" : "'" + RemoveUnprintableChars(lgDocument.legDoc.ReleaseInformationsNote) + "'"),
-           (string.IsNullOrEmpty(lgDocument.legDoc.ReleaseTo) ? "null" : "'" + RemoveUnprintableChars(lgDocument.legDoc.ReleaseTo) + "'"),
+           (string.IsNullOrEmpty(lgDocument.legDoc.ReleaseTo) ? "null": "'" + RemoveUnprintableChars(lgDocument.legDoc.ReleaseTo) + "'"),
            (string.IsNullOrEmpty(lgDocument.legDoc.ReleaseFrom) ? "null" : "'" + RemoveUnprintableChars(lgDocument.legDoc.ReleaseFrom) + "'"),
            (string.IsNullOrEmpty(lgDocument.legDoc.OtherDdesc) ? "null" : "'" + RemoveUnprintableChars(lgDocument.legDoc.OtherDdesc) + "'"),
            (lgDocument.legDoc.DateReleaseInfoExpiration == (DateTime?)null ? "null" : "'" + lgDocument.legDoc.DateReleaseInfoExpiration + "'"),
@@ -3099,9 +3038,9 @@ END", EpisodeId);
                 });
             }
             else
-                //lgDocument.data.Failed = true;
+            //lgDocument.data.Failed = true;
 
-                return PartialView("_LegalDocumentCheckList", ModelState);
+            return PartialView("_LegalDocumentCheckList", ModelState);
         }
         #endregion Legal Doc
         #region print
@@ -3134,7 +3073,7 @@ LEFT OUTER JOIN dbo.tlkpCounty t3 ON t1.ReleaseCountyID = t3.CountyID WHERE Epis
                  INNER JOIN dbo.[User] t4 on t2.ActionBy = t4.UserID WHERE t2.EpisodeID = @EpisodeID AND t2.ID = @NoteID", EpisodeId, CaseNoteId);
 
             var cmNote = SqlHelper.ExecuteCommands<CaseNoteInfo>(query).FirstOrDefault();
-
+            
             if (!string.IsNullOrEmpty(cmNote.Note))
             {
                 var charReplacements = new Dictionary<string, string> {
@@ -3171,7 +3110,7 @@ LEFT OUTER JOIN dbo.tlkpCounty t3 ON t1.ReleaseCountyID = t3.CountyID WHERE Epis
                 dictionary.Add("ParoleUnit", queryheader.ParoleUnit);
                 dictionary.Add("CDCRNum", queryheader.CDCRNum);
                 dictionary.Add("ParoleRegion", queryheader.ParoleRegion == "S" ? "Southern" : "Northern");
-                dictionary.Add("ParoleAgent", queryheader.ParoleAgent);
+                dictionary.Add("ParoleAgent", queryheader.ParoleAgent);                
                 dictionary.Add("PrintDate", "Printed at: " + queryheader.PrintDate);
 
                 //get data from IRP
@@ -3205,68 +3144,21 @@ LEFT OUTER JOIN dbo.tlkpCounty t3 ON t1.ReleaseCountyID = t3.CountyID WHERE Epis
             //Response.AppendHeader("Content-Disposition", "inline; filename=ClientCaseIrp.pdf");
             return File(outputStream.ToArray(), "pdf", "ClientCaseIrp.pdf");
         }
-        public ActionResult PrintBHRIRP(int EpisodeId, int IRPID)
-        {
-            var header = GetReportClientInfo(EpisodeId);
-            Dictionary<string, string> dictionary = new Dictionary<string, string>();
-            dictionary.Add("PAROLEENAME", header.PAROLEENAME);
-            dictionary.Add("CDCR#", header.CDCRNum);
-            dictionary.Add("AgentName", header.ParoleAgent);
-            dictionary.Add("Date", header.ReleaseDate.HasValue ? header.ReleaseDate.Value.ToString("MM/dd/yyyy") : "");
-            dictionary.Add("PrintDate", DateTime.Now.ToString("MM/dd/yyyy"));
-
-            var result = GetBHRIRPListData(EpisodeId, IRPID);
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-            BHRIRPData irpData = (BHRIRPData)result[0];
-            var irp1 = serializer.Deserialize<List<BHRIRP>>(irpData.BHRIRPJson);
-            var irp2 = (List<IdentifiedBarriersToIntervention>)result[1];
-            var irp3 = (List<BarrierFrequency>)result[2];
-            
-            var q = from l1 in irp1
-                    join l2 in irp2 on l1.IdentifiedBarriersToInterventionID equals l2.IBTIID into l2g
-                    join l3 in irp3 on l1.BarrierFrequencyID equals l3.BarrFreqID into l3g
-                    from l2 in l2g.DefaultIfEmpty()
-                    from l3 in l3g.DefaultIfEmpty()
-                    select new BHRIRPPDFData
-                    {
-                        NeedId = l1.NeedId.ToString(),
-                        NeedName = l1.NeedName,
-                        NeedLevel = l1.NeedLevel.HasValue ? l1.NeedLevel.Value.ToString() : "",
-                        STGoal = string.IsNullOrEmpty(l1.STGoal) ? "" : l1.STGoal,
-                        PlanedSTIntervention = string.IsNullOrEmpty(l1.PlanedSTIntervention) ? "" : l1.PlanedSTIntervention,
-                        STGoalMetDate = l1.STGoalMetDate.HasValue ? l1.STGoalMetDate.Value.Date.ToString() : "",
-                        ReadingForCharge = l1.ReadingForCharge.HasValue ? l1.ReadingForCharge.Value.ToString() : "",
-                        LTGoal = string.IsNullOrEmpty(l1.LTGoal) ? "" : l1.LTGoal,
-                        PlanedLTIntervention = string.IsNullOrEmpty(l1.PlanedLTIntervention) ? "" : l1.PlanedLTIntervention,
-                        LTGoalMetDate = l1.LTGoalMetDate.HasValue ? l1.LTGoalMetDate.Value.Date.ToString() : "",
-                        IBTIDesc = l1.IdentifiedBarriersToInterventionID.HasValue ? l2.IBTIValue : "",
-                        BarrFreq = l1.BarrierFrequencyID.HasValue ? l3.BarrFreqValue : ""
-                    };
-
-            dictionary.Add("ASSESSMENTDATE", irpData.AssessmentDate.HasValue ? irpData.AssessmentDate.Value.Date.ToString() : "");
-            dictionary.Add("CurrentPhaseStatus", irpData.CurrentPhaseStatus.HasValue ? irpData.CurrentPhaseStatus.Value.ToString() : "");
-            dictionary.Add("AdditionalRemarks", string.IsNullOrEmpty(irpData.AdditionalRemarks) ? "" : irpData.AdditionalRemarks);
-            dictionary.Add("LoginUser", CurrentUser.UserLFI());
-
-            PrintPATSPDF ppdf1 = new PrintPATSPDF();
-            Byte[] bytes = ppdf1.GenerateBHRIRPStream(CurrentUser.UserLFI(), dictionary, q.ToList());
-            return File(bytes, "pdf", "ClientCaseBHRIrp.pdf");
-        }
         //DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult
         public ActionResult PrintDSM5(int EpisodeId, int DSM5ID)
         {
             var header = GetReportClientInfo(EpisodeId);
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
             dictionary.Add("Name", header.PAROLEENAME);
-            dictionary.Add("Age", header.DOB.HasValue ? GetAge(header.DOB.Value).ToString() : "");
-            dictionary.Add("Sex", header.GenderID.ToString());
-            dictionary.Add("Date", header.ReleaseDate.HasValue ? header.ReleaseDate.Value.ToString("MM/dd/yyyy") : "");
+            dictionary.Add("Age",  header.DOB.HasValue ? GetAge(header.DOB.Value).ToString() : "");
+            dictionary.Add("Sex", header.GenderID.ToString() );
+            dictionary.Add("Date", header.ReleaseDate.HasValue  ? header.ReleaseDate.Value.ToString("MM/dd/yyyy") : "");
             dictionary.Add("PrintDate", DateTime.Now.ToString("MM/dd/yyyy"));
 
             var DSM5List = GetDSM5ListData(EpisodeId, DSM5ID).EpisodeDSM5;
 
             dictionary.Add("LoginUser", CurrentUser.UserLFI());
-            
+
             PrintPATSPDF ppdf1 = new PrintPATSPDF();
             Byte[] bytes = ppdf1.GenerateDSM5Stream(CurrentUser.UserLFI(), dictionary, DSM5List);
             return File(bytes, "pdf", "EpisodeDSM5.pdf");
