@@ -11,3 +11,10 @@
 /PATSWebV2/obj/Debug
 /PATSWebV2/Properties/PublishProfiles
 /.vs/PATSWebV2/v14
+/IdentityManagement/obj
+/PATSWebV2/obj/Release/CSAutoParameterize
+/PATSWebV2/obj/Release/Package/PackageTmp
+/PATSWebV2/obj/Release/TransformWebConfig/assist
+/PATSWebV2/obj/Release/TransformWebConfig
+/PATSWebV2/obj/Release/CSAutoParameterize.parameters.xml
+/PATSWebV2/obj/Release/_WPPLastBuildInfo.txt
