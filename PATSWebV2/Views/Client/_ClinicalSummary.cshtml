@@ -45,10 +45,6 @@
          {
             <a href="javascript:printPATSPDF(@Model.EpisodeID, @item.Id, 'DSM-5 Self-Rated Level 1 Cross-Cutting Symptom Measure--Adult')">Print</a>
          }
-         else if (item.DateType == "Needs Assessment" && item.Id > 0)
-         {
-            <a href="javascript:printPATSPDF(@Model.EpisodeID, @item.Id, 'Case Management Re-entry Needs Assessment','color-danger')">Print</a>
-         }
          else if (item.DateType == "MCASR Entered" && item.Id > 0)
          {
             <a href="javascript:printPATSPDF(@Model.EpisodeID, @item.Id, 'Multnomah Community Ability Scale','color-danger')">Print</a>

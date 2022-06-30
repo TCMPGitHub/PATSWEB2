@@ -15,7 +15,7 @@
     @class = "color-danger"
 }))
 {
-    <div id="appointmentdiv" class="color-danger" style="height:100%;width:99.5%;min-width:1500px;">
+    <div id="appointmentdiv" class="color-danger" style="height:100%;width:99.5%;">@*min-width:1500px;*@
         @Html.HiddenFor(m => m.IRP.EpisodeID, new { id = "hdIRPEpisodeID" })
         @Html.HiddenFor(m => m.IRP.CanEditIRP, new { @id = "hdIRPEditable" })
         @Html.HiddenFor(m => m.IRP.IsLastBIRPSet, new { id = "hdIsLastBIRPSet" })
@@ -31,7 +31,7 @@
                         <tr style="line-height: 10px !important;"><td>@Html.Label("INDIVIDUALIZED REINTEGRATION PLAN (IRP)", new { style = "float:left;font-weight:bold;font-size:14px;" })&nbsp;&nbsp;@Model.NoEditAllowed</td></tr>
                         <tr style="line-height: 10px !important;">
                             <td>
-                                @Html.Label("CDCR 2276(11/14)", new { style = "float:left;font-size:12px;" })&nbsp;&nbsp;
+                                @*@Html.Label("CDCR 2276(11/14)", new { style = "float:left;font-size:12px;" })&nbsp;&nbsp;*@
                                 <a style="visibility:@show;" href="javascript:printPATSPDF(@Model.IRP.EpisodeID, @Model.IRP.IRPId, 'BHR INDIVIDUALIZED REINTEGRATION PLAN (IRP)','color-danger')">
                                     <img style="width:22px; height:22px;margin-top:-5px;" title="Print Case IRP" src='@Url.Content("~/Content/images/printer-icon.png")' />
                                 </a>
@@ -121,108 +121,175 @@
         </tr>
     </table><br />
     &nbsp;&nbsp;<B>**Readiness to change codes:</B>  PC – Pre-contemplation; C- Contemplation; P- Preparation; A- Action; M-Maintenance; R- Regress
-    <table id="gird" class="k-grid" style="background-color:white;width:100%;">
-        <tr style="background-color:silver;font-size:small;text-align:center" class="k-grid-header k-header table-bordered">
-            <th rowspan="2" style="text-align:center;width:200px;">PRESENTING NEED</th>
-            <th colspan="3" style="text-align:center;width:135px;">LEVEL OF NEED</th>
-            <th colspan="3" style="text-align:center;width:330px;">Identified High/Urgent Needs Require ST Plan</th>
-            <th rowspan="2" colspan="3" style="text-align:center;width:200px;">READINESS FOR CHANGE**</th>
-            <th colspan="3" style="text-align:center;width:330px;">Identified High/Urgent Needs Require LT Plan</th>
-            <th rowspan="2" style="text-align:center;width:110px;">Identified Barriers to Intervention</th>
-            <th rowspan="2" style="text-align:center;width:110px;">Barrier Frequency</th>
-            @*<th class="col-xs-1" rowspan="2" stylewidth:150px;="text-align:center">STATUS D</th>*@
-        </tr>
-        <tr style="text-align:center; background-color:silver;font-size:small;" class="k-grid-header k-header table-bordered">
-            <th style="width:45px;text-align:center">None</th>
-            <th style="width:45px;text-align:center">Non-Urgent</th>
-            <th style="width:45px;text-align:center">High / Urgent</th>
-            <th style="width:110px!important;text-align:center">Short Term (ST) Goal</th>
-            <th style="width:110px!important;text-align:center">Planned ST Intervention</th>
-            <th style="text-align:center">Date ST Goal Met</th>
-            <th style="width:110px!important;text-align:center">Long Term (LT) Goal</th>
-            <th style="width:110px!important;text-align:center">Planned LT Intervention</th>
-            <th style="text-align:center">Date LT Goal Met</th>
-        </tr>
-        @for (int i = 0; i < Model.IRP.IRPList.Count; i++)
-        {
-            <tr>
-                @Html.HiddenFor(m => m.IRP.IRPList[i].NeedId)
-                @Html.HiddenFor(m => m.IRP.IRPList[i].NeedName)
-                @Html.HiddenFor(m => m.IRP.IRPList[i].NeedLevel, new { @id = "hdNL" + i.ToString() })
-                @Html.HiddenFor(m => m.IRP.IRPList[i].ReadingForCharge, new { @id = "hdRFC" + i.ToString() })
-                @Html.HiddenFor(m => m.IRP.IRPList[i].BarrierFrequencyID, new { @id = "hdBF" + i.ToString() })
-                @Html.HiddenFor(m => m.IRP.IRPList[i].IdentifiedBarriersToInterventionID, new { @id = "hdIBTI" + i.ToString() })
-                <td valign="top" style="line-height:14px;">
-                    <div style="font-size:12px;line-height:14px;">
-                        @Html.Raw(string.Format("<b>{0}.   {1}</b>", Model.IRP.IRPList[i].NeedId, Model.IRP.IRPList[i].NeedName))
-                    </div>
-                </td>
-                <td>@(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].NeedLevel).Checked(Model.IRP.IRPList[i].NeedLevel == 1).HtmlAttributes(new { @style = "text-align:center", @class = "irpneed", @value = "1", @id = "nl" + i.ToString() + "1" }))</td>
-                <td>@(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].NeedLevel).Checked(Model.IRP.IRPList[i].NeedLevel == 2).HtmlAttributes(new { @class = "irpneed", @value = "2", @id = "nl" + i.ToString() + "2" }))</td>
-                <td>@(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].NeedLevel).Checked(Model.IRP.IRPList[i].NeedLevel == 3).HtmlAttributes(new { @class = "irpneed", @value = "3", @id = "nl" + i.ToString() + "3" }))</td>
-                <td style="line-height:14PX;">@Html.TextAreaFor(m => m.IRP.IRPList[i].STGoal, new { @spellcheck = "true", @class = "textareaforcasemanngement", @placeholder = "Short Term Goal ...", @maxLength = "100" })</td>
-                <td style="line-height:14PX;">@Html.TextAreaFor(m => m.IRP.IRPList[i].PlanedSTIntervention, new { @spellcheck = "true", @class = "textareaforcasemanngement", @placeholder = "Planned ST Intervention ...", @maxLength = "100" })</td>
-                <td style="line-height:14PX;">
-                    @(Html.Kendo().DatePickerFor(m => m.IRP.IRPList[i].STGoalMetDate).Format("MM/dd/yyyy").Value(Model.IRP.IRPList[i].STGoalMetDate.HasValue ? Model.IRP.IRPList[i].STGoalMetDate.Value.ToString("MM/dd/yyyy") : null).HtmlAttributes(new
-                   {
-                       @style = "width:120px",
-                       @id = "date-picker-irp-st-" + i.ToString(),
-                       @class = "input-group irpdp"
-                   }))
-                </td>
-                <td style="border-right:none;">
-                    @(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].ReadingForCharge).Checked(Model.IRP.IRPList[i].ReadingForCharge == 1).HtmlAttributes(new { @class = "RFC", id = "RFC1" + i.ToString(), value = "1" }).Label("PC"))<b />
-                @(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].ReadingForCharge).Checked(Model.IRP.IRPList[i].ReadingForCharge == 2).HtmlAttributes(new { @class = "RFC", id = "RFC2" + i.ToString(), value = "2" }).Label("C"))
-            </td>
-            <td style="border-right:none;border-left:none;">
-                @(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].ReadingForCharge).Checked(Model.IRP.IRPList[i].ReadingForCharge == 3).HtmlAttributes(new { @class = "RFC", id = "RFC3" + i.ToString(), value = "3" }).Label("P" + " "))<b />
-            @(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].ReadingForCharge).Checked(Model.IRP.IRPList[i].ReadingForCharge == 4).HtmlAttributes(new { @class = "RFC", id = "RFC4" + i.ToString(), value = "4" }).Label("A"))
-        </td>
-        <td style="border-left:none;">
-            @(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].ReadingForCharge).Checked(Model.IRP.IRPList[i].ReadingForCharge == 5).HtmlAttributes(new { @class = "RFC", id = "RFC5" + i.ToString(), value = "5" }).Label("M"))<b />
-        @(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].ReadingForCharge).Checked(Model.IRP.IRPList[i].ReadingForCharge == 6).HtmlAttributes(new { @class = "RFC", id = "RFC6" + i.ToString(), value = "6" }).Label("R"))
-    </td>
-    <td style="line-height:14PX;">@Html.TextAreaFor(m => m.IRP.IRPList[i].LTGoal, new { @spellcheck = "true", @class = "textareaforcasemanngement", @placeholder = "Long Term Goal ...", @maxLength = "100" })</td>
-    <td style="line-height:14PX;">@Html.TextAreaFor(m => m.IRP.IRPList[i].PlanedLTIntervention, new { @spellcheck = "true", @class = "textareaforcasemanngement", @placeholder = "Planned LT Intervention ...", @maxLength = "100" })</td>
-    <td style="line-height:14PX;">
-        @(Html.Kendo().DatePickerFor(m => m.IRP.IRPList[i].LTGoalMetDate).Format("MM/dd/yyyy").Value(Model.IRP.IRPList[i].LTGoalMetDate.HasValue ? Model.IRP.IRPList[i].LTGoalMetDate.Value.ToString("MM/dd/yyyy") : null).HtmlAttributes(new
-                    {
-                        @style = "width:120px",
-                        @id = "date-picker-irp-lt-" + i.ToString(),
-                        @class = "input-group irpdp"
-                    }))
-    </td>
-    <td style="line-height:14PX;">
-        @(Html.Kendo().DropDownListFor(m => m.IRP.IRPList[i].IdentifiedBarriersToInterventionID)
+        <div id="divBHRIRP" style="overflow-x:auto;">
+            @*<script>
+                function BuildCheckBoxList(obj) {
+                    var result = "";
+                    if (obj != undefined && obj > 0) {
+                       // result = "<table style='width:100%;padding:0px!important;min-height:45px;' class='table table-condensed' >";
+                        //for (var i = 0; i < 6; i++) {
+                            result += kendo.format(
+                                "<table style='width:100%;padding:0px!important;min-height:45px;border:none;' class='table table-condensed' >" +
+                                "<tr><td style='text-align:center;inline-height:12px!important;font-size:14px;border:none;width:30px;'><input type = 'checkbox' id = 'RC1' {0} == 1 ? checked='checked' : 'unchecked' />PC</td>" +
+                                    "<td style='text-align:center;inline-height:12px!important;font-size:14px;border:none;width:30px;'><input type = 'checkbox' id = 'RC2' {0} == 2 ? checked='checked' : 'unchecked' />&nbsp;P</td>" +
+                                    "<td style='text-align:center;inline-height:12px!important;font-size:14px;border:none;width:30px;'><input type = 'checkbox' id = 'RC3' {0} == 3 ? checked='checked' : 'unchecked' />&nbsp;C</td></tr>" +
+                                "<tr><td style='text-align:center;inline-height:12px!important;font-size:14px;border:none;width:30px;'><input type = 'checkbox' id = 'RC4' {0} == 4 ? checked='checked' : 'unchecked' />&nbsp;A</td>" +
+                                    "<td style='text-align:center;inline-height:12px!important;font-size:14px;border:none;width:30px;'><input type = 'checkbox' id = 'RC5' {0} == 5 ? checked='checked' : 'unchecked' />&nbsp;M</td>" +
+                                    "<td style='text-align:center;inline-height:12px!important;font-size:14px;border:none;width:30px;'><input type = 'checkbox' id = 'RC6' {0} == 6 ? checked='checked' : 'unchecked' />&nbsp;R</td></tr></table>", obj)
+                        //}
+                        result += "</table>"
+                    }
+                    return result;
+                }
+
+            </script>*@
+            @*@(Html.Kendo().Grid(Model.IRP.IRPList)
+            .Name("gridBHRIRP").HtmlAttributes(new { style="height:900px;font-size:6px"})
+            .Columns(columns =>
+            {
+                columns.Bound(o => o.NeedId).Hidden(true);
+                columns.Bound(o=>o.NeedName).Title("PRESENTING NEEDS").ClientTemplate("#=displayNeedString(NeedId, NeedName)#"); ;
+                columns.Group(g => g.Title("LEVEL OF NEED").Width(100)
+                .Columns(i => { i.Bound(b => b.NeedLevel).Width(40).Title("None").ClientTemplate("<input type='checkbox' id = 'NeedLevel2' #= NeedLevel# == 2 ? checked='checked' : ''/>");
+                    i.Bound(b => b.NeedLevel).Width(40).Title("Non-Urgent").ClientTemplate("<input type = 'checkbox' id = 'NeedLevel2' #= NeedLevel# == 2 ? checked='checked' : '' />");
+                    i.Bound(b => b.NeedLevel).Width(40).Title("High / Urgent").ClientTemplate("<input type = 'checkbox' id = 'NeedLevel3' #= NeedLevel# ==3 ? checked='checked' : '' />");
+                }));
+                columns.Group(g => g.Title("Identified High/Urgent Needs Require ST Plan")
+                .Columns(i => { i.Bound(b => b.STGoal).Title("Short Term (ST) Goal");
+                    i.Bound(b => b.PlanedSTIntervention).Title("Planned ST Intervention");
+                    i.Bound(b => b.STGoalMetDate).Title("Date ST Goal Met").Format("{0:MM/dd/yyyy}");
+                }));
+                columns.Bound(o => o.ReadingForCharge).Title("READINESS FOR CHANGE**").ClientTemplate("#=BuildCheckBoxList(ReadingForCharge)#").Width(90);
+                columns.Group(g => g.Title("Identified High/Urgent Needs Require LT Plan")
+                 .Columns(i =>
+                 {
+                     i.Bound(b => b.LTGoal).Title("Short Term (LT) Goal");
+                     i.Bound(b => b.PlanedLTIntervention).Title("Planned LT Intervention");
+                     i.Bound(b => b.LTGoalMetDate).Title("Date LT Goal Met").Format("{0:MM/dd/yyyy}");
+                 }));
+                ////columns.Bound(p => p.IdentifiedBarriersToInterventionID).Title("Identified Barriers to Intervention").ClientTemplate("#=BuildNavClientLink(CDCRNum)#").Width(60);
+                ////columns.Bound(p => p.BarrierFrequencyID).Title("Barrier Frequency").Width(150);
+                //columns.ForeignKey (p => p.IdentifiedBarriersToInterventionID, (System.Collections.IEnumerable)Model.IBTIList, "IBTIID", "IBTIValue").Width(80).Title("Identified Barriers to Intervention").Filterable(f => f.Multi(false));
+                //columns.ForeignKey(p => p.BarrierFrequencyID, (System.Collections.IEnumerable)Model.BarrFreqList, "BarrFreqID", "BarrFreqValue").Width(80).Title("Barrier Frequency").Filterable(f => f.Multi(false));
+                //columns.Command(command => { command.Edit().Text("Assign/Unassign"); }).Width(100).Visible(Model.CanEdit);
+            })
+             //.Excel(e => e.FileName("Assignment.xlsx").Filterable(true).ProxyURL(Url.Action("Excel_Export_Save", "Assignment")).AllPages(true).ForceProxy(true))
+             .Resizable(size => size.Columns(true))
+             .Scrollable(s => s.Enabled(true))
+             .BindTo(Model.IRP.IRPList)
+              .DataSource(dataSource => dataSource
+                    .Ajax()
+                 //.PageSize(1)
+                 //.ServerOperation(false)
+                 )
+                        )</div>*@
+
+
+            <table id="gird" class="k-grid" style="background-color:white;width:100%;resize:both;">
+                <tr style="background-color:silver;font-size:small;text-align:center" class="k-grid-header k-header table-bordered">
+                    <th rowspan="2" style="text-align:center;width:150px;">PRESENTING NEED</th>
+                    <th colspan="3" style="text-align:center;width:75px;">LEVEL OF NEED</th>
+                    <th colspan="3" style="text-align:center;width:330px;">Identified High/Urgent Needs Require ST Plan</th>
+                    <th rowspan="2" colspan="3" style="text-align:center;width:90px;">READINESS FOR CHANGE**</th>
+                    <th colspan="3" style="text-align:center;width:330px;">Identified High/Urgent Needs Require LT Plan</th>
+                    <th rowspan="2" style="text-align:center;width:110px;">Identified Barriers to Intervention</th>
+                    <th rowspan="2" style="text-align:center;width:110px;">Barrier Frequency</th>
+                    @*<th class="col-xs-1" rowspan="2" stylewidth:150px;="text-align:center">STATUS D</th>*@
+                </tr>
+                <tr style="text-align:center; background-color:silver;font-size:small;" class="k-grid-header k-header table-bordered">
+                    <th style="width:25px;text-align:center">None</th>
+                    <th style="width:25px;text-align:center">Non-Urgent</th>
+                    <th style="width:25px;text-align:center">High / Urgent</th>
+                    <th style="width:110px!important;text-align:center">Short Term (ST) Goal</th>
+                    <th style="width:110px!important;text-align:center">Planned ST Intervention</th>
+                    <th style="text-align:center;width:110px;">Date ST Goal Met</th>
+                    <th style="width:110px!important;text-align:center">Long Term (LT) Goal</th>
+                    <th style="width:110px!important;text-align:center">Planned LT Intervention</th>
+                    <th style="text-align:center;width:110px;">Date LT Goal Met</th>
+                </tr>
+                @for (int i = 0; i < Model.IRP.IRPList.Count; i++)
+                {
+                    <tr>
+                        @Html.HiddenFor(m => m.IRP.IRPList[i].NeedId)
+                        @Html.HiddenFor(m => m.IRP.IRPList[i].NeedName)
+                        @Html.HiddenFor(m => m.IRP.IRPList[i].NeedLevel, new { @id = "hdNL" + i.ToString() })
+                        @Html.HiddenFor(m => m.IRP.IRPList[i].ReadingForCharge, new { @id = "hdRFC" + i.ToString() })
+                        @Html.HiddenFor(m => m.IRP.IRPList[i].BarrierFrequencyID, new { @id = "hdBF" + i.ToString() })
+                        @Html.HiddenFor(m => m.IRP.IRPList[i].IdentifiedBarriersToInterventionID, new { @id = "hdIBTI" + i.ToString() })
+                        <td valign="top" style="line-height:14px;">
+                            <div style="font-size:12px;line-height:14px;width:150px;">
+                                @Html.Raw(string.Format("<b>{0}.   {1}</b>", Model.IRP.IRPList[i].NeedId, Model.IRP.IRPList[i].NeedName))
+                            </div>
+                        </td>
+                        <td>@(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].NeedLevel).Checked(Model.IRP.IRPList[i].NeedLevel == 1).HtmlAttributes(new { @style = "text-align:center;width:25px;", @class = "irpneed", @value = "1", @id = "nl" + i.ToString() + "1" }))</td>
+                        <td>@(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].NeedLevel).Checked(Model.IRP.IRPList[i].NeedLevel == 2).HtmlAttributes(new { @style = "text-align:center;width:25px;", @class = "irpneed", @value = "2", @id = "nl" + i.ToString() + "2" }))</td>
+                        <td>@(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].NeedLevel).Checked(Model.IRP.IRPList[i].NeedLevel == 3).HtmlAttributes(new { @style = "text-align:center;width:25px;", @class = "irpneed", @value = "3", @id = "nl" + i.ToString() + "3" }))</td>
+                        <td style="line-height:12PX;">@Html.TextAreaFor(m => m.IRP.IRPList[i].STGoal, new { @spellcheck = "true", @class = "textareaforcasemanngement", @placeholder = "Short Term Goal ...", @maxLength = "100" })</td>
+                        <td style="line-height:12PX;">@Html.TextAreaFor(m => m.IRP.IRPList[i].PlanedSTIntervention, new { @spellcheck = "true", @class = "textareaforcasemanngement", @placeholder = "Planned ST Intervention ...", @maxLength = "100" })</td>
+                        <td style="line-height:12PX;width:110px;">
+                            @(Html.Kendo().DatePickerFor(m => m.IRP.IRPList[i].STGoalMetDate).Format("MM/dd/yyyy").Value(Model.IRP.IRPList[i].STGoalMetDate.HasValue ? Model.IRP.IRPList[i].STGoalMetDate.Value.ToString("MM/dd/yyyy") : null).HtmlAttributes(new
+                {
+                    @style = "width:110px",
+                    @id = "date-picker-irp-st-" + i.ToString(),
+                    @class = "input-group irpdp"
+                }))
+                        </td>
+                        <td style="border-right:none;width:25px;">
+                            @(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].ReadingForCharge).Checked(Model.IRP.IRPList[i].ReadingForCharge == 1).HtmlAttributes(new { @class = "RFC", id = "RFC1" + i.ToString(), value = "1" }).Label("PC"))<b />
+                            @(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].ReadingForCharge).Checked(Model.IRP.IRPList[i].ReadingForCharge == 2).HtmlAttributes(new { @class = "RFC", id = "RFC2" + i.ToString(), value = "2" }).Label("C"))
+                        </td>
+                        <td style="border-right:none;border-left:none;width:25px;">
+                            @(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].ReadingForCharge).Checked(Model.IRP.IRPList[i].ReadingForCharge == 3).HtmlAttributes(new { @class = "RFC", id = "RFC3" + i.ToString(), value = "3" }).Label("P" + " "))<b />
+                            @(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].ReadingForCharge).Checked(Model.IRP.IRPList[i].ReadingForCharge == 4).HtmlAttributes(new { @class = "RFC", id = "RFC4" + i.ToString(), value = "4" }).Label("A"))
+                        </td>
+                        <td style="border-left:none;width:25px;">
+                            @(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].ReadingForCharge).Checked(Model.IRP.IRPList[i].ReadingForCharge == 5).HtmlAttributes(new { @class = "RFC", id = "RFC5" + i.ToString(), value = "5" }).Label("M"))<b />
+                            @(Html.Kendo().CheckBoxFor(m => m.IRP.IRPList[i].ReadingForCharge).Checked(Model.IRP.IRPList[i].ReadingForCharge == 6).HtmlAttributes(new { @class = "RFC", id = "RFC6" + i.ToString(), value = "6" }).Label("R"))
+                        </td>
+                        <td style="line-height:14PX;">@Html.TextAreaFor(m => m.IRP.IRPList[i].LTGoal, new { @spellcheck = "true", @class = "textareaforcasemanngement", @placeholder = "Long Term Goal ...", @maxLength = "100" })</td>
+                        <td style="line-height:14PX;">@Html.TextAreaFor(m => m.IRP.IRPList[i].PlanedLTIntervention, new { @spellcheck = "true", @class = "textareaforcasemanngement", @placeholder = "Planned LT Intervention ...", @maxLength = "100" })</td>
+                        <td style="line-height:14PX;width:110px;">
+                            @(Html.Kendo().DatePickerFor(m => m.IRP.IRPList[i].LTGoalMetDate).Format("MM/dd/yyyy").Value(Model.IRP.IRPList[i].LTGoalMetDate.HasValue ? Model.IRP.IRPList[i].LTGoalMetDate.Value.ToString("MM/dd/yyyy") : null).HtmlAttributes(new
+    {
+        @style = "width:110px",
+        @id = "date-picker-irp-lt-" + i.ToString(),
+        @class = "input-group irpdp"
+    }))
+                        </td>
+                        <td style="line-height:12PX;">
+                            @(Html.Kendo().DropDownListFor(m => m.IRP.IRPList[i].IdentifiedBarriersToInterventionID)
                 .Name("IdentifiedBarriersToInterventionId")
-                .OptionLabel("Select BarriersToIntervention...")
+                .OptionLabel("Select Item ...")
                 .DataTextField("IBTIValue")
                 .DataValueField("IBTIID")
-                .HtmlAttributes(new { id = "IBTIID" + i.ToString(), style = "width:120px;text-align:left;" })
+                .HtmlAttributes(new { id = "IBTIID" + i.ToString(), style = "width:200px;text-align:left;font-size:12px;" })
                 .Filter(FilterType.Contains)
                 .Height(290)
                 .Events(e => e.Change("IBTIDateChanged"))
                 .BindTo(Model.IBTIList))
-    </td>
-    <td>
-        @(Html.Kendo().DropDownListFor(m => m.IRP.IRPList[i].BarrierFrequencyID)
+                        </td>
+                        <td>
+                            @(Html.Kendo().DropDownListFor(m => m.IRP.IRPList[i].BarrierFrequencyID)
                 .Name("BarrierFrequency")
-                .OptionLabel("Select Barrier Frequency...")
+                .OptionLabel("Select Item...")
                 .DataTextField("BarrFreqValue")
                 .DataValueField("BarrFreqID")
-                .HtmlAttributes(new { id = "BarrFreqID" + i.ToString(), style = "width:120px;text-align:left;" })
+                .HtmlAttributes(new { id = "BarrFreqID" + i.ToString(), style = "width:80px;text-align:left;font-size:12px;" })
                 .Filter(FilterType.Contains)
                 .Height(290)
                 .Events(e => e.Change("BFDateChanged"))
                 .BindTo(Model.BarrFreqList))
-    </td>
+                        </td>
 
-</tr>
-        }
-    </table><br />
+                    </tr>
+                }
+            </table>
+        </div>
+
+        <br />
     @Html.Label("ADDITIONAL REMARKS:")
     @Html.TextBoxFor(m => m.IRP.AdditionalRemarks, new { @spellcheck = "true", @class = "textareaforcasemanngement", @placeholder = "Additional Remarks ...", @maxLength = "500", style = "height:100px;text-align:left;" }) <br />
-</div>
+
     <br />
         <div class="padded aligncenter form-actions" id="caseBHRIRPButtonDiv">
             @if (Model.IRP.CanEditIRP)
@@ -239,7 +306,7 @@
             }
         </div>
             <br />
-            @*</div>*@
+            </div>
             }
 <script type="text/javascript">
     function BHRIRPButtonDisable(disabled) {
@@ -354,11 +421,4 @@
             document.getElementById("bfrirpform").reset();
             BHRIRPButtonDisable(true);
         })
-</script>
-
-
-
-
-
-
-
+</script> 

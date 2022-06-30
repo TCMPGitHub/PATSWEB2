@@ -151,9 +151,9 @@ namespace Telerik.Reporting.Pats.Reports
             // cDCRNumDataTextBox
             // 
             this.cDCRNumDataTextBox.CanGrow = true;
-            this.cDCRNumDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0.052D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.cDCRNumDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0.156D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.cDCRNumDataTextBox.Name = "cDCRNumDataTextBox";
-            this.cDCRNumDataTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.653D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.cDCRNumDataTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.611D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.cDCRNumDataTextBox.Style.Font.Name = "Tahoma";
             this.cDCRNumDataTextBox.StyleName = "Data";
             this.cDCRNumDataTextBox.Value = "= Fields.CDCRNo";
@@ -185,7 +185,7 @@ namespace Telerik.Reporting.Pats.Reports
             this.textBox7.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(7.014D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.textBox7.Multiline = true;
             this.textBox7.Name = "textBox7";
-            this.textBox7.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.315D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.textBox7.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.607D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox7.Style.Font.Name = "Tahoma";
             this.textBox7.StyleName = "Data";
             this.textBox7.Value = "= Fields.ApptType";
@@ -205,22 +205,22 @@ namespace Telerik.Reporting.Pats.Reports
             formattingRule1.Filters.Add(new Telerik.Reporting.Filter("=IIF(Fields.Followup=\'\"\"\', True, False)", Telerik.Reporting.FilterOperator.Equal, null));
             this.textBox12.ConditionalFormatting.AddRange(new Telerik.Reporting.Drawing.FormattingRule[] {
             formattingRule1});
-            this.textBox12.Format = "{0:g}";
-            this.textBox12.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(10.059D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.textBox12.Format = "";
+            this.textBox12.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(10.399D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.textBox12.Multiline = true;
             this.textBox12.Name = "textBox12";
-            this.textBox12.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.883D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.textBox12.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.543D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox12.Style.Font.Name = "Tahoma";
             this.textBox12.StyleName = "Data";
-            this.textBox12.Value = "=IIF(Len(Fields.Followup) < 5, \'\', Format(\'{0:g}\',Substr(Fields.Followup,1,16)))";
+            this.textBox12.Value = "= Fields.Followup";
             // 
             // textBox9
             // 
             this.textBox9.Format = "{0:g}";
-            this.textBox9.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(8.417D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.textBox9.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(8.775D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.textBox9.Multiline = true;
             this.textBox9.Name = "textBox9";
-            this.textBox9.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.565D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.textBox9.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.506D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox9.Style.Font.Name = "Tahoma";
             this.textBox9.StyleName = "Data";
             this.textBox9.Value = "= Fields.Outcome";
@@ -250,7 +250,7 @@ namespace Telerik.Reporting.Pats.Reports
             // textBox16
             // 
             this.textBox16.CanGrow = true;
-            this.textBox16.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(10.049D), Telerik.Reporting.Drawing.Unit.Inch(1.253D));
+            this.textBox16.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(10.399D), Telerik.Reporting.Drawing.Unit.Inch(1.253D));
             this.textBox16.Name = "textBox16";
             this.textBox16.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.156D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox16.Style.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(144)))), ((int)(((byte)(229)))));
@@ -264,9 +264,9 @@ namespace Telerik.Reporting.Pats.Reports
             // textBox15
             // 
             this.textBox15.CanGrow = true;
-            this.textBox15.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(8.476D), Telerik.Reporting.Drawing.Unit.Inch(1.259D));
+            this.textBox15.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(8.775D), Telerik.Reporting.Drawing.Unit.Inch(1.253D));
             this.textBox15.Name = "textBox15";
-            this.textBox15.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.111D), Telerik.Reporting.Drawing.Unit.Inch(0.194D));
+            this.textBox15.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.048D), Telerik.Reporting.Drawing.Unit.Inch(0.194D));
             this.textBox15.Style.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(144)))), ((int)(((byte)(229)))));
             this.textBox15.Style.Color = System.Drawing.Color.White;
             this.textBox15.Style.Font.Name = "Tahoma";
@@ -403,9 +403,9 @@ namespace Telerik.Reporting.Pats.Reports
             // textBox13
             // 
             this.textBox13.CanGrow = true;
-            this.textBox13.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0.052D), Telerik.Reporting.Drawing.Unit.Inch(1.253D));
+            this.textBox13.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0.156D), Telerik.Reporting.Drawing.Unit.Inch(1.253D));
             this.textBox13.Name = "textBox13";
-            this.textBox13.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.538D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.textBox13.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.434D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox13.Style.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(144)))), ((int)(((byte)(229)))));
             this.textBox13.Style.Color = System.Drawing.Color.White;
             this.textBox13.Style.Font.Name = "Tahoma";

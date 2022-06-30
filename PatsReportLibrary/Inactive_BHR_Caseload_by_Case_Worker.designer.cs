@@ -14,7 +14,6 @@ namespace Telerik.Reporting.Pats.Reports
             Telerik.Reporting.PictureBox pictureBox2;
             Telerik.Reporting.Group group1 = new Telerik.Reporting.Group();
             Telerik.Reporting.Group group2 = new Telerik.Reporting.Group();
-            Telerik.Reporting.Group group3 = new Telerik.Reporting.Group();
             Telerik.Reporting.ReportParameter reportParameter1 = new Telerik.Reporting.ReportParameter();
             Telerik.Reporting.ReportParameter reportParameter2 = new Telerik.Reporting.ReportParameter();
             Telerik.Reporting.ReportParameter reportParameter3 = new Telerik.Reporting.ReportParameter();
@@ -39,10 +38,6 @@ namespace Telerik.Reporting.Pats.Reports
             this.groupHeaderSection = new Telerik.Reporting.GroupHeaderSection();
             this.textBox5 = new Telerik.Reporting.TextBox();
             this.textBox8 = new Telerik.Reporting.TextBox();
-            this.locationGroupFooterSection = new Telerik.Reporting.GroupFooterSection();
-            this.locationGroupHeaderSection = new Telerik.Reporting.GroupHeaderSection();
-            this.textBox1 = new Telerik.Reporting.TextBox();
-            this.textBox6 = new Telerik.Reporting.TextBox();
             this.sqlDataSourceWorkerType = new Telerik.Reporting.SqlDataSource();
             this.sqlDataSourceCaseWorker = new Telerik.Reporting.SqlDataSource();
             this.pageHeader = new Telerik.Reporting.PageHeaderSection();
@@ -103,12 +98,12 @@ namespace Telerik.Reporting.Pats.Reports
             this.labelsGroupHeaderSection.Items.AddRange(new Telerik.Reporting.ReportItemBase[] {
             this.lastAppointmentNotPresentCaptionTextBox,
             this.nextPlannedAppointmentCaptionTextBox,
-            this.totalAppointmentNoOutcomeCaptionTextBox,
             this.lastAppointmentPresentCaptionTextBox,
             this.textBox13,
             this.textBox15,
             this.textBox16,
-            this.textBox14});
+            this.textBox14,
+            this.totalAppointmentNoOutcomeCaptionTextBox});
             this.labelsGroupHeaderSection.Name = "labelsGroupHeaderSection";
             this.labelsGroupHeaderSection.PrintOnEveryPage = true;
             this.labelsGroupHeaderSection.Style.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(18)))), ((int)(((byte)(149)))), ((int)(((byte)(216)))));
@@ -116,9 +111,9 @@ namespace Telerik.Reporting.Pats.Reports
             // lastAppointmentNotPresentCaptionTextBox
             // 
             this.lastAppointmentNotPresentCaptionTextBox.CanGrow = true;
-            this.lastAppointmentNotPresentCaptionTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(6.423D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.lastAppointmentNotPresentCaptionTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(7.09D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.lastAppointmentNotPresentCaptionTextBox.Name = "lastAppointmentNotPresentCaptionTextBox";
-            this.lastAppointmentNotPresentCaptionTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.5D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.lastAppointmentNotPresentCaptionTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.25D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.lastAppointmentNotPresentCaptionTextBox.Style.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(144)))), ((int)(((byte)(229)))));
             this.lastAppointmentNotPresentCaptionTextBox.Style.Color = System.Drawing.Color.White;
             this.lastAppointmentNotPresentCaptionTextBox.Style.Font.Name = "Tahoma";
@@ -130,9 +125,9 @@ namespace Telerik.Reporting.Pats.Reports
             // nextPlannedAppointmentCaptionTextBox
             // 
             this.nextPlannedAppointmentCaptionTextBox.CanGrow = true;
-            this.nextPlannedAppointmentCaptionTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(8.5D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.nextPlannedAppointmentCaptionTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(8.59D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.nextPlannedAppointmentCaptionTextBox.Name = "nextPlannedAppointmentCaptionTextBox";
-            this.nextPlannedAppointmentCaptionTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.5D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.nextPlannedAppointmentCaptionTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.389D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.nextPlannedAppointmentCaptionTextBox.Style.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(144)))), ((int)(((byte)(229)))));
             this.nextPlannedAppointmentCaptionTextBox.Style.Color = System.Drawing.Color.White;
             this.nextPlannedAppointmentCaptionTextBox.Style.Font.Name = "Tahoma";
@@ -145,9 +140,9 @@ namespace Telerik.Reporting.Pats.Reports
             // totalAppointmentNoOutcomeCaptionTextBox
             // 
             this.totalAppointmentNoOutcomeCaptionTextBox.CanGrow = true;
-            this.totalAppointmentNoOutcomeCaptionTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(8.029D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.totalAppointmentNoOutcomeCaptionTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(4.668D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.totalAppointmentNoOutcomeCaptionTextBox.Name = "totalAppointmentNoOutcomeCaptionTextBox";
-            this.totalAppointmentNoOutcomeCaptionTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.321D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.totalAppointmentNoOutcomeCaptionTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.752D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.totalAppointmentNoOutcomeCaptionTextBox.Style.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(144)))), ((int)(((byte)(229)))));
             this.totalAppointmentNoOutcomeCaptionTextBox.Style.Color = System.Drawing.Color.White;
             this.totalAppointmentNoOutcomeCaptionTextBox.Style.Font.Name = "Tahoma";
@@ -155,14 +150,14 @@ namespace Telerik.Reporting.Pats.Reports
             this.totalAppointmentNoOutcomeCaptionTextBox.Style.LineColor = System.Drawing.Color.Transparent;
             this.totalAppointmentNoOutcomeCaptionTextBox.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Left;
             this.totalAppointmentNoOutcomeCaptionTextBox.StyleName = "Caption";
-            this.totalAppointmentNoOutcomeCaptionTextBox.Value = "N/A";
+            this.totalAppointmentNoOutcomeCaptionTextBox.Value = "Location";
             // 
             // lastAppointmentPresentCaptionTextBox
             // 
             this.lastAppointmentPresentCaptionTextBox.CanGrow = true;
-            this.lastAppointmentPresentCaptionTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(4.784D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.lastAppointmentPresentCaptionTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(5.555D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.lastAppointmentPresentCaptionTextBox.Name = "lastAppointmentPresentCaptionTextBox";
-            this.lastAppointmentPresentCaptionTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.5D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.lastAppointmentPresentCaptionTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.139D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.lastAppointmentPresentCaptionTextBox.Style.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(144)))), ((int)(((byte)(229)))));
             this.lastAppointmentPresentCaptionTextBox.Style.Color = System.Drawing.Color.White;
             this.lastAppointmentPresentCaptionTextBox.Style.Font.Name = "Tahoma";
@@ -176,7 +171,7 @@ namespace Telerik.Reporting.Pats.Reports
             this.textBox13.CanGrow = true;
             this.textBox13.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0.042D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.textBox13.Name = "textBox13";
-            this.textBox13.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.textBox13.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.75D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox13.Style.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(144)))), ((int)(((byte)(229)))));
             this.textBox13.Style.Color = System.Drawing.Color.White;
             this.textBox13.Style.Font.Name = "Tahoma";
@@ -188,9 +183,9 @@ namespace Telerik.Reporting.Pats.Reports
             // textBox15
             // 
             this.textBox15.CanGrow = true;
-            this.textBox15.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(2.98D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.textBox15.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(2.765D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.textBox15.Name = "textBox15";
-            this.textBox15.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.textBox15.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.916D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox15.Style.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(144)))), ((int)(((byte)(229)))));
             this.textBox15.Style.Color = System.Drawing.Color.White;
             this.textBox15.Style.Font.Name = "Tahoma";
@@ -202,23 +197,23 @@ namespace Telerik.Reporting.Pats.Reports
             // textBox16
             // 
             this.textBox16.CanGrow = true;
-            this.textBox16.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(4.13D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.textBox16.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(3.752D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.textBox16.Name = "textBox16";
-            this.textBox16.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.448D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.textBox16.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.792D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox16.Style.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(144)))), ((int)(((byte)(229)))));
             this.textBox16.Style.Color = System.Drawing.Color.White;
             this.textBox16.Style.Font.Name = "Tahoma";
             this.textBox16.Style.LineColor = System.Drawing.Color.Transparent;
             this.textBox16.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Left;
             this.textBox16.StyleName = "Caption";
-            this.textBox16.Value = "PC290";
+            this.textBox16.Value = "Agent";
             // 
             // textBox14
             // 
             this.textBox14.CanGrow = true;
-            this.textBox14.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(1.08D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.textBox14.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0.927D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.textBox14.Name = "textBox14";
-            this.textBox14.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.75D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.textBox14.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.687D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.textBox14.Style.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(144)))), ((int)(((byte)(229)))));
             this.textBox14.Style.Color = System.Drawing.Color.White;
             this.textBox14.Style.Font.Name = "Tahoma";
@@ -260,41 +255,6 @@ namespace Telerik.Reporting.Pats.Reports
             this.textBox8.Style.Font.Bold = true;
             this.textBox8.Style.Font.Name = "Tahoma";
             this.textBox8.Value = "= \'Total by Worker  \' + Count(Fields.CDCRNum)";
-            // 
-            // locationGroupFooterSection
-            // 
-            this.locationGroupFooterSection.Height = Telerik.Reporting.Drawing.Unit.Inch(0.052D);
-            this.locationGroupFooterSection.Name = "locationGroupFooterSection";
-            // 
-            // locationGroupHeaderSection
-            // 
-            this.locationGroupHeaderSection.Height = Telerik.Reporting.Drawing.Unit.Inch(0.2D);
-            this.locationGroupHeaderSection.Items.AddRange(new Telerik.Reporting.ReportItemBase[] {
-            this.textBox1,
-            this.textBox6});
-            this.locationGroupHeaderSection.Name = "locationGroupHeaderSection";
-            this.locationGroupHeaderSection.Style.BackgroundColor = System.Drawing.Color.LightGray;
-            // 
-            // textBox1
-            // 
-            this.textBox1.CanGrow = true;
-            this.textBox1.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0.341D), Telerik.Reporting.Drawing.Unit.Inch(0D));
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(4.479D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
-            this.textBox1.Style.Font.Bold = true;
-            this.textBox1.Style.Font.Name = "Tahoma";
-            this.textBox1.StyleName = "Data";
-            this.textBox1.Value = "= IIF (Fields.Location =\'ZZ\', \'UNKNOWN\', ToUpper(Fields.Location))";
-            // 
-            // textBox6
-            // 
-            this.textBox6.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(7.481D), Telerik.Reporting.Drawing.Unit.Inch(0D));
-            this.textBox6.Name = "textBox6";
-            this.textBox6.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(2.258D), Telerik.Reporting.Drawing.Unit.Inch(0.188D));
-            this.textBox6.Style.Font.Bold = true;
-            this.textBox6.Style.Font.Italic = true;
-            this.textBox6.Style.Font.Name = "Tahoma";
-            this.textBox6.Value = "= \'Total at Location   \' + Count(Fields.CDCRNum)";
             // 
             // sqlDataSourceWorkerType
             // 
@@ -439,15 +399,15 @@ namespace Telerik.Reporting.Pats.Reports
             this.mI_ClassDataTextBox,
             this.offenderDataTextBox,
             this.pC290DataTextBox,
-            this.totalAppointmentNoOutcomeDataTextBox,
-            this.textBox12});
+            this.textBox12,
+            this.totalAppointmentNoOutcomeDataTextBox});
             this.detail.Name = "detail";
             this.detail.Style.BackgroundColor = System.Drawing.Color.White;
             // 
             // cDCRNumDataTextBox
             // 
             this.cDCRNumDataTextBox.CanGrow = true;
-            this.cDCRNumDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0.292D), Telerik.Reporting.Drawing.Unit.Inch(0.012D));
+            this.cDCRNumDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0.042D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.cDCRNumDataTextBox.Name = "cDCRNumDataTextBox";
             this.cDCRNumDataTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.75D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.cDCRNumDataTextBox.Style.Font.Name = "Tahoma";
@@ -458,9 +418,9 @@ namespace Telerik.Reporting.Pats.Reports
             // 
             this.lastAppointmentNotPresentDataTextBox.CanGrow = true;
             this.lastAppointmentNotPresentDataTextBox.Format = "{0:g}";
-            this.lastAppointmentNotPresentDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(6.423D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.lastAppointmentNotPresentDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(7.09D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.lastAppointmentNotPresentDataTextBox.Name = "lastAppointmentNotPresentDataTextBox";
-            this.lastAppointmentNotPresentDataTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.5D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.lastAppointmentNotPresentDataTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.438D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.lastAppointmentNotPresentDataTextBox.Style.Font.Name = "Tahoma";
             this.lastAppointmentNotPresentDataTextBox.StyleName = "Data";
             this.lastAppointmentNotPresentDataTextBox.Value = "= Fields.LastAppointmentNotPresent";
@@ -469,9 +429,9 @@ namespace Telerik.Reporting.Pats.Reports
             // 
             this.lastAppointmentPresentDataTextBox.CanGrow = true;
             this.lastAppointmentPresentDataTextBox.Format = "{0:g}";
-            this.lastAppointmentPresentDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(4.784D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.lastAppointmentPresentDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(5.555D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.lastAppointmentPresentDataTextBox.Name = "lastAppointmentPresentDataTextBox";
-            this.lastAppointmentPresentDataTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.5D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.lastAppointmentPresentDataTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.472D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.lastAppointmentPresentDataTextBox.Style.Font.Name = "Tahoma";
             this.lastAppointmentPresentDataTextBox.StyleName = "Data";
             this.lastAppointmentPresentDataTextBox.Value = "= Fields.LastAppointmentPresent";
@@ -479,7 +439,7 @@ namespace Telerik.Reporting.Pats.Reports
             // mI_ClassDataTextBox
             // 
             this.mI_ClassDataTextBox.CanGrow = true;
-            this.mI_ClassDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(3.007D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.mI_ClassDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(2.681D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.mI_ClassDataTextBox.Name = "mI_ClassDataTextBox";
             this.mI_ClassDataTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.mI_ClassDataTextBox.Style.Font.Name = "Tahoma";
@@ -489,7 +449,7 @@ namespace Telerik.Reporting.Pats.Reports
             // offenderDataTextBox
             // 
             this.offenderDataTextBox.CanGrow = true;
-            this.offenderDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(1.118D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.offenderDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0.864D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.offenderDataTextBox.Name = "offenderDataTextBox";
             this.offenderDataTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.75D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.offenderDataTextBox.Style.Font.Name = "Tahoma";
@@ -499,30 +459,30 @@ namespace Telerik.Reporting.Pats.Reports
             // pC290DataTextBox
             // 
             this.pC290DataTextBox.CanGrow = true;
-            this.pC290DataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(4.145D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.pC290DataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(3.752D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.pC290DataTextBox.Name = "pC290DataTextBox";
-            this.pC290DataTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.5D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.pC290DataTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.792D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.pC290DataTextBox.Style.Font.Name = "Tahoma";
             this.pC290DataTextBox.StyleName = "Data";
-            this.pC290DataTextBox.Value = "= IIF(Fields.PC290=False, \'\', Fields.PC290)";
+            this.pC290DataTextBox.Value = "= Fields.ParoleAgent";
             // 
             // totalAppointmentNoOutcomeDataTextBox
             // 
             this.totalAppointmentNoOutcomeDataTextBox.CanGrow = true;
-            this.totalAppointmentNoOutcomeDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(8.029D), Telerik.Reporting.Drawing.Unit.Inch(0D));
+            this.totalAppointmentNoOutcomeDataTextBox.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(4.612D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.totalAppointmentNoOutcomeDataTextBox.Name = "totalAppointmentNoOutcomeDataTextBox";
-            this.totalAppointmentNoOutcomeDataTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.3D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
+            this.totalAppointmentNoOutcomeDataTextBox.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.883D), Telerik.Reporting.Drawing.Unit.Inch(0.2D));
             this.totalAppointmentNoOutcomeDataTextBox.Style.Font.Name = "Tahoma";
             this.totalAppointmentNoOutcomeDataTextBox.StyleName = "Data";
-            this.totalAppointmentNoOutcomeDataTextBox.Value = "= Fields.TotalAppointmentNoOutcome";
+            this.totalAppointmentNoOutcomeDataTextBox.Value = "= Fields.Location";
             // 
             // textBox12
             // 
             this.textBox12.Format = "{0:g}";
-            this.textBox12.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(8.5D), Telerik.Reporting.Drawing.Unit.Inch(0.012D));
+            this.textBox12.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(8.59D), Telerik.Reporting.Drawing.Unit.Inch(0.012D));
             this.textBox12.Multiline = true;
             this.textBox12.Name = "textBox12";
-            this.textBox12.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.5D), Telerik.Reporting.Drawing.Unit.Inch(0.176D));
+            this.textBox12.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(1.389D), Telerik.Reporting.Drawing.Unit.Inch(0.176D));
             this.textBox12.Style.Font.Name = "Tahoma";
             this.textBox12.StyleName = "Data";
             this.textBox12.Value = "= Fields.NextPlannedAppointment";
@@ -550,21 +510,14 @@ namespace Telerik.Reporting.Pats.Reports
             group2.GroupHeader = this.groupHeaderSection;
             group2.Groupings.Add(new Telerik.Reporting.Grouping("= Fields.CaseWorkerID"));
             group2.Name = "group";
-            group3.GroupFooter = this.locationGroupFooterSection;
-            group3.GroupHeader = this.locationGroupHeaderSection;
-            group3.Groupings.Add(new Telerik.Reporting.Grouping("= Fields.Location"));
-            group3.Name = "locationGroup";
             this.Groups.AddRange(new Telerik.Reporting.Group[] {
             group1,
-            group2,
-            group3});
+            group2});
             this.Items.AddRange(new Telerik.Reporting.ReportItemBase[] {
             this.labelsGroupHeaderSection,
             this.labelsGroupFooterSection,
             this.groupHeaderSection,
             this.groupFooterSection,
-            this.locationGroupHeaderSection,
-            this.locationGroupFooterSection,
             this.pageHeader,
             this.pageFooter,
             this.reportHeader,
@@ -662,9 +615,6 @@ namespace Telerik.Reporting.Pats.Reports
         private TextBox nextPlannedAppointmentCaptionTextBox;
         private TextBox totalAppointmentNoOutcomeCaptionTextBox;
         private GroupFooterSection labelsGroupFooterSection;
-        private GroupHeaderSection locationGroupHeaderSection;
-        private TextBox textBox1;
-        private GroupFooterSection locationGroupFooterSection;
         private PageHeaderSection pageHeader;
         private TextBox reportNameTextBox;
         private PageFooterSection pageFooter;
@@ -688,7 +638,6 @@ namespace Telerik.Reporting.Pats.Reports
         private GroupHeaderSection groupHeaderSection;
         private GroupFooterSection groupFooterSection;
         private TextBox textBox5;
-        private TextBox textBox6;
         private TextBox textBox8;
         private TextBox textBox10;
         private TextBox textBox11;

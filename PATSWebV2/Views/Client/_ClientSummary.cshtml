@@ -130,7 +130,7 @@ else
                case "IRP": { tab = "IRP"; break; }
                case "DSM-5": { tab = "DSM5"; break; }
                case "MCAS-R": { tab = "Multnomah"; break; }
-               case "NEEDS ASSESSMENT": { tab = "Assessment"; break; }
+               //case "NEEDS ASSESSMENT": { tab = "Assessment"; break; }
                case "PROFILE":{ tab = "PMHSProfile"; break;}
                case "IDTT": { tab = "IDTT"; break; }
                case "(PMHS) PLACEMENT AND CHANGE": {  tab = "PMHSPC";   break; }
@@ -169,7 +169,7 @@ else
                        LoadSelectedTab(url, fndata, "#viewPlaceHolder");
                        return;
                    }
-               case "ReEntry": case "IDTT": case "IRP": case "DSM5": case "Multnomah": case "Assessment": case "PMHSProfile": case "PMHSPC": case "PMHSR": case "clinicalNote": {
+               case "ReEntry": case "IDTT": case "IRP": case "DSM5": case "Multnomah": case "PMHSProfile": case "PMHSPC": case "PMHSR": case "clinicalNote": {
                    url = '@Url.Action("GetSocialWork", "Client")';
                    fndata = { EpisodeID: $("#AllSelectedOffenderEpisodeResult").val(), ActiveTabIn: tab };
                    LoadSelectedTab(url, fndata, "#viewPlaceHolder");
@@ -245,7 +245,7 @@ else
             child.Add().Text("IRP").HtmlAttributes(new { @class = "patsdbmenu" });
             child.Add().Text("DSM-5").HtmlAttributes(new { @class = "patsdbmenu" });
             child.Add().Text("MCAS-R").HtmlAttributes(new { @class = "patsdbmenu" });
-            child.Add().Text("NEEDS ASSESSMENT").HtmlAttributes(new { @class = "patsdbmenu" });
+            //child.Add().Text("NEEDS ASSESSMENT").HtmlAttributes(new { @class = "patsdbmenu" });
             child.Add().Text("PROFILE").HtmlAttributes(new { @class = "patsdbmenu" });
             child.Add().Text("(PMHS) PLACEMENT AND CHANGE").HtmlAttributes(new { @class = "patsdbmenu", @id= "menuchange" }).Enabled(@Model.ClientSummary.HasIDTT);
             child.Add().Text("(PMHS) REMOVAL").HtmlAttributes(new { @class = "patsdbmenu", @id = "menuremove" }).Enabled(@Model.ClientSummary.HasIDTT);

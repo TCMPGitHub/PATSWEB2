@@ -58,7 +58,7 @@
          .Name("swTabstrip")
          .Events(e =>
          {
-             e.Select("swTabChanged"); 
+             e.Select("swTabChanged");
          })
          .HtmlAttributes(new { style = "padding:0; height:auto;width:98vw;background-color:#F0D9D9;" })
          .Animation(animation =>
@@ -80,8 +80,6 @@
                   .LoadContentFrom("GetClinicalDSM5", "Client", new { EpisodeId = Model.EpisodeId, DSM5ID = 0 });
           tabstrip.Add().Text("MCAS-R")
                   .LoadContentFrom("GetMCASR", "Client", new { EpisodeId = Model.EpisodeId, MCASRID=0 });
-          tabstrip.Add().Text("NEEDS ASSESSMENT")
-                  .LoadContentFrom("GetNeedsAssessmentSet", "Client", new { EpisodeId = Model.EpisodeId, AssessmentId=0 });
           tabstrip.Add().Text("PROFILE")
                   .LoadContentFrom("GetPMHProfile", "Client", new { EpisodeID = Model.EpisodeId });
           tabstrip.Add().Text("(PMHS) PLACEMENT AND CHANGE")
@@ -105,11 +103,11 @@
                 case "IRP": { tabidex = 3; break; }
                 case "DSM5": { tabidex = 4; break; }
                 case "Multnomah": { tabidex = 5; break; }
-                case "Assessment": { tabidex = 6; break; }
-                case "PMHSProfile": { tabidex = 7; break; }
-                case "PMHSPC": { tabidex = 8; break; }
-                case "PMHSR": { tabidex = 9; break; }
-                case "clinicalNote": { tabidex = 10; break; }
+                //case "Assessment": { tabidex = 6; break; }
+                case "PMHSProfile": { tabidex = 6; break; }
+                case "PMHSPC": { tabidex = 7; break; }
+                case "PMHSR": { tabidex = 8; break; }
+                case "clinicalNote": { tabidex = 9; break; }
             }
             $("#swTabstrip").kendoTabStrip().data("kendoTabStrip").activateTab($("#swTabstrip-" + tabidex.toString()));
             $('#swTabstrip').getKendoTabStrip().select(tabidex -1);
