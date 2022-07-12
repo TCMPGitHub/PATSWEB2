@@ -116,4 +116,9 @@ GRANT EXECUTE ON [dbo].[spGetEpisodeBHRIRP] to [ACCOUNTS\Svc_CDCRBASSSQLWte]
 GO
 GRANT EXECUTE ON [dbo].[spGetEpisodeBHRIRP] to [ACCOUNTS\Svc_CDCRPATSUser]
 GO 
-
+ALTER TABLE dbo.tlkpBarriersFrequency
+ADD PRIMARY KEY (BarrFreqID);
+GO
+ALTER TABLE dbo.tlkpIdentifiedBarriersToIntervention
+ADD PRIMARY KEY (IBTIID);
+GO
