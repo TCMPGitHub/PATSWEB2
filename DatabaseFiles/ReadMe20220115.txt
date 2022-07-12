@@ -1,3 +1,44 @@
 1. Run spGetClientSummaryList
 2. Run spGetEpisodeSummary
 3. spCheckOccupied
+
+USE [PATSWebV2]
+GO
+
+/****** Object:  Table [dbo].[CaseBHRIRP]    Script Date: 7/12/2022 9:22:00 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[CaseBHRIRP](
+	[IRPId] [int] IDENTITY(1,1) NOT NULL,
+	[EpisodeID] [int] NOT NULL,
+	[CurrentPhaseStatus] [int] NULL,
+	[BHRIRPJson] [ntext] NULL,
+	[AdditionalRemarks] [nvarchar](500) NULL,
+	[ActionStatus] [int] NOT NULL,
+	[ActionBy] [int] NOT NULL,
+	[DateAction] [datetime] NOT NULL,
+	[BassUserID] [int] NULL,
+ CONSTRAINT [PK_dbo.CaseBHRIRP] PRIMARY KEY CLUSTERED 
+(
+	[IRPId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+
+USE [PATSWebV2]
+GO
+
+/****** Object:  Index [IX_EpisodeID]    Script Date: 7/12/2022 9:23:11 AM ******/
+CREATE NONCLUSTERED INDEX [IX_EpisodeID] ON [dbo].[CaseBHRIRP]
+(
+	[EpisodeID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+
+ALTER TABLE dbo.EpisodeTrace
+ADD BHRIRPID INT NULL
