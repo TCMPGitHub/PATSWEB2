@@ -42,3 +42,78 @@ GO
 
 ALTER TABLE dbo.EpisodeTrace
 ADD BHRIRPID INT NULL
+
+USE [PATSWebV2Test]
+GO
+
+/****** Object:  StoredProcedure [dbo].[spGetEpisodeBHRIRP]    Script Date: 7/12/2022 9:33:36 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Create date: 2020-04-06
+-- Description:	Get the Latest BHR IRP 
+-- =============================================
+CREATE PROCEDURE [dbo].[spGetEpisodeBHRIRP] 
+	@EpisodeID int = null,
+	@BHRIRPID int = 0, 
+	@CurrentUserID int = 0
+AS
+BEGIN
+   
+ DECLARE @True BIT = 1
+ DeCLARE @False BIT = 0
+ DECLARE @IsLastBIRPSet bit
+ DECLARE @LBIRPID  int = 0
+ DECLARE @NeedsAssessmentID int = 0
+  IF  @EpisodeID > 0 
+   BEGIN
+     SELECT @LBIRPID = ISNULl(BHRIRPID, 0), @NeedsAssessmentID = ISNULl(NeedsAssessmentID, 0)         FROM dbo.EpisodeTrace WHERE EpisodeID = @EpisodeID
+	
+	 IF @LBIRPID = @BHRIRPID OR @LBIRPID = 0
+		     SET @IsLastBIRPSet = 1
+
+	DECLARE  @CanEdit bit  = (SELECT (CASE WHEN ((IsPOCAdmin = 1 OR IsPOCSocialWorker = 1)) THEN 1 ELSE 0 END ) FROM [User] WHERE UserID  = @CurrentUserID)
+
+	DECLARE @AssessmentDate DateTime = ( SELECT DateAction AS AssessmentDate From dbo.CaseNeedsAssessment WHERE Id = @NeedsAssessmentID)
+	
+     IF @BHRIRPID > 0 
+	    SELECT IRPID, EpisodeID, @CanEdit AS CanEditIRP, @IsLastBIRPSet AS IsLastBIRPSet,CurrentPhaseStatus, BHRIRPJson, AdditionalRemarks, ActionBy, (SELECT Name FROM [dbo].[fn_GetAsstUserName](ActionBy))ActionName, @AssessmentDate AS AssessmentDate
+		  FROM dbo.CaseBHRIRP where IRPID  = @BHRIRPID
+     ELSE 
+	 BEGIN
+	   IF @LBIRPID = 0
+	    BEGIN
+		DECLARE @Json nvarchar(MAX) = (select '[' + STUFF((
+		SELECT ',{"NeedID":"'  + cast(NeedId as varchar(2)) + '"'
+		   + ', "NeedName":"' + Name + '"'
+		   + ', "NeedLevel": "", "STGoal": "", "PlanedSTInterv": ""'
+		   + ', "STGoalMetDate": "", "ReadingForCharge": "", "LTGoal": "", "PlanedLTInterv": ""'
+		   + ', "LTGoalMetDate": "", "IdentifiedBarriersToInterventionID":"", "BarrierFrequencyID":""'
+		   + '}'
+        FROM [dbo].[tlkpCaseNeeds]  for xml path(''), type).value('.', 'nvarchar(max)'), 1, 1, '') + ']')
+		SELECT 0 AS IRPID, @EpisodeID AS EpisodeID, @CanEdit AS CanEditIRP, @True AS IsLastBIRPSet, null AS CurrentPhaseStatus,  @Json AS BHRIRPJson,
+		'' AS AdditionalRemarks, @CurrentUserID AS ActionBy, 
+		(SELECT Name FROM [dbo].[fn_GetAsstUserName](@CurrentUserID))ActionName 	           
+		END
+	   ELSE
+	     SELECT IRPID, EpisodeID, @True AS CanEditIRP, @True AS IsLastBIRPSet,CurrentPhaseStatus, BHRIRPJson, AdditionalRemarks, ActionBy, (SELECT Name FROM [dbo].[fn_GetAsstUserName](ActionBy))ActionName, @AssessmentDate AS AssessmentDate 
+		  FROM dbo.CaseBHRIRP where IRPID  = @LBIRPID
+     END
+     END
+
+  SELECT IBTIID, IBTIValue  FROM [dbo].[tlkpIdentifiedBarriersToIntervention]
+
+  SELECT BarrFreqID, BarrFreqValue  FROM [dbo].[tlkpBarriersFrequency]
+
+END
+
+GO
+GRANT EXECUTE ON [dbo].[spGetEpisodeBHRIRP] to [ACCOUNTS\Svc_CDCRBASSSQLWte]
+GO
+GRANT EXECUTE ON [dbo].[spGetEpisodeBHRIRP] to [ACCOUNTS\Svc_CDCRPATSUser]
+GO 
+
