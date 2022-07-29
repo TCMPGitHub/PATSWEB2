@@ -3020,7 +3020,7 @@ check the number that best describes how much(or how often) you have been bother
                 //============================================
                 PdfPTable pdfClientInfoTab = new PdfPTable(5);
                 pdfClientInfoTab.TotalWidth = document.PageSize.Width;
-                string[] list = new string[5] { "CDCR#", "PAROLEE NAME", "AGENT OF RECORD", "ASSESSMENT DATE", "CURRENT PHASE STATUS: " };
+                string[] list = new string[5] { "CDCR#", "PAROLEE NAME", "AGENT OF RECORD", "IRP DATE", "CURRENT PHASE STATUS: " };
                 for (int i = 0; i < 5; i++)
                 {
                     PrintRow(pdfClientInfoTab, list[i], tabFoneB, 1, 1, 0);
