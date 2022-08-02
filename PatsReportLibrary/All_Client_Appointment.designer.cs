@@ -87,10 +87,13 @@ namespace Telerik.Reporting.Pats.Reports
             this.shape2.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0D), Telerik.Reporting.Drawing.Unit.Inch(0D));
             this.shape2.Name = "shape2";
             this.shape2.ShapeType = new Telerik.Reporting.Drawing.Shapes.LineShape(Telerik.Reporting.Drawing.Shapes.LineDirection.EW);
-            this.shape2.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(12D), Telerik.Reporting.Drawing.Unit.Inch(0.01D));
+            this.shape2.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(12D), Telerik.Reporting.Drawing.Unit.Inch(0.011D));
             this.shape2.Stretch = true;
             this.shape2.Style.BackgroundColor = System.Drawing.Color.White;
-            this.shape2.Style.LineWidth = Telerik.Reporting.Drawing.Unit.Point(2D);
+            this.shape2.Style.BorderColor.Default = System.Drawing.Color.Silver;
+            this.shape2.Style.BorderWidth.Default = Telerik.Reporting.Drawing.Unit.Point(0.5D);
+            this.shape2.Style.LineColor = System.Drawing.Color.Silver;
+            this.shape2.Style.LineWidth = Telerik.Reporting.Drawing.Unit.Point(0.5D);
             // 
             // groupHeaderSection
             // 
@@ -126,12 +129,13 @@ namespace Telerik.Reporting.Pats.Reports
             // 
             // shape1
             // 
-            this.shape1.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0D), Telerik.Reporting.Drawing.Unit.Inch(0.02D));
+            this.shape1.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(0D), Telerik.Reporting.Drawing.Unit.Inch(0.01D));
             this.shape1.Name = "shape1";
             this.shape1.ShapeType = new Telerik.Reporting.Drawing.Shapes.LineShape(Telerik.Reporting.Drawing.Shapes.LineDirection.EW);
-            this.shape1.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(12D), Telerik.Reporting.Drawing.Unit.Inch(0.03D));
+            this.shape1.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(12D), Telerik.Reporting.Drawing.Unit.Inch(0.012D));
             this.shape1.Stretch = true;
-            this.shape1.Style.LineWidth = Telerik.Reporting.Drawing.Unit.Point(2D);
+            this.shape1.Style.LineWidth = Telerik.Reporting.Drawing.Unit.Point(0.2D);
+            this.shape1.Style.TextAlign = Telerik.Reporting.Drawing.HorizontalAlign.Center;
             // 
             // detail
             // 
@@ -242,8 +246,8 @@ namespace Telerik.Reporting.Pats.Reports
             this.sqlDataSourceApptList.ConnectionString = "Telerik.Reporting.Pats.Reports.Properties.Settings.PatsWebReport";
             this.sqlDataSourceApptList.Name = "sqlDataSourceApptList";
             this.sqlDataSourceApptList.Parameters.AddRange(new Telerik.Reporting.SqlDataSourceParameter[] {
-            new Telerik.Reporting.SqlDataSourceParameter("@StartDate", System.Data.DbType.DateTime, "2019-01-01"),
-            new Telerik.Reporting.SqlDataSourceParameter("@EndDate", System.Data.DbType.DateTime, "2019-03-01")});
+            new Telerik.Reporting.SqlDataSourceParameter("@StartDate", System.Data.DbType.DateTime, "= Parameters.StartDate.Value"),
+            new Telerik.Reporting.SqlDataSourceParameter("@EndDate", System.Data.DbType.DateTime, "= Parameters.EndDate.Value")});
             this.sqlDataSourceApptList.SelectCommand = "dbo.spRptClientApptList";
             this.sqlDataSourceApptList.SelectCommandType = Telerik.Reporting.SqlDataSourceCommandType.StoredProcedure;
             // 

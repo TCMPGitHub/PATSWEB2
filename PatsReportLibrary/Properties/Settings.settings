@@ -5,10 +5,10 @@
     <Setting Name="PatsWebReport" Type="(Connection string)" Scope="Application">
       <DesignTimeValue Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
 &lt;SerializableConnectionString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;ConnectionString&gt;Data Source=APO10LTCMP6512;Initial Catalog=PatsWebTest;Integrated Security=SSPI&lt;/ConnectionString&gt;
+  &lt;ConnectionString&gt;Data Source=FDCDBA11\BASS;Initial Catalog=PatsWebV2Test;Integrated Security=True;Persist Security Info=True;MultipleActiveResultSets=True;Connect Timeout=90&lt;/ConnectionString&gt;
   &lt;ProviderName&gt;System.Data.SqlClient&lt;/ProviderName&gt;
 &lt;/SerializableConnectionString&gt;</DesignTimeValue>
-      <Value Profile="(Default)">Data Source=APO10LTCMP6512;Initial Catalog=PatsWebTest;Integrated Security=SSPI</Value>
+      <Value Profile="(Default)">Data Source=FDCDBA11\BASS;Initial Catalog=PatsWebV2Test;Integrated Security=SSPI</Value>
     </Setting>
   </Settings>
 </SettingsFile>

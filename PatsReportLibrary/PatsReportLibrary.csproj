@@ -43,7 +43,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Telerik.Reporting, Version=13.0.19.222, Culture=neutral, PublicKeyToken=a9d7983dfcc261be, processorArchitecture=MSIL">
+    <Reference Include="Telerik.Reporting, Version=11.0.17.406, Culture=neutral, PublicKeyToken=a9d7983dfcc261be, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\PATSWebV2\TelerikLibrary\Telerik.Reporting.dll</HintPath>
     </Reference>
@@ -125,6 +125,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Client_Episode_Inactive.resx">
       <DependentUpon>Client_Episode_Inactive.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Inactive_BHR_Caseload_by_Case_Worker.resx">
       <DependentUpon>Inactive_BHR_Caseload_by_Case_Worker.cs</DependentUpon>

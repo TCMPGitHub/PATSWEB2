@@ -117,28 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="pictureBox2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="pictureBox2.Style.BackgroundImage.ImageData" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAAAgAAAAsCAYAAABYMvmrAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        xAAADsQBlSsOGwAAAhhJREFUOE99zMtrE1EUx/Hzl4kgKILgRlF0I7hw4cKVILjRhXVRreKLLppGiE2Q
-        pGBqjWJSq4mmaaxN2zwmzXsmmcTMJGlSCaKbn+cmk8lQ8C4+nHO/cxjaWTwGGUq5j0OGdl+egAztvToJ
-        GUovnYIMH5zmxeK1OBplfGdg81ocjbK+s5AhxX8eU+cs00ZK4CJsyxfGHI2ygUuwLV8eczTKBa/A9sbi
-        aKSsXIUMKW+vQYYKoeuQocKHG5Ch8sebkKFK5BZk+OA2L5Y1i6NR9fNdTN2xTBtpsRnUovegxe5D5V0Q
-        TVCjMyD16ywaG3PQ4g+gfpsd4ybU4w/5D4nHqMXnoG48gtidRCM9+RSNTeEJxH4UNbfmoW0+QyP5AvqP
-        eYj3RD35nP+w7eLHAn9cQCPlgnhPNLdcoFbKDV0cbC+iueO2TTq1dz3oZLwwMkv4uecZS3sgupn2gszs
-        a45etNM+GLwLbWZmeHKnTi7A0Y92zg9DCaCt8M5z1LlRpxBEJx+EydMsrozmqAn7QT4ovYeRX+WPqzDK
-        IZilEDrF8TT334G65TAO1XUc1CLoVMPoCpUwetwH6idQnz+Ko25tDT2ND8Uxz0FtHb1KhA/qMfRrX9DX
-        mNid1Cgf6AkMGgmIeXCE6DTQv0OGfrVSkKFhOw0ZGhp52ExlzNFo2C1hqmiZNvrdrcLWszga/enrsA0s
-        jkZ/D1v4vxb+AeKjaq0kAy1fAAAAAElFTkSuQmCC
-</value>
+  <data name="sqlDataSourceCaseWorker.ParameterValues" xml:space="preserve">
+    <value>{"@CaseWorkerType":"5"}</value>
   </data>
-  <metadata name="pictureBox1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="pictureBox2.GenerateMember" type="System.Boolean, mscorlib">
     <value>False</value>
-  </metadata>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="pictureBox1.Value" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         /9j/4AAQSkZJRgABAQEAYABgAAD/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAEAAAAAAAD/2wBD
@@ -331,22 +317,38 @@
         bOT6ptJLpG65jo+sUqMHSwqavo5P4mu2mkV5K7fVsKKKK+lOE//Z
 </value>
   </data>
-  <metadata name="sqlDataSourceCaseWorker.ParameterValues" xml:space="preserve">
-    <value>{"@CaseWorkerType":"5"}</value>
-  </metadata>
+  <data name="pictureBox1.GenerateMember" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
   <data name="sqlDataSourceCaseWorker.SelectCommand" xml:space="preserve">
     <value>	SELECT Concat(LastName, ', ', SUBSTRING(FirstName, 1, 1), '.') CaseWorker, Cast([UserID] as nvarchar(5)) CaseWorkerID
 	FROM [User] 
 	WHERE [CaseWorkerTypeID] = @CaseWorkerType AND [IsActive]=1
 	ORDER by LastName</value>
   </data>
-  <metadata name="sqlDataSourceMain.ParameterValues" xml:space="preserve">
-    <value>{"@DaysInactive":"30","@CaseWorkerIds":"608","@StartDate":"2019-10-01"}</value>
-  </metadata>
-  <metadata name="$this.SnapToGrid" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="$this.SnapToGrid" type="System.Boolean, mscorlib">
     <value>False</value>
-  </metadata>
-  <metadata name="$this.SnapGridSize" type="Telerik.Reporting.Drawing.Unit, Telerik.Reporting, Version=13.0.19.222, Culture=neutral, PublicKeyToken=a9d7983dfcc261be">
+  </data>
+  <data name="pictureBox2.Style.BackgroundImage.ImageData" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAAAgAAAAsCAYAAABYMvmrAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        xAAADsQBlSsOGwAAAhhJREFUOE99zMtrE1EUx/Hzl4kgKILgRlF0I7hw4cKVILjRhXVRreKLLppGiE2Q
+        pGBqjWJSq4mmaaxN2zwmzXsmmcTMJGlSCaKbn+cmk8lQ8C4+nHO/cxjaWTwGGUq5j0OGdl+egAztvToJ
+        GUovnYIMH5zmxeK1OBplfGdg81ocjbK+s5AhxX8eU+cs00ZK4CJsyxfGHI2ygUuwLV8eczTKBa/A9sbi
+        aKSsXIUMKW+vQYYKoeuQocKHG5Ch8sebkKFK5BZk+OA2L5Y1i6NR9fNdTN2xTBtpsRnUovegxe5D5V0Q
+        TVCjMyD16ywaG3PQ4g+gfpsd4ybU4w/5D4nHqMXnoG48gtidRCM9+RSNTeEJxH4UNbfmoW0+QyP5AvqP
+        eYj3RD35nP+w7eLHAn9cQCPlgnhPNLdcoFbKDV0cbC+iueO2TTq1dz3oZLwwMkv4uecZS3sgupn2gszs
+        a45etNM+GLwLbWZmeHKnTi7A0Y92zg9DCaCt8M5z1LlRpxBEJx+EydMsrozmqAn7QT4ovYeRX+WPqzDK
+        IZilEDrF8TT334G65TAO1XUc1CLoVMPoCpUwetwH6idQnz+Ko25tDT2ND8Uxz0FtHb1KhA/qMfRrX9DX
+        mNid1Cgf6AkMGgmIeXCE6DTQv0OGfrVSkKFhOw0ZGhp52ExlzNFo2C1hqmiZNvrdrcLWszga/enrsA0s
+        jkZ/D1v4vxb+AeKjaq0kAy1fAAAAAElFTkSuQmCC
+</value>
+  </data>
+  <assembly alias="Telerik.Reporting" name="Telerik.Reporting, Version=13.0.19.222, Culture=neutral, PublicKeyToken=a9d7983dfcc261be" />
+  <data name="$this.SnapGridSize" type="Telerik.Reporting.Drawing.Unit, Telerik.Reporting">
     <value>0.025in</value>
-  </metadata>
+  </data>
+  <data name="sqlDataSourceMain.ParameterValues" xml:space="preserve">
+    <value>{"@DaysInactive":"30","@CaseWorkerIds":"608","@StartDate":"2019-10-01"}</value>
+  </data>
 </root>
