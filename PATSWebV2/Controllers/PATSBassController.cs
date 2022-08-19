@@ -18,7 +18,7 @@ namespace PATSWebV2.Controllers
 {
     public enum ControllerID
     {
-        Unknown, Client, Assignment, Appointment, Reports
+        Unknown, Client, Assignment, Appointment, Reports, Admin
     }
 
     public enum ACTION_STATUS

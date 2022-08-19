@@ -1025,6 +1025,8 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Client\_ClinicalDSM5.cshtml" />
     <Content Include="Views\Client\_BHRIRP.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Admin\_AdminUser.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\Reports\" />

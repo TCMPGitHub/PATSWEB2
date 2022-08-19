@@ -1,0 +1,21 @@
+﻿@{
+    //ViewBag.Title = "ApptIndex";
+    Layout = "~/Views/Shared/_LayoutNoSearchHeader.cshtml";
+}
+
+<div id="outerframe">
+    @section HeaderSection{
+        <div class="apptitem1">
+           @{ Html.RenderPartial("_HeaderForPats", new PATSWebV2.ViewModels.Client.PersonSearchViewModel { SelectedParentResult = -1 }); }
+        </div>
+    }
+    <div class="apptitem2" style="overflow:hidden;padding-right:5px;padding-bottom:0px;width:100vw;min-width:1200px;">
+        @section ContentBody{ @{Html.RenderAction("GetUser", "Admin");}}
+    </div>
+    @section FooterSection{
+        <div class="apptitem3">
+            <Foot style="height:18px!important;padding:6px;">@Html.Partial("_Footer")</Foot>
+        </div>
+    }
+</div>
+ }

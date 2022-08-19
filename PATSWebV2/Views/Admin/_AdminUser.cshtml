@@ -1,0 +1,218 @@
+﻿@using Kendo.Mvc.UI;
+@model PATSWebV2.ViewModels.Client.AdminUser
+
+@Html.HiddenFor(m => m.UserClass.Email)
+@Html.HiddenFor(m => m.UserClass.Password)
+@Html.HiddenFor(m => m.UserClass.PasswordHash)
+@Html.HiddenFor(m => m.UserClass.LoginFailures)
+          
+@using (Html.BeginForm("SaveUser", "Admin", FormMethod.Post, new
+{
+    @id = "userForm",
+    style = "height:77%;margin-top:10px"
+}))
+{
+    @Html.HiddenFor(m => m.UserClass.UserID, new { id = "UserClass_UserID" })
+    <script>
+    function GetSelectedUser(e) {
+        ResetForm();
+    }
+    </script>
+    <center>
+        <div style="height:30px;width:300px">
+            <div style="float:left;padding-right:2px;">Select User:</div>
+            <div style="float:left;margin-left:12px;">
+                @(Html.Kendo().DropDownListFor(m => m.UserClass.UserID).Name("AllUsers")
+        .DataTextField("UserName")
+        .DataValueField("UserID")
+        .OptionLabel("Select User Name...")
+        .Filter(FilterType.Contains)
+        .Events(e => e.Change("GetSelectedUser"))
+        .DataSource(d => d.Read(r => r.Action("GetAllUsers", "Admin", new { UserID = "0" }))))
+            </div>
+        </div>
+    </center>
+<div style="height:calc(100vh - 200px);border-style:solid; border-width:1px; margin:20px 20px 20px 20px;"><center>      
+    <table style="align-content:center;">
+        <tr><td colspan="4" style="height:10px;"></td></tr>
+        <tr>
+            <td style="text-align:right;"><div>First Name<span style="color:red;">*</span></div>&nbsp;&nbsp;</td>
+            <td colspan="3">@(Html.Kendo().TextBoxFor(m => m.UserClass.FirstName)) </td>
+        </tr>
+        <tr>
+            <td style="text-align:right;"><div>Last Name<span style="color:red;">*</span></div>&nbsp;&nbsp;</td>
+            <td colspan="3">@(Html.Kendo().TextBoxFor(m => m.UserClass.LastName))</td>
+        </tr>
+        <tr>
+            <td  style="text-align:right;"><div>User Name<span style="color:red;">*</span></div>&nbsp;&nbsp;</td>
+            <td colspan="3">@(Html.Kendo().TextBoxFor(m => m.UserClass.UserName))</td>
+        </tr>
+        <tr>
+            <td style="text-align:right;"><div>Case Worker Type<span style="color:red;">*</span></div>&nbsp;&nbsp;</td>
+            <td colspan="3">@(Html.Kendo().DropDownListFor(m => m.UserClass.CaseWorkerTypeId)
+        //.Name("CaseWorkerTypeId")
+        .DataTextField("CaseWorkerTypeDesc")
+        .DataValueField("CaseWorkerTypeId")
+        .Filter(FilterType.Contains)
+        .OptionLabel("Select Case Worker Type...")
+    .DataSource(d=>d.Read("GetCaseWorkerType", "Admin")))</td>
+        </tr>
+        <tr>
+            <td style="text-align:right;"><div>Primary Location</div>&nbsp;&nbsp;</td>
+            <td colspan="3">@(Html.Kendo().DropDownListFor(m => m.UserClass.PrimaryLocationId)
+        //.Name("PrimaryLocationId")
+        .DataTextField("LocationDesc")
+        .DataValueField("LocationID")
+        .Filter(FilterType.Contains)
+        .OptionLabel("Select Location...")
+    .DataSource(d=>d.Read("GetLocation", "Admin"))) </td>
+        </tr>
+        <tr>
+            <td style="text-align:right;"><div>Login Failure<span style="color:red;">*</span></div>&nbsp;&nbsp;</td>
+            <td colspan="3">@(Html.Kendo().TextBoxFor(m => m.UserClass.LoginFailures))</td>
+        </tr>
+        <tr><td colspan="4" style="height:10px;"></td></tr>
+        <tr>
+            <td></td>
+            <td >@(Html.Kendo().CheckBoxFor(m => m.UserClass.IsActive).Label("Active"))</td>
+            <td colspan="2">@(Html.Kendo().CheckBoxFor(m => m.UserClass.IsPOCAdmin).Label("Admin"))</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>@(Html.Kendo().CheckBoxFor(m => m.UserClass.IsPOCSocialWorker).Label("Social Worker"))</td>
+            <td colspan="2">@(Html.Kendo().CheckBoxFor(m => m.UserClass.IsPOCCaseManager).Label("Case Manager"))</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>@(Html.Kendo().CheckBoxFor(m => m.UserClass.IsPOCPsychologist).Label("Psychologist"))</td>
+            <td colspan="2">@(Html.Kendo().CheckBoxFor(m => m.UserClass.IsPOCPsychiatrist).Label("Psychiatrist"))</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>@(Html.Kendo().CheckBoxFor(m => m.UserClass.IsSysAdmin).Label("System Admin"))</td>
+            <td colspan="2">@(Html.Kendo().CheckBoxFor(m => m.UserClass.IsLOCBHRAdmin).Label("BHR Admin"))</td>
+        </tr>
+    </table>
+    <br/>
+    <div>
+        @(Html.Kendo().Button().Name("Save").Content("Save").HtmlAttributes( new { type="submit", style="height:22px; width:100px;"}))
+        @(Html.Kendo().Button().Name("Cancel").Content("Cancel").HtmlAttributes(new { type = "button", style = "height:22px; width:100px;" }))
+        @(Html.Kendo().Button().Name("Reset").Content("Reset").HtmlAttributes(new { type = "button", style = "height:22px; width:100px;" }))
+    </div>
+    <div><span style="color:red">@Html.ValidationSummary(true)</span></div>
+</center>
+</div>
+}
+<script type="text/javascript">
+    function ResetForm() {
+        var val = $("#AllUsers").val();
+        if (val !== "" || val !== 0) {
+            var dp = $("#AllUsers").data('kendoDropDownList');
+            var item = dp.dataItem(dp.selectedIndex);
+            if (item.UserID == undefined || item.UserID == '') item.UserID = 0;
+            var form = document.getElementById("userForm");
+            form.elements.UserClass_UserID.value = item.UserID;
+            form.elements.UserClass_FirstName.value = item.FirstName  == undefined ? '' : item.FirstName;
+            form.elements.UserClass_LastName.value = item.LastName  == undefined ? '' : item.LastName;
+            form.elements.UserClass_UserName.value = (item.UserName  == undefined || item.UserName =='Select User Name...') ? '' : item.UserName;
+            form.elements.UserClass_IsActive.checked = item.IsActive  == undefined ? false : item.IsActive;
+            form.elements.UserClass_IsPOCAdmin.checked = item.IsPOCAdmin  == undefined ? false : item.IsPOCAdmin;
+            form.elements.UserClass_IsPOCCaseManager.checked = item.IsPOCCaseManager == undefined ? 0 : item.IsPOCCaseManager;
+            form.elements.UserClass_IsPOCSocialWorker.checked = item.IsPOCSocialWorker == undefined ? false : item.IsPOCSocialWorker;
+            form.elements.UserClass_IsPOCPsychologist.checked = item.IsPOCPsychologist == undefined ? false : item.IsPOCPsychologist;
+            form.elements.UserClass_IsPOCPsychiatrist.checked = item.IsPOCPsychiatrist == undefined ? false : item.IsPOCPsychiatrist;
+            form.elements.UserClass_PrimaryLocationId.value = item.PrimaryLocationId == undefined ? -1 : item.PrimaryLocationId;
+            form.elements.UserClass_CaseWorkerTypeId.value = item.CaseWorkerTypeId == undefined ? 0 : item.CaseWorkerTypeId;
+            form.elements.UserClass_LoginFailures.value = item.LoginFailures == undefined ? 0 : item.LoginFailures;
+            var dpc = $("#UserClass_CaseWorkerTypeId").data("kendoDropDownList");
+            if (item.CaseWorkerTypeId !== undefined && item.CaseWorkerTypeId !== "")
+                dpc.value(item.CaseWorkerTypeId.toString());
+            else
+                dpc.value("0");
+            var dpp = $("#UserClass_PrimaryLocationId").data("kendoDropDownList");
+            if (item.PrimaryLocationId !== undefined && item.PrimaryLocationId !== "")
+                dpp.value(item.PrimaryLocationId.toString());
+            else
+                dpp.value("-1");
+
+            $("#UserClass_UserID").val(item.UserID);
+        }
+    }
+    function postFormForUser(formObj) {
+        var url = formObj.attr("action");
+        var submission = formObj.serialize();
+        var name = formObj.attr("name");
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: submission,
+            cache: false,
+            dataType: "Html",
+            success: function (data, status, xhr) {
+                alert("User is successfully saved.");
+                formObj.replaceWith(data);
+            },
+            error: function (data, textStatus, xhr) {
+                alert("User might be already existed, please check with user's supervisor.");
+                return false;
+            }
+        });
+        return false;
+    }
+    //function AdminButtonDisable(disabled) {
+    //    $("#Save").prop('disabled', disabled);
+    //    $("#Cancel").prop('disabled', disabled);
+    //    $("#Reset").prop('disabled', disabled);
+    //}
+    
+    $(function () {
+        var initdata = $('#userForm').serialize();
+        $('#userForm').submit(function (e) {
+            e.preventDefault();
+            var nowdata = $('#userForm').serialize();
+            if (initdata === nowdata) {
+                alert("No data changed!");
+                e.stopPropagation();
+                return false;
+            }
+            if (confirm("Save this user?") == false) {
+                e.stopPropagation();
+                return false;
+            }
+            if ($("#UserClass_FirstName").val() == "" || $("#UserClass_LastName").val() == "" ||
+                $("#UserClass_UserName").val() == "" || $("#UserClass_CaseWorkerTypeId").val() == "") {              
+                alert("All required fields must be filled out.");
+                e.stopPropagation();
+                return false;
+            }
+               
+            initdata = nowdata;
+            postFormForUser($('#userForm'));
+            //var tabstrip = $("#swTabstrip").data("kendoTabStrip");
+            //var tab = tabstrip.select();
+            //tabstrip.reload(tab);
+            return true;
+        });
+        $("#Cancel").click(function () {
+            var val = $("#AllUsers").val();
+            if (val !== "" && val !== 0 && val !== undefined) {
+                ResetForm();            
+            }
+            else {
+                $("#Reset").trigger('click');
+            }
+        });
+        $("#Reset").click(function (e) {
+            debugger
+            var val = $("#AllUsers").val();
+            if (val !== "" && val !== 0 && val !== undefined) {
+                $("#AllUsers").data('kendoDropDownList').value("0");
+            }
+            ResetForm();
+            //var form = e.target.form;
+            //form.reset();
+            //document.getElementById("userForm").reset();
+        })
+       
+    });
+</script>

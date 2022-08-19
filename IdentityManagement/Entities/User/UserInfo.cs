@@ -10,6 +10,7 @@ namespace IdentityManagement.Entities
 {
     public class UserInfo : IUser<int>
     {
+
         public int UserID { get; set; }
         public string UserName { get; set; }
         public string LastName { get; set; }

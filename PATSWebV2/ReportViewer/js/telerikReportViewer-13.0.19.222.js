@@ -358,7 +358,7 @@
         preparingPrint: "Preparing document to print. Please wait...",
         errorLoadingTemplates: "Error loading the report viewer's templates. (templateUrl = '{0}').",
         errorServiceUrl: "Cannot access the Reporting REST service. (serviceUrl = '{0}'). Make sure the service address is correct and enable CORS if needed. (https://enable-cors.org)",
-        loadingReportPagesInProgress: "Loading...  {0} pages loaded so far...",
+        loadingReportPagesInProgress: "{0} pages loaded so far...",
         loadedReportPagesComplete: "Done. Total {0} pages loaded.",
         noPageToDisplay: "No page to display.",
         errorDeletingReportInstance: "Error deleting report instance: '{0}'.",
@@ -3030,7 +3030,7 @@
             invalidateCurrentlyLoadedPage();
         }).reportLoadProgress(function(event, args) {
             navigateWhenPageAvailable(navigateToPageOnDocReady, args.pageCount);
-            showError(utils.stringFormat(sr.loadingReportPagesInProgress, [ args.pageCount ]));
+            showError(args.pageCount === 0 ? sr.loadingReport : utils.stringFormat(sr.loadingReportPagesInProgress, [ args.pageCount ]));
         }).reportLoadComplete(function(event, args) {
             if (0 === args.pageCount) {
                 clearPage();
