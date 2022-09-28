@@ -700,10 +700,11 @@ DECLARE @DateAction int
 DECLARE @IRPID int
 DECLARE @DSM5ID int
 
+
 SELECT @ClientEpisodeID =[ClientEpisodeID],@ClientNoteID=[ClientNoteID],@AddressID=[AddressID],@StaffAssignmentID=[StaffAssignmentID]
       ,@HealthBenefitID=[HealthBenefitID],@IDTTID=[IDTTID],@MCASRID=[MCASRID],@NeedsAssessmentID=[NeedsAssessmentID]
       ,@ReEntryIMHSID=[ReEntryIMHSID],@PMHSID=[PMHSID],@DSMID=[DSMID],@LegalDocID=[LegalDocID],@ASMTID=[ASMTID]
-      ,@EvaluationID=[EvaluationID],@IRPID=[IRPID],@DSM5ID =[DSM5ID]
+      ,@EvaluationID=[EvaluationID],@IRPID=[BHRIRPID], @DSM5ID = [DSM5ID]
   FROM [dbo].[EpisodeTrace] Where EpisodeID  = @EpisodeId
 
   --SELECT @ClientEpisodeID,@ClientNoteID,@AddressID,@StaffAssignmentID,@HealthBenefitID,@IDTTID,@MCASRID,
@@ -742,11 +743,10 @@ IF ISNULL(@IRPID, 0)= 0
 ELSE   
  BEGIN
     INSERT INTO @tempCollection
-	SELECT 'ClinicSmy', Id, 'IRP Entered', convert(varchar(10), DateAction, 110), (SELECT Name From dbo.fn_GetAsstUserName(ActionBy)) 
-	  FROM dbo.CaseIRP
-	 WHERE ActionStatus != 10 AND Id = @IRPID
+	SELECT 'ClinicSmy', IRPId AS id, 'IRP Entered', convert(varchar(10), DateAction, 110), (SELECT Name From dbo.fn_GetAsstUserName(ActionBy)) 
+	  FROM dbo.CaseBHRIRP
+	 WHERE ActionStatus != 10 AND IRPId = @IRPID
  END
-
  IF ISNULL(@DSM5ID, 0)= 0  
  BEGIN
     INSERT INTO @tempCollection
@@ -759,7 +759,6 @@ ELSE
 	  FROM dbo.ClinicalDSM5
 	 WHERE ActionStatus != 10 AND DSM5ID = @DSM5ID
  END
-
 IF ISNULL(@NeedsAssessmentID, 0)= 0  
   BEGIN
     INSERT INTO @tempCollection
@@ -904,11 +903,11 @@ ELSE
 	 (select Id, (CASE WHEN DateNoticePrivacyPractice IS NULL OR DateNoticePrivacyPractice = '01/01/1900' THEN '' ELSE Convert(varchar(10),  DateNoticePrivacyPractice, 110) END) as Notice_Of_Privacy_Practices, 
 			 (CASE WHEN DateInformedConcentForTreatment IS NULL OR DateInformedConcentForTreatment = '01/01/1900' THEN '' ELSE Convert(varchar(10),DateInformedConcentForTreatment, 110) END)Informed_Consent_for_Treatment, 
 			 (CASE WHEN DateReleaseInfoExpiration IS NULL OR DateReleaseInfoExpiration= '01/01/1900' THEN '' ELSE Convert(varchar(10), DateReleaseInfoExpiration, 110) END)Release_Info_Expiration, 
-			 Convert(varchar(10), DateAction, 110)[Doc._Entered], 
+			 Convert(varchar(10), DateAction, 110)[Doc._Entered],
 			 (CASE WHEN DateOther IS NULL OR DateOther= '01/01/1900' THEN '' ELSE Convert(varchar(10), DateOther, 110) END)Other FROM dbo.LegalDocument  where ID = @LegalDocID AND ActionStatus != 10) X
 		 unpivot
 		 ( 
-		   DateEnrolled for DateType in (Notice_Of_Privacy_Practices, Informed_Consent_for_Treatment, Release_Info_Expiration,[Doc._Entered], Other)
+		   DateEnrolled for DateType in (Notice_Of_Privacy_Practices, Informed_Consent_for_Treatment, Release_Info_Expiration, [Doc._Entered],Other)
 	  ) as p
 
 	  UNION
@@ -951,12 +950,13 @@ BEGIN
 Select * from @tempCollection
 
 SELECT TOP 6 'Assignment'ClientSmy, ID as Id, convert(varchar(10), DateAction, 110)DateEnrolled, 
+	    (CASE WHEN ISNULL(CaseManagerUserId, 0) > 0 THEN (Select Name FROM dbo.fn_GetAsstUserName(CaseManagerUserId)) ELSE '' END) AS CaseManager, 
 		(CASE WHEN ISNULL(SocialWorkerUserId, 0) > 0 THEN (Select Name FROM dbo.fn_GetAsstUserName(SocialWorkerUserId)) ELSE '' END) AS SocialWorker, 
 		(CASE WHEN ISNULL(PsychologistUserId, 0) > 0 THEN (Select Name FROM dbo.fn_GetAsstUserName(PsychologistUserId)) ELSE '' END) AS Psychologist, 
 		(CASE WHEN ISNULL(PsychiatristUserId, 0) > 0 THEN (Select Name FROM dbo.fn_GetAsstUserName(PsychiatristUserId)) ELSE '' END) AS Psychiatrist
  FROM StaffAssignment 
 WHERE EpisodeID =@EpisodeID AND NOT (ISNULL(PsychologistUserId, 0) = 0 and ISNULL(PsychiatristUserId, 0) = 0 and
-    ISNULL(SocialWorkerUserId, 0)= 0) Order BY ID DESC
+    ISNULL(SocialWorkerUserId, 0)= 0 and ISNULL(CaseManagerUserId, 0)= 0) Order BY ID DESC
 
 SELECT DISTINCT top 6 t.AppointmentID AS ID,t.StartDate,'' AS Progress,
     Clinician = STUFF((SELECT ';' + Staffs 
@@ -966,6 +966,7 @@ SELECT DISTINCT top 6 t.AppointmentID AS ID,t.StartDate,'' AS Progress,
 	(CASE t3.ClientEventStatus WHEN 1 THEN 'Absent' WHEN 2 THEN 'Pending' WHEN 3 THEN 'Present' WHEN 4 THEN 'Excused' WHEN 5 THEN 'Canceled' END)as eventstatus	
 	FROM Appointment t INNER JOIN AppointmentTrace t1 on t.AppointmentID= t1.AppointmentID INNER JOIN  AppointmentWithStaff t2 ON t.AppointmentID= t2.AppointmentID 
 					INNER Join AppointmentWithClient t3 ON t.AppointmentID = t3.AppointmentID WHERE t.ActionStatus <> 10 AND t3.EpisodeID = @EpisodeID Order BY t.StartDate DESC
+
 
 SELECT ISNULL(ParoleLocationID, 0)ParoleLocationID From Episode Where EpisodeID  = @EpisodeID
 --SELECT DISTINCT top 6 t.AppointmentID AS ID,t.StartDate,'' AS Progress,

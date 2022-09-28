@@ -122,3 +122,84 @@ GO
 ALTER TABLE dbo.tlkpIdentifiedBarriersToIntervention
 ADD PRIMARY KEY (IBTIID);
 GO
+USE [PATSWebV2Test]
+GO
+
+/****** Object:  StoredProcedure [dbo].[spGetPATSEpisodeIRPToBASS]    Script Date: 8/9/2022 12:55:43 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Create date: 2020-03-08
+-- Update date: 
+-- Description:	Retrive IRP From PATS to BASS
+-- =============================================
+CREATE PROCEDURE [dbo].[spGetPATSEpisodeIRPToBASS]
+    @CDCRNum varchar(6) = '',
+	@EpisodeID int  = 0,
+	@IRPID int = 0,
+	@CurrentUserID int = 0
+AS	
+BEGIN
+   DECLARE @PATSEpisodeID int  = 0
+   DECLARE @PATSUserID int = 0
+   DECLARE @BassUserID int  = @CurrentUserID
+  
+   IF @EpisodeID = 0 AND @CDCRNum <> ''
+      SET @PATSEpisodeID = (SELECT EpisodeID FROM Episode WHERE CDCRNum = @CDCRNum)
+   ELSE IF @EpisodeID > 0
+      SET @PATSEpisodeID = @EpisodeID
+
+   --===========================================
+   --Add new CDCR
+   --===========================================
+   IF @PATSEpisodeID = 0
+   BEGIN
+     DECLARE @PID int  = (SELECT PID FROM [BASSWeb].[dbo].[Episode] E INNER JOIN [BASSWeb].[dbo].[Offender] O ON E.OffenderID = O.OffenderID WHERE CDCRNum = @CDCRNum)
+	 IF NOT EXISTS(SELECT PID FROM Offender WHERE PID = @PID)
+	 BEGIN
+	   INSERT INTO [dbo].[Offender]([MiddleName],[PC290],[PC457],[USVet],[FirstName],
+   [LastName],[SSN],[DOB],[GenderID],[MHStatus],[PhysDisabled],[DevDisabled],[PID],[InitialDate] ) 
+   SELECT [MiddleName],[PC290],[PC457],[USVet],[FirstName],[LastName],[SSN],[DOB],
+    (CASE [GenderID] WHEN 0 THEN 1 WHEN 1 THEN 2 WHEN 2 THEN 3 ELSE 99 END),
+    (CASE WHEN EOP = 1 THEN 2 WHEN CCCMS = 1 THEN 3 ELSE NULL END),[PhysDisabled],[DevDisabled],[PID],GetDate() 
+	 FROM [BASSWeb].[dbo].[Offender] WHERE PID  = @PID
+	 END
+
+	 DECLARE @OffenderID int = (SELECT OffenderID FROM dbo.Offender WHERE PID = @PID)
+	 	 
+   INSERT INTO [dbo].[Episode]([OffenderID],[SuggestionDate],[InitialDate],[CDCRNum],
+     [ReleaseDate],[CustodyFacilityID],[ReleaseCountyID],[Lifer],[ParoleUnit],[ParoleAgent])
+   SELECT @OffenderID,[ReferralDate],GetDate(),[CDCRNum],[ReleaseDate],[CustodyFacilityID]
+      ,[ReleaseCountyID],[Lifer],[ParoleUnit],[ParoleAgent]
+    FROM [BassWeb].[dbo].[Episode] WHERE CDCRNum = @CDCRNum  
+	SET @PATSEpisodeID = (SELECT EpisodeID FROM Episode WHERE CDCRNum = @CDCRNum)
+	UPDATE EpisodeTrace SET IsLastOne = 0 Where EpisodeID in (SELECT EpisodeID FROM Episode WHERE OffenderID = @OffenderID) 
+  INSERT INTO dbo.EpisodeTrace(EpisodeID, IsLastOne, DateAction) VALUES (@PATSEpisodeID, 1, GetDate())
+   END
+
+   IF ISNULL(@PATSEpisodeID, 0) > 0
+   BEGIN
+     IF @IRPID = 0
+       SET @IRPID = (SELECT ISNULL(BHRIRPID,0) FROM dbo.EpisodeTrace WHERE EpisodeID  = @PATSEpisodeID)
+	 
+     IF @IRPID > 0 
+	  BEGIN
+	   SELECT @BassUserID = ISNULL(BassUserID, 0), @PATSUserID = ActionBy 
+		 FROM dbo.CaseBHRIRP WHERE IRPID = @IRPID 
+	  END
+	  
+   END
+   EXEC [dbo].[spGetEpisodeBHRIRP] @PATSEpisodeID, @IRPID, @CurrentUserID
+   
+   SELECT @BassUserID AS BassUserID, (SELECT Name FROM [dbo].[fn_GetAsstUserName](@PATSUserID))PATSUserName
+END
+GO
+
+GRANT EXECUTE ON [dbo].[spGetPATSEpisodeIRPToBASS] to [ACCOUNTS\Svc_CDCRBASSSQLWte]
+GO
+GRANT EXECUTE ON [dbo].[spGetPATSEpisodeIRPToBASS] to [ACCOUNTS\Svc_CDCRPATSUser]
+GO 
