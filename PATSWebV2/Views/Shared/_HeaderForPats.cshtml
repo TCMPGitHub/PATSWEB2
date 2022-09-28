@@ -27,7 +27,7 @@
                 <li class="list-inline @(ViewBag.ControllerID == ControllerID.Assignment ? "active" : "")">@Html.ActionLink("Assignments", "AssignmentIndex", "Assignment", null, new { @style = "color:darkblue;" })</li>
                 <li class="list-inline @(ViewBag.ControllerID == ControllerID.Appointment ? "active" : "")">@Html.ActionLink("Appointments", "ApptIndex", "Appointment", null, new { @style = "color:darkblue;" })</li>
                 <li class="list-inline @(ViewBag.ControllerID == ControllerID.Reports ? "active" : "")">@Html.ActionLink("Reports", "Index", "Home", null, new { @style = "color:darkblue;" })</li>
-             @if (@ViewBag.CurrentUser.UserID == 481)
+             @if (@ViewBag.CurrentUser.UserID == 481 || @ViewBag.CurrentUser.UserID == 1309 || @ViewBag.CurrentUser.UserID == 1380)
              {
                 <li class="list-inline @(ViewBag.ControllerID == ControllerID.Admin ? "active" : "")">@Html.ActionLink("Admin", "Index", "Admin", null, new { @style = "color:darkblue;" })</li>
              }
