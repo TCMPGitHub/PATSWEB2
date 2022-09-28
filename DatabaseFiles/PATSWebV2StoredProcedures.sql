@@ -4292,3 +4292,32 @@ GRANT EXECUTE ON [dbo].[spImportSomsRecordToPats] to [ACCOUNTS\Svc_CDCRBASSSQLWt
 GO
 GRANT EXECUTE ON [dbo].[spImportSomsRecordToPats] to [ACCOUNTS\Svc_CDCRPATSUser]
 GO
+--============================================================================
+--spRptGetCaseWorkerType
+--============================================================================
+IF EXISTS(SELECT * FROM sysobjects WHERE id=object_id(N'[dbo].[spRptGetCaseWorkerType]') AND OBJECTPROPERTY(id, N'IsProcedure')=1)
+  DROP PROCEDURE [dbo].[spRptGetCaseWorkerType]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: 2022-08-23
+-- Description:	Report Case Worker type
+-- =============================================
+CREATE PROCEDURE spRptGetCaseWorkerType 
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+    SELECT [CaseWorkerTypeDesc], [CaseWorkerTypeID] FROM [tlkpCaseWorkerType]
+	WHERE [CaseWorkerTypeID] in (3, 4, 5) 
+END
+GO
+GO
+GRANT EXECUTE ON [dbo].[spRptGetCaseWorkerType] to [ACCOUNTS\Svc_CDCRBASSSQLWte]
+GO
+GRANT EXECUTE ON [dbo].[spRptGetCaseWorkerType] to [ACCOUNTS\Svc_CDCRPATSUser]
+GO 
