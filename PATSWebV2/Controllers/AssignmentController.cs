@@ -261,86 +261,9 @@ namespace PATSWebV2.Controllers
                     query = query + " " + BuildAssignmentQuery(assign.EpisodeID, assign.SocialWorkerUserId, assign.PsychiatristUserId, assign.PsychologistUserId, assign.ParoleAgentName);
                 }
                 var results = SqlHelper.ExecuteCommand(query);
-                //foreach (var assign in assignments)
-                //{
-                //    SaveAssignment(assign.EpisodeID, assign.SocialWorkerUserId, assign.CaseManagerUserId, assign.PsychiatristUserId, assign.PsychologistUserId, assign.ParoleAgentName);
-                //}
-
             }
             //Returns how many records was posted
             return Json(new { count = count });
         }
-        //public List<SocialWorkerViewModel> GetSocialWorkerList()
-        //{
-        //    List<SocialWorkerViewModel> socialworkers = new List<SocialWorkerViewModel>();
-        //    var query = string.Format(@"SELECT UserID, (SELECT Name FROM dbo.fn_GetAsstUserName(UserID))Name FROM [User] WHERE CaseWorkerTypeId ={0}",5);
-        //    var query = GetUsers((int)TCMP_WORKER_TYPE.SocialWorker);
-        //    foreach (var user in query)
-        //    {
-        //        SocialWorkerViewModel view = new SocialWorkerViewModel
-        //        {
-        //            SocialWorkerUserId = user.UserID,
-        //            SocialWorkerName = user.LastFirstIni
-        //        };
-        //        socialworkers.Add(view);
-        //    }
-        //    socialworkers.Add(
-        //        new SocialWorkerViewModel
-        //        {
-        //            SocialWorkerUserId = 67,
-        //            SocialWorkerName = "Gibbs, Sara"
-        //        }
-        //      );
-        //    return socialworkers;
-        //}
-
-
-        //public List<CaseManagerViewModel> GetCaseManagerList()
-        //{
-        //    List<CaseManagerViewModel> casemanagers = new List<CaseManagerViewModel>();
-        //    var query = GetUsers((int)TCMP_WORKER_TYPE.CaseManager);
-        //    foreach (var user in query)
-        //    {
-        //        CaseManagerViewModel view = new CaseManagerViewModel
-        //        {
-        //            CaseManagerUserId = user.UserID,
-        //            CaseManagerName = user.LastFirstIni
-        //        };
-        //        casemanagers.Add(view);
-        //    }
-        //    return casemanagers;
-        //}
-
-        //public List<PsychiatristViewModel> GetPsychiatristList()
-        //{
-        //    List<PsychiatristViewModel> psychiatrists = new List<PsychiatristViewModel>();
-        //    var query = GetUsers((int)TCMP_WORKER_TYPE.Psychiatrist);
-        //    foreach (var user in query)
-        //    {
-        //        PsychiatristViewModel view = new PsychiatristViewModel
-        //        {
-        //            PsychiatristUserId = user.UserID,
-        //            PsychiatristName = user.LastFirstIni
-        //        };
-        //        psychiatrists.Add(view);
-        //    }
-        //    return psychiatrists;
-        //}
-
-        //public List<PsychologistViewModel> GetPsychologistList()
-        //{
-        //    List<PsychologistViewModel> psychologists = new List<PsychologistViewModel>();
-        //    var query = GetUsers((int)TCMP_WORKER_TYPE.Psychologist);
-        //    foreach (var user in query)
-        //    {
-        //        PsychologistViewModel view = new PsychologistViewModel
-        //        {
-        //            PsychologistUserId = user.UserID,
-        //            PsychologistName = user.LastFirstIni
-        //        };
-        //        psychologists.Add(view);
-        //    }
-        //    return psychologists;
-        //}
     }
 }

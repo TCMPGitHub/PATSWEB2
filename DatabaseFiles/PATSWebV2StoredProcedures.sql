@@ -950,13 +950,12 @@ BEGIN
 Select * from @tempCollection
 
 SELECT TOP 6 'Assignment'ClientSmy, ID as Id, convert(varchar(10), DateAction, 110)DateEnrolled, 
-	    (CASE WHEN ISNULL(CaseManagerUserId, 0) > 0 THEN (Select Name FROM dbo.fn_GetAsstUserName(CaseManagerUserId)) ELSE '' END) AS CaseManager, 
 		(CASE WHEN ISNULL(SocialWorkerUserId, 0) > 0 THEN (Select Name FROM dbo.fn_GetAsstUserName(SocialWorkerUserId)) ELSE '' END) AS SocialWorker, 
 		(CASE WHEN ISNULL(PsychologistUserId, 0) > 0 THEN (Select Name FROM dbo.fn_GetAsstUserName(PsychologistUserId)) ELSE '' END) AS Psychologist, 
 		(CASE WHEN ISNULL(PsychiatristUserId, 0) > 0 THEN (Select Name FROM dbo.fn_GetAsstUserName(PsychiatristUserId)) ELSE '' END) AS Psychiatrist
  FROM StaffAssignment 
 WHERE EpisodeID =@EpisodeID AND NOT (ISNULL(PsychologistUserId, 0) = 0 and ISNULL(PsychiatristUserId, 0) = 0 and
-    ISNULL(SocialWorkerUserId, 0)= 0 and ISNULL(CaseManagerUserId, 0)= 0) Order BY ID DESC
+    ISNULL(SocialWorkerUserId, 0)= 0) Order BY ID DESC
 
 SELECT DISTINCT top 6 t.AppointmentID AS ID,t.StartDate,'' AS Progress,
     Clinician = STUFF((SELECT ';' + Staffs 
@@ -4293,3 +4292,32 @@ GRANT EXECUTE ON [dbo].[spImportSomsRecordToPats] to [ACCOUNTS\Svc_CDCRBASSSQLWt
 GO
 GRANT EXECUTE ON [dbo].[spImportSomsRecordToPats] to [ACCOUNTS\Svc_CDCRPATSUser]
 GO
+--============================================================================
+--spRptGetCaseWorkerType
+--============================================================================
+IF EXISTS(SELECT * FROM sysobjects WHERE id=object_id(N'[dbo].[spRptGetCaseWorkerType]') AND OBJECTPROPERTY(id, N'IsProcedure')=1)
+  DROP PROCEDURE [dbo].[spRptGetCaseWorkerType]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: 2022-08-23
+-- Description:	Report Case Worker type
+-- =============================================
+CREATE PROCEDURE spRptGetCaseWorkerType 
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+    SELECT [CaseWorkerTypeDesc], [CaseWorkerTypeID] FROM [tlkpCaseWorkerType]
+	WHERE [CaseWorkerTypeID] in (3, 4, 5) 
+END
+GO
+GO
+GRANT EXECUTE ON [dbo].[spRptGetCaseWorkerType] to [ACCOUNTS\Svc_CDCRBASSSQLWte]
+GO
+GRANT EXECUTE ON [dbo].[spRptGetCaseWorkerType] to [ACCOUNTS\Svc_CDCRPATSUser]
+GO 

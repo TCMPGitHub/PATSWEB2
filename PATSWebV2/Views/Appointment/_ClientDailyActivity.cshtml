@@ -519,8 +519,8 @@
         var id = "pending";
         if (e.dataItem.Value =="1" ) id ="absent";
         else if (e.dataItem.Value =="3" ) id ="canceled";
-        else if (e.dataItem.Value =="4" ) id ="excused";
-        else if (e.dataItem.Value =="5" ) id ="present";
+        else if (e.dataItem.Value =="5" ) id ="excused";
+        else if (e.dataItem.Value =="4" ) id ="present";
         
         $("#" + id).prop('checked', true);
         $(".chkstatus").each(function () {

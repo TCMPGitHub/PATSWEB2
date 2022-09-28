@@ -122,4 +122,8 @@ namespace PATSWebV2.ViewModels.Client
         //public EvaluationSummary EvaSmy { get; set; }
     }
 
+    public class AdminUser{
+        public UserInfo UserClass { get; set;}
+    }
+
 }
